@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Night - Reloaded | 0M_P</title>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'SF Pro', sans-serif;
+            background: url('GNR.jpg') center/cover no-repeat;
+            backdrop-filter: blur(10px);
+            margin: 0;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 18px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 350px; /* Slightly wider than button width */
+            width: 90%;
+            padding: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        .dark-mode .container {
+            background: rgba(20, 20, 20, 0.9);
+            color: #fff;
+        }
+        .cover img {
+            width: 300px;
+            height: auto;
+            border-radius: 18px;
+            margin: 30px 0 20px; /* Move cover down */
+            draggable: false; /* Disable image dragging */
+        }
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+        h2 {
+            font-size: 18px;
+            font-weight: 400;
+            margin-bottom: 20px;
+        }
+        .divider {
+            border-top: 1px solid #ccc;
+            margin: 20px 0;
+        }
+        .platform-buttons ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .platform-buttons li {
+            margin: 10px 0;
+        }
+        .platform-buttons a {
+            display: block;
+            padding: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #000;
+            background-color: #f7f7f7;
+            border-radius: 18px;
+            text-decoration: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            text-align: left;
+            width: 300px; /* Match cover width */
+            margin: 0 auto;
+        }
+        .dark-mode .platform-buttons a {
+            background-color: #444;
+            color: #fff;
+        }
+        .platform-buttons a:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+        }
+        .dark-mode .platform-buttons a:hover {
+            box-shadow: 0 4px 12px rgba(30, 144, 255, 0.7);
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #999;
+            line-height: 1.5; /* Space out lines */
+        }
+        @media (prefers-color-scheme: dark) {
+            body {
+                color: #fff;
+            }
+            .container {
+                background: rgba(20, 20, 20, 0.9);
+                color: #fff;
+            }
+            .platform-buttons a {
+                background-color: #444;
+                color: #fff;
+            }
+        }
+    </style>
+    <script>
+        // Disable right-click
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // Disable F12 and developer tools
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J'))) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="cover">
+            <img src="GNR.jpg" alt="Good Night - Reloaded Cover">
+        </div>
+        <h1>Good Night - Reloaded</h1>
+        <h2>0M_P feat. Hatsune Miku</h2>
+        <div class="divider"></div>
+        <div class="platform-buttons">
+            <ul>
+                <li><a href="https://music.apple.com/jp/album/good-night-feat-hatsune-miku-reloaded-single/1744128026" target="_blank">Apple Music</a></li>
+                <li><a href="https://open.spotify.com/album/4Yhbi1ow77HxSU3iTrhasl" target="_blank">Spotify</a></li>
+                <li><a href="https://music.youtube.com/watch?v=Az8n0JzK-PE" target="_blank">YouTube Music</a></li>
+                <li><a href="https://music.apple.com/jp/album/good-night-feat-hatsune-miku-reloaded-single/1744128026?app=itunes" target="_blank">iTunes</a></li>
+                <li><a href="https://mora.jp/package/43000074/TCJPR0001173834/" target="_blank">Mora</a></li>
+                <li><a href="https://mora.jp/package/43000074/TCJPR0001173834_hires/" target="_blank">Mora (Hi-Res)</a></li>
+                <li><a href="https://ototoy.jp/_/default/p/2111581" target="_blank">OTOTOY</a></li>
+                <li><a href="https://ototoy.jp/_/default/p/2111653" target="_blank">OTOTOY (Hi-Res)</a></li>
+                <li><a href="https://music.163.com/#/album?id=194274513" target="_blank">网易云音乐</a></li>
+                <li><a href="https://y.qq.com/portal/search.html?t=album&w=0M_P%20Good%20Night" target="_blank">QQ音乐</a></li>
+                <li><a href="https://www.kugou.com/" target="_blank">酷狗音乐</a></li>
+                <li><a href="https://www.kuwo.cn/search/album?key=0M_P%20Good%20Night" target="_blank">酷我音乐</a></li>
+                <li><a href="https://music.line.me/webapp/album/mb00000000039ab0aa" target="_blank">LINE MUSIC</a></li>
+                <li><a href="https://www.amazon.co.jp/music/player/albums/B0D33F8K1M" target="_blank">amazon music</a></li>
+                <li><a href="https://www.kkbox.com/jp/ja/album/HaEa5ZuP_dvJKH2hMM" target="_blank">KKBOX</a></li>
+                <li><a href="https://pc.dwango.jp/portals/music/7100645" target="_blank">ドワンゴジェイピー</a></li>
+            </ul>
+        </div>
+        <div class="footer">
+            © 2024-2025 0M_P All rights reserved.<br>
+            ℗ 2024 0M Production/0M_P
+        </div>
+    </div>
+</body>
+</html>
