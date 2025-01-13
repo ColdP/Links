@@ -33,17 +33,46 @@
             background: rgba(20, 20, 20, 0.9);
             color: #fff;
         }
+        .cover {
+            position: relative;
+            display: inline-block;
+        }
         .cover img {
             width: 300px;
             height: auto;
             border-radius: 18px;
-            margin: 30px 0 20px; /* Move cover down */
+            margin: 30px 0; /* Adjust cover margin */
             draggable: false; /* Disable image dragging */
+        }
+        .preview-button {
+            position: absolute;
+            bottom: -20px;
+            right: 10px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .dark-mode .preview-button {
+            background: rgba(255, 255, 255, 0.6);
+            color: #000;
+        }
+        .preview-button:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+        .dark-mode .preview-button:hover {
+            background: rgba(255, 255, 255, 0.8);
         }
         h1 {
             font-size: 24px;
             font-weight: 600;
-            margin: 10px 0;
+            margin: 40px 0 10px; /* Adjust for spacing */
         }
         h2 {
             font-size: 18px;
@@ -106,6 +135,15 @@
                 color: #fff;
             }
         }
+        .audio-frame {
+            display: none;
+            margin: 10px auto 0; /* Adjust position */
+            width: 330px;
+            height: 110px; /* Adjusted height for new component */
+        }
+        .audio-frame.active {
+            display: block;
+        }
     </style>
     <script>
         // Disable right-click
@@ -119,12 +157,21 @@
                 e.preventDefault();
             }
         });
+
+        function togglePreview() {
+            const audioFrame = document.querySelector('.audio-frame');
+            audioFrame.classList.toggle('active');
+        }
     </script>
 </head>
 <body>
     <div class="container">
         <div class="cover">
             <img src="YNR.jpg" alt="You Need - Reloaded Cover">
+            <button class="preview-button" onclick="togglePreview()">Preview</button>
+        </div>
+        <div class="audio-frame">
+            <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="110" src="//music.163.com/outchain/player?type=1&id=246402873&auto=0&height=90"></iframe>
         </div>
         <h1>You Need - Reloaded</h1>
         <h2>0M_P feat. Hatsune Miku</h2>
@@ -144,16 +191,16 @@
                 <li><a href="https://www.kugou.com/" target="_blank">酷狗音乐</a></li>
                 <li><a href="https://www.kuwo.cn/search/album?key=0M_P%20You%20Need" target="_blank">酷我音乐</a></li>
                 <li><a href="https://music.line.me/webapp/album/mb0000000003ee3f3d" target="_blank">LINE MUSIC</a></li>
-                <li><a href="https://www.amazon.co.jp/music/player/albums/B0DJVNHVR5" target="_blank">amazon music</a></li>
-                <li><a href="https://www.kkbox.com/jp/ja/album/HaEa5ZuP_dvJKH2hMM" target="_blank">KKBOX</a></li>
-                <li><a href="https://pc.dwango.jp/portals/music/7634565" target="_blank">ドワンゴジェイピー</a></li>
             </ul>
         </div>
         <div class="footer">
-            Developed with ChatGPT<br>
             © 2024-2025 0M_P All rights reserved.<br>
             ℗ 2024 0M Production/0M_P
+        </div>
+        <div class="audio-frame">
+            <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="80" src="//music.163.com/outchain/player?type=1&id=246402873&auto=0&height=90"></iframe>
         </div>
     </div>
 </body>
 </html>
+
