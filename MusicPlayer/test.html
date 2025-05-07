@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple Style Music Player</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fast-average-color/8.1.1/index.min.js"></script>
+    <style>
+        body {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            position: relative;
+        }
+
+        /* 背景模糊层 */
+      .blur-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+            /* 添加兼容性前缀 */
+            -webkit-backdrop-filter: blur(30px);
+            backdrop-filter: blur(30px);
+        }
+
+        /* 检查浏览器是否支持 backdrop-filter */
+        @supports not ((backdrop-filter: blur(30px)) or (-webkit-backdrop-filter: blur(30px))) {
+          .blur-bg {
+                background-color: rgba(0, 0, 0, 0.5); /* 不支持时的备用样式 */
+            }
+        }
+
+        /* 进度条容器 */
+      .progress-container {
+            position: relative;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        /* 进度条 */
+      .progress-bar {
+            height: 4px;
+            background: white;
+            border-radius: 2px;
+            width: 0%;
+        }
+
+        /* 进度条时间显示 */
+      .progress-time {
+            position: absolute;
+            top: -20px;
+            font-size: 12px;
+            color: white;
+        }
+
+        /* 进度条左侧时间 */
+      .progress-time-left {
+            left: 0;
+        }
+
+        /* 进度条右侧时间 */
+      .progress-time-right {
+            right: 0;
+        }
+
+        /* 反转 SVG 颜色 */
+        img[src$=".svg"] {
+            filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(307deg) brightness(102%) contrast(102%);
+        }
+
+        /* 背景矩形 */
+        #background-rect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background-color: rgba(0, 0, 0, 0.5);
+            /* 添加兼容性前缀 */
+            -webkit-backdrop-filter: blur(30px);
+            backdrop-filter: blur(30px);
+        }
+
+        /* 检查浏览器是否支持 backdrop-filter */
+        @supports not ((backdrop-filter: blur(30px)) or (-webkit-backdrop-filter: blur(30px))) {
+            #background-rect {
+                background-color: rgba(0, 0, 0, 0.8); /* 不支持时的备用样式 */
+            }
+        }
+
+        /* 新增灰色透明蒙版样式 */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(128, 128, 128, 0.5); /* 灰色透明背景 */
+            z-index: -1;
+            /* 添加兼容性前缀 */
+            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px);
+        }
+
+        /* 检查浏览器是否支持 backdrop-filter */
+        @supports not ((backdrop-filter: blur(15px)) or (-webkit-backdrop-filter: blur(15px))) {
+            #overlay {
+                background-color: rgba(128, 128, 128, 0.7); /* 不支持时的备用样式 */
+            }
+        }
+
+        /* 调整专辑封面样式，使其略宽于进度条长度 */
+        #cover {
+            width: 120%;
+            max-width: 400px; /* 可根据需要调整最大宽度 */
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            /* 添加阴影效果 */
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        /* 调整播放区域样式，使其居中 */
+      .w-1/3 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body class="flex h-screen w-screen overflow-hidden">
+    <input type="file" id="filePicker" class="hidden" multiple accept="audio/*">
+    <div id="background" class="blur-bg"></div>
+    <!-- 新增背景矩形元素 -->
+    <div id="background-rect"></div>
+    <!-- 新增灰色透明蒙版元素 -->
+    <div id="overlay"></div>
+
+    <!-- 歌曲播放部分 -->
+    <div class="w-1/3 flex flex-col items-center justify-center text-white p-8">
+        <img id="cover" src="https://via.placeholder.com/300" class="object-cover">
+        <h2 id="title" class="mt-4 text-2xl font-semibold">请选择歌曲</h2>
+        <h4 id="artist" class="mt-1 text-lg opacity-75">未知艺术家</h4>
+        <div class="flex space-x-4 mt-4">
+            <img id="prev" src="last.svg" class="w-10 h-10 cursor-pointer">
+            <img id="playPause" src="play.svg" class="w-10 h-10 cursor-pointer">
+            <img id="next" src="next.svg" class="w-10 h-10 cursor-pointer">
+        </div>
+        <div class="w-full mt-4 px-8">
+            <div class="progress-container" id="progressContainer">
+                <span id="currentTime" class="progress-time progress-time-left">0:00</span>
+                <span id="durationTime" class="progress-time progress-time-right">0:00</span>
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 播放列表部分 -->
+    <div class="w-2/3 p-8 overflow-y-auto">
+        <button onclick="document.getElementById('filePicker').click()"
+            class="flex items-center px-4 py-2 bg-gray-700 text-white rounded-lg opacity-75 hover:opacity-100">
+            <img src="add.svg" class="w-6 h-6 mr-2"> 添加音乐
+        </button>
+        <div id="playlist" class="mt-4 space-y-4"></div>
+    </div>
+
+    <audio id="audio" class="hidden"></audio>
+
+    <script>
+        const filePicker = document.getElementById('filePicker');
+        const playlistContainer = document.getElementById('playlist');
+        const audio = document.getElementById('audio');
+        const title = document.getElementById('title');
+        const artist = document.getElementById('artist');
+        const cover = document.getElementById('cover');
+        const background = document.getElementById('background');
+        const playPause = document.getElementById('playPause');
+        const prev = document.getElementById('prev');
+        const next = document.getElementById('next');
+        const progressBar = document.getElementById('progressBar');
+        const progressContainer = document.getElementById('progressContainer');
+        const currentTimeDisplay = document.getElementById('currentTime');
+        const durationTimeDisplay = document.getElementById('durationTime');
+        const backgroundRect = document.getElementById('background-rect');
+        let songIndex = 0;
+        let songs = [];
+        let currentCoverUrl = null;
+
+        // 从localStorage加载播放列表
+        const storedPlaylist = localStorage.getItem('musicPlaylist');
+        if (storedPlaylist) {
+            songs = JSON.parse(storedPlaylist);
+            updatePlaylist();
+        }
+
+        // 文件选择事件监听
+        filePicker.addEventListener('change', (event) => {
+            const files = Array.from(event.target.files).filter(file => file.type.startsWith('audio'));
+            songs.push(...files);
+            updatePlaylist();
+            localStorage.setItem('musicPlaylist', JSON.stringify(songs));
+        });
+
+        // 更新播放列表
+        function updatePlaylist() {
+            playlistContainer.innerHTML = '';
+            songs.forEach((file, index) => {
+                const listItem = document.createElement('div');
+                listItem.className = "flex items-center space-x-4 p-2 rounded hover:bg-gray-800 cursor-pointer relative";
+
+                const coverImage = document.createElement('img');
+                coverImage.className = "w-12 h-12 rounded-lg";
+                coverImage.src = "https://via.placeholder.com/300"; // 默认封面
+
+                const songTitle = document.createElement('h3');
+                songTitle.className = "text-lg";
+                songTitle.textContent = file.name;
+
+                const songArtist = document.createElement('h5');
+                songArtist.className = "text-sm opacity-75";
+                songArtist.textContent = "未知艺术家";
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = "删除";
+                deleteButton.className = "absolute right-4 bg-red-500 text-white px-2 py-1 rounded opacity-0 hover:opacity-100";
+                deleteButton.onclick = () => {
+                    songs.splice(index, 1);
+                    updatePlaylist();
+                    localStorage.setItem('musicPlaylist', JSON.stringify(songs));
+                };
+
+                listItem.appendChild(coverImage);
+                listItem.appendChild(songTitle);
+                listItem.appendChild(songArtist);
+                listItem.appendChild(deleteButton);
+                playlistContainer.appendChild(listItem);
+
+                listItem.addEventListener('click', () => playSong(index));
+
+                // 读取音乐元数据更新播放列表信息
+                jsmediatags.read(file, {
+                    onSuccess: function (tag) {
+                        const tags = tag.tags;
+                        songTitle.textContent = tags.title || file.name;
+                        songArtist.textContent = tags.artist || "未知艺术家";
+                        if (tags.picture) {
+                            const base64String = arrayBufferToBase64(tags.picture.data);
+                            const coverUrl = `data:${tags.picture.format};base64,${base64String}`;
+                            coverImage.src = coverUrl;
+                            listItem.dataset.cover = coverUrl;
+                        }
+                    },
+                    onError: function (error) {
+                        console.error("读取播放列表音乐元数据出错:", error);
+                    }
+                });
+            });
+        }
+
+        // 播放歌曲
+        function playSong(index) {
+            songIndex = index;
+            const file = songs[index];
+            audio.src = URL.createObjectURL(file);
+            audio.play();
+            playPause.src = "pause.svg";
+
+            const listItem = playlistContainer.children[index];
+            if (listItem.dataset.cover) {
+                cover.src = listItem.dataset.cover;
+                currentCoverUrl = listItem.dataset.cover;
+                background.style.backgroundImage = `url(${currentCoverUrl})`;
+                // 更新背景矩形样式
+                updateBackgroundRect(currentCoverUrl);
+            } else {
+                cover.src = "https://via.placeholder.com/300";
+                currentCoverUrl = null;
+                background.style.backgroundImage = "none";
+                backgroundRect.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+            }
+
+            // 读取音乐元数据更新歌曲信息
+            jsmediatags.read(file, {
+                onSuccess: function (tag) {
+                    const tags = tag.tags;
+                    title.textContent = tags.title || file.name;
+                    artist.textContent = tags.artist || "未知艺术家";
+                    console.log('成功读取歌曲元数据 - 歌曲名:', title.textContent, '艺术家:', artist.textContent);
+                },
+                onError: function (error) {
+                    console.error("读取播放歌曲音乐元数据出错:", error);
+                    title.textContent = file.name;
+                    artist.textContent = "未知艺术家";
+                }
+            });
+        }
+
+        // 将ArrayBuffer转换为Base64
+        function arrayBufferToBase64(buffer) {
+            let binary = '';
+            const bytes = new Uint8Array(buffer);
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(binary);
+        }
+
+        // 播放/暂停按钮功能
+        playPause.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+                playPause.src = "pause.svg";
+            } else {
+                audio.pause();
+                playPause.src = "play.svg";
+            }
+        });
+
+        // 上一首按钮功能
+        prev.addEventListener('click', () => {
+            songIndex = (songIndex - 1 + songs.length) % songs.length;
+            playSong(songIndex);
+        });
+
+        // 下一首按钮功能
+        next.addEventListener('click', () => {
+            songIndex = (songIndex + 1) % songs.length;
+            playSong(songIndex);
+        });
+
+        // 更新进度条
+        audio.addEventListener('timeupdate', () => {
+            const currentTime = audio.currentTime;
+            const duration = audio.duration;
+            const progressPercent = (currentTime / duration) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+
+            currentTimeDisplay.textContent = formatTime(currentTime);
+            durationTimeDisplay.textContent = formatTime(duration);
+        });
+
+        // 点击进度条跳转播放
+        progressContainer.addEventListener('click', (e) => {
+            const width = progressContainer.clientWidth;
+            const clickX = e.offsetX;
+            const duration = audio.duration;
+            audio.currentTime = (clickX / width) * duration;
+        });
+
+        // 格式化时间显示
+        function formatTime(time) {
+            const minutes = Math.floor(time / 60);
+            const seconds = Math.floor(time % 60);
+            return `${minutes}:${seconds < 10? '0' : ''}${seconds}`;
+        }
+
+        // 更新背景矩形样式
+        function updateBackgroundRect(coverUrl) {
+            const fac = new FastAverageColor();
+            fac.getColorAsync(coverUrl)
+              .then(color => {
+                    const rgbaColor = `rgba(${color.value[0]}, ${color.value[1]}, ${color.value[2]}, 0.8)`;
+                    backgroundRect.style.backgroundColor = rgbaColor;
+                    // 加强模糊效果
+                    backgroundRect.style.backdropFilter = 'blur(30px)';
+                    backgroundRect.style.webkitBackdropFilter = 'blur(30px)';
+                })
+              .catch(error => {
+                    console.error('获取封面颜色失败:', error);
+                    backgroundRect.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+                });
+        }
+    </script>
+</body>
+
+</html>
