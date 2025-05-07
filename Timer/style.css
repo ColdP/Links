@@ -1,0 +1,85 @@
+:root {
+  --bg: #ffffff;
+  --fg: #000000;
+  --editor-bg: #ffffff;
+  --editor-fg: #000000;
+  --btn-bg: #e5e5e5;
+  --btn-hover: #d0d0d0;
+}
+.dark-mode {
+  --bg: #1e1e1e;
+  --fg: #f0f0f0;
+  --editor-bg: #2c2c2c;
+  --editor-fg: #ffffff;
+  --btn-bg: #444;
+  --btn-hover: #666;
+}
+body {
+  background: var(--bg);
+  color: var(--fg);
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.titlebar {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  -webkit-app-region: drag;
+  padding: 0 10px;
+  background: var(--bg);
+  border-bottom: 1px solid #ccc;
+}
+.mac-buttons {
+  display: flex;
+  gap: 8px;
+  margin-right: 10px;
+}
+.mac-buttons div {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  -webkit-app-region: no-drag;
+  cursor: pointer;
+}
+.close { background: #ff5f57; }
+.minimize { background: #ffbd2e; }
+.maximize { background: #28c840; }
+.filename {
+  flex-grow: 1;
+  font-size: 12px;
+  color: var(--fg);
+}
+textarea#editor {
+  flex-grow: 1;
+  resize: none;
+  border: none;
+  outline: none;
+  padding: 16px;
+  font-size: 14px;
+  font-family: monospace;
+  background: var(--editor-bg);
+  color: var(--editor-fg);
+}
+.footer {
+  padding: 10px;
+  display: flex;
+  gap: 10px;
+  background: var(--bg);
+  border-top: 1px solid #ccc;
+  align-items: center;
+}
+button.mac-btn {
+  background: var(--btn-bg);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--fg);
+}
+button.mac-btn:hover {
+  background: var(--btn-hover);
+}

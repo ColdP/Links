@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高考倒计时</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background: var(--bg);
+            color: var(--fg);
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* 背景图片和视频 */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: url('bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            opacity: 0.5;
+        }
+
+        /* 视频背景样式 */
+        video.bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.5;
+        }
+
+        .window {
+            width: 90%;
+            max-width: 1000px;
+            height: 90%;
+            max-height: 500px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(8px);
+            background: var(--window-bg); /* 动态更改背景颜色 */
+        }
+
+        .titlebar {
+            height: 32px;
+            display: flex;
+            align-items: center;
+            -webkit-app-region: drag;
+            padding: 0 10px;
+            background: var(--titlebar-bg); /* 动态更改标题栏背景 */
+            border-bottom: 1px solid #ccc;
+            backdrop-filter: blur(6px);
+        }
+
+        .mac-buttons {
+            display: flex;
+            gap: 8px;
+            margin-right: 10px;
+        }
+
+        .mac-buttons div {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            -webkit-app-region: no-drag;
+            cursor: pointer;
+        }
+
+        .close { background: #ff5f57; }
+        .minimize { background: #ffbd2e; }
+        .maximize { background: #28c840; }
+
+        .filename {
+            flex-grow: 1;
+            font-size: 12px;
+            color: var(--fg);
+        }
+
+        .countdown-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            align-items: center;
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .countdown {
+            font-size: 20px;
+            background: var(--countdown-bg);
+            color: var(--fg);
+            border: 1px solid #ccc;
+            padding: 15px;
+            border-radius: 12px;
+            width: 150px;
+            text-align: center;
+            margin: 10px;
+            backdrop-filter: blur(6px);
+        }
+
+        .countdown p {
+            margin: 5px 0;
+        }
+
+        .time {
+            font-weight: bold;
+        }
+
+        /* 悬浮模式切换按钮 */
+        .mode-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(6px);
+        }
+
+        /* 深色模式和浅色模式 */
+        body.light-mode {
+            --bg: rgba(255, 255, 255, 0.8);
+            --fg: #333;
+            --window-bg: rgba(255, 255, 255, 0.8); /* 浅色模式下的窗口背景 */
+            --titlebar-bg: rgba(255, 255, 255, 0.9); /* 浅色模式下的标题栏背景 */
+            --countdown-bg: rgba(255, 255, 255, 0.7); /* 浅色模式下的倒计时框背景 */
+        }
+
+        body.dark-mode {
+            --bg: rgba(0, 0, 0, 0.8);
+            --fg: #fff;
+            --window-bg: rgba(0, 0, 0, 0.6); /* 深色模式下的窗口背景 */
+            --titlebar-bg: rgba(0, 0, 0, 0.7); /* 深色模式下的标题栏背景 */
+            --countdown-bg: rgba(0, 0, 0, 0.6); /* 深色模式下的倒计时框背景 */
+        }
+    </style>
+</head>
+<body>
+    <div class="window">
+        <div class="titlebar">
+            <div class="mac-buttons">
+                <div class="close"></div>
+                <div class="minimize"></div>
+                <div class="maximize"></div>
+            </div>
+            <div class="filename">高考倒计时</div>
+        </div>
+
+        <div class="countdown-container">
+            <div class="countdown">
+                <p>语 文</p>
+                <p class="time" id="chinese-time"></p>
+            </div>
+            <div class="countdown">
+                <p>数 学</p>
+                <p class="time" id="math-time"></p>
+            </div>
+            <div class="countdown">
+                <p>物理/历史</p>
+                <p class="time" id="physics-time"></p>
+            </div>
+            <div class="countdown">
+                <p>外语</p>
+                <p class="time" id="english-time"></p>
+            </div>
+            <div class="countdown">
+                <p>化学</p>
+                <p class="time" id="chemistry-time"></p>
+            </div>
+            <div class="countdown">
+                <p>地理</p>
+                <p class="time" id="geography-time"></p>
+            </div>
+            <div class="countdown">
+                <p>思想政治</p>
+                <p class="time" id="politics-time"></p>
+            </div>
+            <div class="countdown">
+                <p>生 物</p>
+                <p class="time" id="biology-time"></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="mode-toggle" onclick="toggleMode()">切换为深色模式</div>
+
+    <script>
+        // 检查是否有视频文件，优先播放视频
+        const bgFile = 'bg.mp4';
+        const videoBackground = document.createElement('video');
+        videoBackground.classList.add('bg-video');
+        videoBackground.loop = true;
+        videoBackground.muted = true;
+        videoBackground.src = bgFile;
+
+        // 如果视频文件存在则播放
+        videoBackground.onloadstart = () => {
+            document.body.appendChild(videoBackground);
+        };
+
+        // 否则，使用图片背景
+        const bgImageFiles = ['bg.jpg', 'bg.png', 'bg.bmp'];
+        let bgFileFound = false;
+        bgImageFiles.forEach(file => {
+            if (!bgFileFound) {
+                const img = new Image();
+                img.src = file;
+                img.onload = () => {
+                    document.body.style.backgroundImage = `url(${file})`;
+                    bgFileFound = true;
+                };
+            }
+        });
+
+        // 考试时间
+        const examTimes = {
+            'chinese': new Date('2025-06-07T09:00:00'),
+            'math': new Date('2025-06-07T15:00:00'),
+            'physics': new Date('2025-06-08T09:00:00'),
+            'english': new Date('2025-06-08T15:00:00'),
+            'chemistry': new Date('2025-06-09T08:30:00'),
+            'geography': new Date('2025-06-09T11:00:00'),
+            'politics': new Date('2025-06-09T14:30:00'),
+            'biology': new Date('2025-06-09T17:00:00')
+        };
+
+        // 更新倒计时
+        function updateCountdown() {
+            const now = new Date();
+
+            for (const subject in examTimes) {
+                const timeLeft = examTimes[subject] - now;
+
+                if (timeLeft >= 0) {
+                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                    document.getElementById(`${subject}-time`).textContent = `${days}天 ${hours}时 ${minutes}分 ${seconds}秒`;
+                } else {
+                    document.getElementById(`${subject}-time`).textContent = '考试已开始';
+                }
+            }
+        }
+
+        // 每秒更新一次
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // 切换深色/浅色模式
+        function toggleMode() {
+            const currentMode = document.body.classList.contains('dark-mode');
+            if (currentMode) {
+                document.body.classList.remove('dark-mode');
+                document.body.classList.add('light-mode');
+                localStorage.setItem('theme', 'light');
+                document.querySelector('.mode-toggle').textContent = '切换为深色模式';
+            } else {
+                document.body.classList.add('dark-mode');
+                document.body.classList.remove('light-mode');
+                localStorage.setItem('theme', 'dark');
+                document.querySelector('.mode-toggle').textContent = '切换为浅色模式';
+            }
+        }
+
+        // 根据系统设置或上次的模式进行初始化
+        const storedTheme = localStorage.getItem('theme');
+        if (storedTheme) {
+            if (storedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.querySelector('.mode-toggle').textContent = '切换为浅色模式';
+            } else {
+                document.body.classList.add('light-mode');
+                document.querySelector('.mode-toggle').textContent = '切换为深色模式';
+            }
+        } else {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (prefersDark) {
+                document.body.classList.add('dark-mode');
+                document.querySelector('.mode-toggle').textContent = '切换为浅色模式';
+            }
+        }
+    </script>
+</body>
+</html>
