@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Song Lyrics - 綺羅キラー</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Include Noto Sans SC for better Chinese character rendering -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+SC:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif; /* Add Noto Sans SC for Chinese font support */
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            position: relative; /* For background positioning */
+            z-index: 1; /* Ensure content is above background */
+        }
+
+        /* Blurred background from album art - reduced blur radius */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('./cover.jpg'); /* Reusing album art for background */
+            background-size: cover;
+            background-position: center;
+            filter: blur(15px); /* Reduced Gaussian blur effect */
+            z-index: -1; /* Place behind content */
+            transform: scale(1.05); /* To avoid harsh edges after blur */
+        }
+
+        .container {
+            /* Enhanced Liquid Glass effect for the main container */
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1)); /* Slightly more opaque gradient */
+            border-radius: 30px; /* Increased radius */
+            padding: 30px;
+            backdrop-filter: blur(25px); /* Increased blur for glass effect */
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.25); /* Slightly more prominent border */
+            box-shadow: 0 8px 40px 0 rgba(0, 0, 0, 0.5); /* Slightly stronger shadow */
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            z-index: 2; /* Ensure container is above blurred background */
+            position: relative; /* For stacking context */
+        }
+
+        .left-panel {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .album-art {
+            width: 250px;
+            height: 250px;
+            border-radius: 15px; /* Kept as requested */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+            object-fit: cover;
+        }
+
+        .song-info h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        .song-info h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #E0E0E0; /* Slightly brighter for better contrast on dark background */
+            margin-bottom: 15px;
+        }
+
+        .buttons-group {
+            display: flex;
+            flex-direction: column; /* Stack buttons vertically */
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 30px; /* Add margin below buttons for iframe */
+            width: 100%; /* Allow buttons to take full width of panel */
+            max-width: 250px; /* Constrain button width */
+        }
+
+        .action-button {
+            width: 100%; /* Make button take full width of its container */
+            /* Default button style (light background, black text) as per image */
+            background-color: rgba(255, 255, 255, 0.5); /* Increased transparency */
+            color: #000; /* Black text */
+            padding: 10px 20px;
+            border-radius: 25px; /* Increased radius */
+            font-weight: 600;
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease, border 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(0, 0, 0, 0.1); /* Subtle dark border */
+            display: flex;
+            justify-content: center; /* Center text and icon */
+            align-items: center;
+            gap: 8px;
+            text-decoration: none; /* Remove underline for links */
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+            backdrop-filter: blur(2px); /* Light blur for a hint of glass */
+            -webkit-backdrop-filter: blur(2px);
+        }
+
+        .action-button:hover {
+            /* Hover button style (blue background, white text) as per image */
+            background-color: rgba(33, 150, 243, 0.8); /* Blue background with transparency */
+            color: #fff; /* White text */
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3); /* Stronger shadow on hover */
+            border: 1px solid rgba(33, 150, 243, 0.8); /* Solid blue border on hover */
+            backdrop-filter: none; /* Make it solid on hover */
+            -webkit-backdrop-filter: none;
+        }
+
+        .action-button .svg-icon {
+            color: #000; /* Default icon color */
+            transition: color 0.3s ease;
+        }
+
+        .action-button:hover .svg-icon {
+            color: #fff; /* White icon on hover */
+        }
+
+        /* Responsive iframe container */
+        .video-container {
+            position: relative;
+            width: 100%;
+            /* 16:9 aspect ratio (height / width = 9 / 16 = 0.5625) */
+            padding-bottom: 56.25%;
+            margin-bottom: 20px; /* Space below video */
+            border-radius: 15px; /* Kept as requested */
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 15px; /* Kept as requested */
+        }
+
+        .video-fallback-message {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.7); /* Dark overlay */
+            color: #fff;
+            font-size: 1.1rem;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            opacity: 0; /* Hidden by default */
+            transition: opacity 0.3s ease;
+            pointer-events: none; /* Allow interaction with iframe underneath if visible */
+        }
+
+        .video-fallback-message p {
+            background-color: rgba(0,0,0,0.5);
+            border-radius: 20px; /* Increased radius */
+            padding: 10px 15px;
+        }
+
+
+        .lyrics-panel {
+            flex: 2;
+            min-width: 500px;
+            /* Enhanced Liquid Glass effect for the lyrics panel */
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2)); /* Slightly more opaque dark gradient */
+            border-radius: 35px; /* Increased radius */
+            padding: 25px;
+            backdrop-filter: blur(25px); /* Increased blur for glass effect */
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border for definition */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Stronger shadow */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: flex-end; /* Align tabs to the right as per image */
+            margin-bottom: 20px;
+            /* Enhanced Liquid Glass effect for tabs */
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08)); /* Slightly more opaque */
+            border-radius: 25px; /* Increased radius */
+            padding: 8px;
+            gap: 5px;
+            backdrop-filter: blur(15px); /* Added blur for glass effect */
+            -webkit-backdrop-filter: blur(15px);
+        }
+
+        .tab-button {
+            background-color: transparent;
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 20px; /* Increased radius */
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            border: none;
+            outline: none;
+        }
+
+        .tab-button.active {
+            background-color: rgba(255, 255, 255, 0.35); /* More opaque when active */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* Stronger shadow for active state */
+        }
+
+        .tab-button:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.2); /* More opaque on hover */
+        }
+
+        .lyrics-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: 70vh; /* Adjust max height for scrolling */
+            padding-right: 10px; /* For scrollbar space */
+            color: #eee;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .lyrics-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .lyrics-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .lyrics-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .lyrics-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .lyrics-line {
+            margin-bottom: 15px;
+        }
+
+        /* Default style for original Japanese lyrics */
+        .lyrics-line .japanese {
+            font-weight: 600;
+            color: #fff;
+            font-size: 1.05rem;
+        }
+
+        /* Default style for romanized/translated text when original Japanese is shown */
+        .lyrics-line .romanized,
+        .lyrics-line .english,
+        .lyrics-line .chinese {
+            font-size: 0.95rem;
+            color: #bbb;
+            font-weight: 400; /* Explicitly set default font weight */
+        }
+
+        /* Style for translations when original is hidden - higher specificity */
+        /* This ensures these styles override the default translation styles */
+        .lyrics-line span.romanized.translation-styled-as-original,
+        .lyrics-line span.english.translation-styled-as-original,
+        .lyrics-line span.chinese.translation-styled-as-original {
+            font-weight: 600;
+            color: #fff;
+            font-size: 1.05rem;
+            display: block; /* Ensure it takes full line if original is hidden */
+        }
+        /* Specific style for Chinese font to ensure proper rendering */
+        .lyrics-line .chinese,
+        .lyrics-line span.chinese.translation-styled-as-original {
+            font-family: 'Noto Sans SC', 'Inter', sans-serif;
+        }
+
+
+        /* Floating Menu for Japanese Original Toggle */
+        .floating-menu {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            /* Enhanced Liquid Glass effect for floating menu */
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.12)); /* Slightly more opaque */
+            backdrop-filter: blur(20px); /* Increased blur */
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 30px; /* Increased radius */
+            padding: 15px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Stronger border */
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5); /* Stronger shadow */
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .floating-menu.hidden {
+            opacity: 0;
+            pointer-events: none; /* Disable interactions when hidden */
+        }
+
+        .floating-menu label {
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        /* Custom Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(16px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+                padding: 20px;
+            }
+
+            .left-panel, .lyrics-panel {
+                min-width: unset;
+                width: 100%;
+            }
+
+            .album-art {
+                width: 200px;
+                height: 200px;
+            }
+
+            .song-info h1 {
+                font-size: 1.75rem;
+            }
+
+            .song-info h2 {
+                font-size: 1.2rem;
+            }
+
+            .tabs {
+                justify-content: center;
+                flex-wrap: wrap;
+                padding: 5px;
+            }
+
+            .tab-button {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+
+            .lyrics-content {
+                font-size: 0.9rem;
+            }
+
+            .floating-menu {
+                bottom: 20px;
+                right: 20px;
+                padding: 10px 15px;
+            }
+        }
+
+        /* SVG Icons */
+        .svg-icon {
+            width: 1em;
+            height: 1em;
+            fill: currentColor;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <!-- Album Art from the image -->
+            <img src="./cover.jpg" alt="Album Art" class="album-art">
+
+            <div class="song-info">
+                <h1>綺羅キラー</h1>
+                <h2>ZUTOMAYO</h2>
+            </div>
+
+            <div class="buttons-group">
+                <!-- Streaming/DL Link -->
+                <a href="https://lnk.to/ZTMY_KK" target="_blank" class="action-button">
+                    <svg class="svg-icon" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
+                    </svg>
+                    Streaming/DL
+                </a>
+                <!-- MV Link -->
+                <a href="https://www.youtube.com/watch?v=e5LaKxJVeVI" target="_blank" class="action-button">
+                    <svg class="svg-icon" viewBox="0 0 24 24">
+                        <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                    </svg>
+                    MV
+                </a>
+            </div>
+
+            <!-- YouTube iframe embed code -->
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/e5LaKxJVeVI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <div class="video-fallback-message">
+                    <p>如果视频无法在此处播放，这可能是由于YouTube的嵌入限制。请点击“MV”按钮在YouTube上观看。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="lyrics-panel">
+            <div class="tabs">
+                <button class="tab-button active" data-lang="original">Original</button>
+                <button class="tab-button" data-lang="romanized">Romanized</button>
+                <button class="tab-button" data-lang="english">English Translation</button>
+                <button class="tab-button" data-lang="chinese">Chinese Translation</button>
+            </div>
+
+            <div class="lyrics-content" id="lyricsContent">
+                <!-- Lyrics will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Menu -->
+    <div class="floating-menu hidden" id="japaneseOriginalToggleMenu">
+        <label for="showJapaneseOriginal">Original Lyrics</label>
+        <label class="switch">
+            <input type="checkbox" id="showJapaneseOriginal" checked>
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <script>
+        // Lyrics data
+        const lyricsData = [
+            {
+                jp: "周りに合わせる言語も知らねえ",
+                romaji: "Mawari ni awaseru gengo mo shiranē",
+                en: "Don't even know the language to fit in with others",
+                zh: "连融入周围的语言都不懂"
+            },
+            {
+                jp: "守備力は弱いけど勘は鋭",
+                romaji: "Shubiryoku wa yowai kedo kan wa surudoi",
+                en: "My defense is weak, but my intuition is sharp",
+                zh: "防守力弱但直觉敏锐"
+            },
+            {
+                jp: "一旦進められたら止まれ",
+                romaji: "Ittan susumeraretara tomare",
+                en: "Once I start, I can't stop",
+                zh: "一旦被推动就停不下来"
+            },
+            {
+                jp: "いったん木綿みたいに",
+                romaji: "Ittan momen mitai ni",
+                en: "Like Ittan Momen (a Japanese yokai)",
+                zh: "就像棉布妖怪一样"
+            },
+            {
+                jp: "曲がれまだ上 ゆらゆら揺らして",
+                romaji: "Magare mada ue yurayura yurashite",
+                en: "Bend, still up, swaying gently",
+                zh: "弯曲向上 摇摇晃晃"
+            },
+            {
+                jp: "すぐとらぶるぜ 過呼吸と心得",
+                romaji: "Sugu toraburu ze kakokyū to kokoroe",
+                en: "I'll get into trouble right away, know it's hyperventilation",
+                zh: "立刻就会惹麻烦 伴随着过度呼吸"
+            },
+            {
+                jp: "って原罪人生 盾と矛で 葛藤の活動がマスト",
+                romaji: "tte genzai jinsei tate to hoko de kattō no katsudō ga masuto",
+                en: "That's original sin life, with shield and spear, conflict is a must",
+                zh: "这就是原罪人生 盾与矛的冲突是必然的活动"
+            },
+            {
+                jp: "締め切られなきゃ言葉が増殖",
+                romaji: "Shimekiri rarenakya kotoba ga zōshoku",
+                en: "If I'm not cut off, words will multiply",
+                zh: "若不被截止 词语便会增殖"
+            },
+            {
+                jp: "No thoughts, head empty 虚無で円陣",
+                romaji: "No thoughts, head empty kyomu de enjin",
+                en: "No thoughts, head empty, forming a circle in nihility",
+                zh: "没有思想 脑中空空 在虚无中围成一圈"
+            },
+            {
+                jp: "Brought to you in chaos and serenity",
+                romaji: "Brought to you in chaos and serenity",
+                en: "Brought to you in chaos and serenity",
+                zh: "在混沌与宁静中为你呈现"
+            },
+            {
+                jp: "やめたいことをやらなきゃ満たされない僕",
+                romaji: "Yametai koto o yaranakya mitasarenai boku",
+                en: "I won't be satisfied unless I do what I want to stop",
+                zh: "若不去做那些想停止的事 我便无法满足"
+            },
+            {
+                jp: "Shockin', isn't it? \"Dream life?\" You're livin' it",
+                romaji: "Shockin', isn't it? \"Dream life?\" You're livin' it",
+                en: "Shocking, isn't it? \"Dream life?\" You're living it",
+                zh: "令人震惊 对吧？“梦想生活？”你正在经历它"
+            },
+            {
+                jp: "\"バイトだったらどこでもよくない?\"",
+                romaji: "\"Baito dattara doko demo yokunai?\"",
+                en: "\"If it's just a part-time job, isn't anywhere fine?\"",
+                zh: "“如果是兼职的话，哪里都行吧？”"
+            },
+            {
+                jp: "綺羅キラー",
+                romaji: "Kira Kirā",
+                en: "Glitter Killer",
+                zh: "闪耀杀手"
+            },
+            {
+                jp: "嫌いなんて序の口 そう思うと楽だし",
+                romaji: "Kirai nante jo no kuchi sō omou to raku da shi",
+                en: "Saying 'I hate it' is just the beginning, thinking that way makes it easier",
+                zh: "说讨厌不过是开端 这样想会轻松些"
+            },
+            {
+                jp: "Three, two, one で歪み合った",
+                romaji: "Three, two, one de yugami atta",
+                en: "Distorted together at three, two, one",
+                zh: "三、二、一，彼此扭曲"
+            },
+            {
+                jp: "君のその口 シガレット辛口",
+                romaji: "Kimi no sono kuchi shigaretto karakuchi",
+                en: "That mouth of yours, a harsh cigarette",
+                zh: "你那张嘴，香烟辛辣"
+            },
+            {
+                jp: "割り切ったけど",
+                romaji: "Warikitta kedo",
+                en: "Though I've come to terms with it",
+                zh: "虽然我已经看开了"
+            },
+            {
+                jp: "(知るか? 汁なら drink up we're still tough)",
+                romaji: "(Shiru ka? Shiru nara drink up we're still tough)",
+                en: "(Who cares? If it's juice, drink up, we're still tough)",
+                zh: "（谁在乎？如果是汤汁就喝掉，我们依然坚韧）"
+            },
+            {
+                jp: "最低なコンプだし 最高の昆布だし",
+                romaji: "Saitei na konpu da shi saikō no konbu da shi",
+                en: "It's the worst complex, but the best kelp stock",
+                zh: "是最糟糕的自卑，也是最棒的昆布高汤"
+            },
+            {
+                jp: "揃ってるだけじゃつまらんし",
+                romaji: "Sorotteru dake ja tsumaran shi",
+                en: "Just having everything lined up is boring",
+                zh: "仅仅具备一切也无趣"
+            },
+            {
+                jp: "繋いだって綻ぶし しょっぱいな鰹節",
+                romaji: "Tsunaidatte hokorobu shi shoppai na katsuobushi",
+                en: "Even if connected, it unravels, salty bonito flakes",
+                zh: "即使连接也会绽裂，真咸啊鲣鱼干"
+            },
+            {
+                jp: "もっと甘えたいけどー?",
+                romaji: "Motto amaetai kedo—?",
+                en: "But I want to be more pampered—?",
+                zh: "但我想更撒娇—？"
+            },
+            {
+                jp: "ぞんざいでアップダウンな現状が今ヒット中",
+                romaji: "Zonzai de appudaun na genjō ga ima hitto chū",
+                en: "The rough and up-and-down situation is a hit right now",
+                zh: "粗糙且跌宕起伏的现状正在流行"
+            },
+            {
+                jp: "落ち込んでる方が 進めるセオリー",
+                romaji: "Ochikonderu hō ga susumeru seorī",
+                en: "Being down is the theory that pushes me forward",
+                zh: "心情低落反而更能推进理论"
+            },
+            {
+                jp: "Upダウンな成長が いまひとつ",
+                romaji: "Appudaun na seichō ga imahitotsu",
+                en: "Up-and-down growth is still lacking",
+                zh: "起伏不定的成长还差一点"
+            },
+            {
+                jp: "底辺のてっぺんの味で 満たされたいわ",
+                romaji: "Teihen no teppen no aji de mitasaretai wa",
+                en: "I want to be satisfied with the taste of the bottom's peak",
+                zh: "我想被底层顶端的滋味所满足"
+            },
+            {
+                jp: "I don't wanna write, or hold a mic, feedback stopped me",
+                romaji: "I don't wanna write, or hold a mic, feedback stopped me",
+                en: "I don't wanna write, or hold a mic, feedback stopped me",
+                zh: "我不想写作，也不想拿麦克风，反馈阻止了我"
+            },
+            {
+                jp: "I fell off, I gotta buy brand coffee",
+                romaji: "I fell off, I gotta buy brand coffee",
+                en: "I fell off, I gotta buy brand coffee",
+                zh: "我跌落了，我得买名牌咖啡"
+            },
+            {
+                jp: "Figured the days of genre were long gone",
+                romaji: "Figured the days of genre were long gone",
+                en: "Figured the days of genre were long gone",
+                zh: "原以为流派的日子早已远去"
+            },
+            {
+                jp: "Thanks a lot 君の song が好きそう",
+                romaji: "Thanks a lot kimi no song ga sukisō",
+                en: "Thanks a lot, seems like I'd like your song",
+                zh: "非常感谢，我好像会喜欢你的歌"
+            },
+            {
+                jp: "Though I'm washed up 未だ足りない",
+                romaji: "Though I'm washed up mada tarinai",
+                en: "Though I'm washed up, it's still not enough",
+                zh: "虽然我已经过气了，但仍然不够"
+            },
+            {
+                jp: "Throwin' lyrics like expired canned food stuff",
+                romaji: "Throwin' lyrics like expired canned food stuff",
+                en: "Throwing lyrics like expired canned food stuff",
+                zh: "像扔过期罐头食品一样扔出歌词"
+            },
+            {
+                jp: "Average kid got too big, I'm toast",
+                romaji: "Average kid got too big, I'm toast",
+                en: "Average kid got too big, I'm toast",
+                zh: "普通孩子变得太大了，我完蛋了"
+            },
+            {
+                jp: "Litter the internet with bitter sentiment and move the goal post",
+                romaji: "Litter the internet with bitter sentiment and move the goal post",
+                en: "Litter the internet with bitter sentiment and move the goal post",
+                zh: "用苦涩的情绪污染互联网，并转移目标"
+            },
+            {
+                jp: "ぐずぐず おセンチな マイナス思考だ",
+                romaji: "Guzuguzu osenchina mainasu shikō da",
+                en: "Procrastinating, sentimental, negative thinking",
+                zh: "磨磨蹭蹭，多愁善感，负面思考"
+            },
+            {
+                jp: "Nobody's coming and still I'm crying \"red rover\" (what?)",
+                romaji: "Nobody's coming and still I'm crying \"red rover\" (what?)",
+                en: "Nobody's coming and still I'm crying \"red rover\" (what?)",
+                zh: "没有人来，我却还在喊“红土车”（什么？）"
+            },
+            {
+                jp: "Not every line hits, moments of \"i miss\"",
+                romaji: "Not every line hits, moments of \"i miss\"",
+                en: "Not every line hits, moments of \"I miss\"",
+                zh: "并非每句话都触动人心，有“我想念”的时刻"
+            },
+            {
+                jp: "Being nobody 'cause nobody owns kindness",
+                romaji: "Being nobody 'cause nobody owns kindness",
+                en: "Being nobody 'cause nobody owns kindness",
+                zh: "成为无名小卒，因为没有人拥有善良"
+            },
+            {
+                jp: "Should let myself, slack off みんなの前で",
+                romaji: "Should let myself, slack off minna no mae de",
+                en: "Should let myself slack off in front of everyone",
+                zh: "应该让自己在大家面前放松一下"
+            },
+            {
+                jp: "Might go back to being unknown, know what? Fine",
+                romaji: "Might go back to being unknown, know what? Fine",
+                en: "Might go back to being unknown, know what? Fine",
+                zh: "也许会回到默默无闻的状态，知道吗？没关系"
+            },
+            {
+                jp: "In the grand scheme, man dreams, never needing sleep aid",
+                romaji: "In the grand scheme, man dreams, never needing sleep aid",
+                en: "In the grand scheme, man dreams, never needing sleep aid",
+                zh: "从宏观来看，人做梦，从不需要助眠"
+            },
+            {
+                jp: "\"しょっぱい夢\" さよなら 会えてよかった",
+                romaji: "\"Shoppai yume\" sayonara aete yokatta",
+                en: "Salty dream\" goodbye, it was good to meet you",
+                zh: "“苦涩的梦”再见，很高兴遇见你"
+            },
+            {
+                jp: "キラキラ",
+                romaji: "Kirakira",
+                en: "Sparkling",
+                zh: "闪闪发光"
+            },
+            {
+                jp: "嫌いなんて序の口 そう思うと楽だし",
+                romaji: "Kirai nante jo no kuchi sō omou to raku da shi",
+                en: "Saying 'I hate it' is just the beginning, thinking that way makes it easier",
+                zh: "说讨厌不过是开端 这样想会轻松些"
+            },
+            {
+                jp: "Three, two, one で歪み合った",
+                romaji: "Three, two, one de yugami atta",
+                en: "Distorted together at three, two, one",
+                zh: "三、二、一，彼此扭曲"
+            },
+            {
+                jp: "君のその口 シガレット辛口",
+                romaji: "Kimi no sono kuchi shigaretto karakuchi",
+                en: "That mouth of yours, a harsh cigarette",
+                zh: "你那张嘴，香烟辛辣"
+            },
+            {
+                jp: "割り切ったけど",
+                romaji: "Warikitta kedo",
+                en: "Though I've come to terms with it",
+                zh: "虽然我已经看开了"
+            },
+            {
+                jp: "(知るか 汁なら drink up we're still tough)",
+                romaji: "(Shiru ka shiru nara drink up we're still tough)",
+                en: "(Who cares? If you know, drink up, we're still tough)",
+                zh: "（谁在乎？如果知道就喝掉，我们依然坚韧）"
+            },
+            {
+                jp: "最低なコンプだし 最高の昆布だし",
+                romaji: "Saitei na konpu da shi saikō no konbu da shi",
+                en: "It's the worst complex, but the best kelp stock",
+                zh: "是最糟糕的自卑，也是最棒的昆布高汤"
+            },
+            {
+                jp: "揃ってるだけじゃつまらんし",
+                romaji: "Sorotteru dake ja tsumaran shi",
+                en: "Just having everything lined up is boring",
+                zh: "仅仅具备一切也无趣"
+            },
+            {
+                jp: "繋いだって绽ぶし しょっぱいな鰹節",
+                romaji: "Tsunaidatte hokorobu shi shoppai na katsuobushi",
+                en: "Even if connected, it unravels, salty bonito flakes",
+                zh: "即使连接也会绽裂，真咸啊鲣鱼干"
+            },
+            {
+                jp: "もっと甘えたいけどー?",
+                romaji: "Motto amaetai kedo—?",
+                en: "But I want to be more pampered—?",
+                zh: "但我想更撒娇—？"
+            },
+            {
+                jp: "ぶらーんぶらーん ぶらんたったた",
+                romaji: "Burānburān burantattata",
+                en: "Buraanburaan burantattata",
+                zh: "ぶらーんぶらーん ぶらんたったた"
+            },
+            {
+                jp: "ぶらたたたらないや",
+                romaji: "Buratatataranaiya",
+                en: "Buratatataranaiya",
+                zh: "ぶらたたたらないや"
+            },
+            {
+                jp: "ぶらーんぶらーん ぶらんたったた",
+                romaji: "Burānburān burantattata",
+                en: "Buraanburaan burantattata",
+                zh: "ぶらーんぶらーん ぶらんたったた"
+            },
+            {
+                jp: "ぶらーんぶらーん ぶらんたったた",
+                romaji: "Burānburān burantattata",
+                en: "Buraanburaan burantattata",
+                zh: "ぶらーんぶらーん ぶらんたったた"
+            },
+            {
+                jp: "ぶらたたたらないや",
+                romaji: "Buratatataranaiya",
+                en: "Buratatataranaiya",
+                zh: "ぶらたたたらないや"
+            },
+            {
+                jp: "ぶらーんぶらーん ぶらんたったた",
+                romaji: "Burānburān burantattata",
+                en: "Buraanburaan burantattata",
+                zh: "ぶらーんぶらーん ぶらんたったた"
+            },
+            {
+                jp: "出だしの荒削り衝動 ここにある",
+                romaji: "Dedashi no arakazuri shōdō koko ni aru",
+                en: "The rough impulse at the start is here",
+                zh: "开头的粗糙冲动就在这里"
+            },
+            {
+                jp: "学んでるようで 学んでない声してる",
+                romaji: "Mananderu yō de manandenai koe shiteru",
+                en: "Sounds like I'm learning, but not really learning",
+                zh: "听起来像是在学习，却又没有学到什么"
+            },
+            {
+                jp: "期限切れ らいか ろんりねす 受け入れるよ",
+                romaji: "Kigen kire raika ronrinesu ukeireru yo",
+                en: "Expired, like loneliness, I'll accept it",
+                zh: "过期，像孤独一样，我会接受的"
+            },
+            {
+                jp: "素顔を君に送りたいけど",
+                romaji: "Sugao o kimi ni okuritai kedo",
+                en: "I want to show you my true self, but",
+                zh: "我想把素颜送给你，但是"
+            },
+            {
+                jp: "饱きられてしまうから 糧にする",
+                romaji: "Akira rete shimau kara kate ni suru",
+                en: "Because I'll be tired of it, I'll make it my sustenance",
+                zh: "因为会被厌倦，所以将其作为食粮"
+            },
+            {
+                jp: "ヤミ エネルギーは いつも助かってるんだよ",
+                romaji: "Yami enerugī wa itsumo tasukatteru n da yo",
+                en: "Dark energy always helps me",
+                zh: "黑暗能量总是帮助着我"
+            },
+            {
+                jp: "绮罗绮罗",
+                romaji: "Kirakira",
+                en: "Glittering",
+                zh: "璀璨闪耀"
+            },
+            {
+                jp: "罗鬼罗鬼",
+                romaji: "Rakiraki",
+                en: "Rakiraki (sound of rustling/crackling)",
+                zh: "罗鬼罗鬼"
+            },
+            {
+                jp: "きらーいなんて序の口 そう思うと楽だし",
+                romaji: "Kirāi nante jo no kuchi sō omou to raku da shi",
+                en: "Saying 'I hate it' is just the beginning, thinking that way makes it easier",
+                zh: "说讨厌不过是开端 这样想会轻松些"
+            },
+            {
+                jp: "Three, two, one で歪み会った",
+                romaji: "Three, two, one de yugami atta",
+                en: "Distorted together at three, two, one",
+                zh: "三、二、一，彼此扭曲"
+            },
+            {
+                jp: "きみーのその口 シガレット辛口",
+                romaji: "Kimī no sono kuchi shigaretto karakuchi",
+                en: "That mouth of yours, a harsh cigarette",
+                zh: "你那张嘴，香烟辛辣"
+            },
+            {
+                jp: "割り切ったけど",
+                romaji: "Warikitta kedo",
+                en: "Though I've come to terms with it",
+                zh: "虽然我已经看开了"
+            },
+            {
+                jp: "(知るか 知るなら drink up we're still tough)",
+                romaji: "(Shiru ka shiru nara drink up we're still tough)",
+                en: "(Who cares? If you know, drink up, we're still tough)",
+                zh: "（谁在乎？如果知道就喝掉，我们依然坚韧）"
+            },
+            {
+                jp: "最低なコンプだし 最高の昆布だし",
+                romaji: "Saitei na konpu da shi saikō no konbu da shi",
+                en: "It's the worst complex, but the best kelp stock",
+                zh: "是最糟糕的自卑，也是最棒的昆布高汤"
+            },
+            {
+                jp: "揃ってるだけじゃつまらんし",
+                romaji: "Sorotteru dake ja tsumaran shi",
+                en: "Just having everything lined up is boring",
+                zh: "仅仅具备一切也无趣"
+            },
+            {
+                jp: "繋いだって綻ぶし しょっぱいな鰹節",
+                romaji: "Tsunaidatte hokorobu shi shoppai na katsuobushi",
+                en: "Even if connected, it unravels, salty bonito flakes",
+                zh: "即使连接也会绽裂，真咸啊鲣鱼干"
+            },
+            {
+                jp: "もっと甘えたいけどー?",
+                romaji: "Motto amaetai kedo—?",
+                en: "But I want to be more pampered—?",
+                zh: "但我想更撒娇—？"
+            },
+            {
+                jp: "ぶらーんぶらーんぶらーんぶらーん",
+                romaji: "Burānburānburānburān",
+                en: "Buraanburaanburaanburaan",
+                zh: "ぶらーんぶらーんぶらーんぶらーん"
+            },
+            {
+                jp: "ぶらーんぶらーんぶらーんぶらーん",
+                romaji: "Burānburānburānburān",
+                en: "Buraanburaanburaanburaan",
+                zh: "ぶらーんぶらーんぶらーんぶらーん"
+            }
+        ];
+
+        const lyricsContentDiv = document.getElementById('lyricsContent');
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const japaneseOriginalToggle = document.getElementById('showJapaneseOriginal');
+        const japaneseOriginalToggleMenu = document.getElementById('japaneseOriginalToggleMenu');
+        let currentLang = 'original';
+        let showJapanese = true; // Default to showing Japanese when translations are active
+
+        // Function to render lyrics based on selected language and toggle state
+        function renderLyrics(lang) {
+            lyricsContentDiv.innerHTML = ''; // Clear previous content
+            lyricsData.forEach(line => {
+                const lineDiv = document.createElement('div');
+                lineDiv.classList.add('lyrics-line');
+
+                if (lang === 'original') {
+                    lineDiv.innerHTML = `<span class="japanese">${line.jp}</span>`;
+                } else {
+                    let translationContent = '';
+                    let translationClass = '';
+
+                    if (lang === 'romanized') {
+                        translationContent = line.romaji;
+                        translationClass = 'romanized';
+                    } else if (lang === 'english') {
+                        translationContent = line.en;
+                        translationClass = 'english';
+                    } else if (lang === 'chinese') {
+                        translationContent = line.zh;
+                        translationClass = 'chinese';
+                    }
+
+                    // Add Japanese original if the toggle is on
+                    if (showJapanese) {
+                        lineDiv.innerHTML += `<span class="japanese">${line.jp}</span><br>`;
+                    }
+
+                    // Determine the class for the translation based on showJapanese
+                    // If showJapanese is false, apply the 'translation-styled-as-original' class
+                    const finalTranslationClass = showJapanese ? translationClass : `${translationClass} translation-styled-as-original`;
+
+                    // Append the translation/romanized text
+                    lineDiv.innerHTML += `<span class="${finalTranslationClass}">${translationContent}</span>`;
+                }
+                lyricsContentDiv.appendChild(lineDiv);
+            });
+        }
+
+        // Add event listeners to tab buttons
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to the clicked button
+                button.classList.add('active');
+                // Update current language
+                currentLang = button.dataset.lang;
+
+                // Show/hide floating menu based on selected tab
+                if (currentLang === 'original') {
+                    japaneseOriginalToggleMenu.classList.add('hidden');
+                } else {
+                    japaneseOriginalToggleMenu.classList.remove('hidden');
+                }
+
+                // Re-render lyrics
+                renderLyrics(currentLang);
+            });
+        });
+
+        // Add event listener for the Japanese original toggle
+        japaneseOriginalToggle.addEventListener('change', (event) => {
+            showJapanese = event.target.checked;
+            renderLyrics(currentLang); // Re-render with new toggle state
+        });
+
+        // Initial render on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set initial state of toggle based on whether the 'original' tab is active
+            if (currentLang === 'original') {
+                japaneseOriginalToggleMenu.classList.add('hidden');
+            } else {
+                japaneseOriginalToggleMenu.classList.remove('hidden');
+            }
+            renderLyrics(currentLang);
+        });
+    </script>
+</body>
+</html>

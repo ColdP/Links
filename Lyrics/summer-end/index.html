@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Song Lyrics - もうじき夏が終わるから</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Include Noto Sans SC for better Chinese character rendering -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+SC:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif; /* Add Noto Sans SC for Chinese font support */
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            position: relative; /* For background positioning */
+            z-index: 1; /* Ensure content is above background */
+        }
+
+        /* Blurred background from album art - reduced blur radius */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url(' ./cover.jpg'); /* Placeholder album art for background */
+            background-size: cover;
+            background-position: center;
+            filter: blur(15px); /* Reduced Gaussian blur effect */
+            z-index: -1; /* Place behind content */
+            transform: scale(1.05); /* To avoid harsh edges after blur */
+        }
+
+        .container {
+            /* Enhanced Liquid Glass effect for the main container */
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1)); /* Slightly more opaque gradient */
+            border-radius: 30px; /* Increased radius */
+            padding: 30px;
+            backdrop-filter: blur(25px); /* Increased blur for glass effect */
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.25); /* Slightly more prominent border */
+            box-shadow: 0 8px 40px 0 rgba(0, 0, 0, 0.5); /* Slightly stronger shadow */
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            z-index: 2; /* Ensure container is above blurred background */
+            position: relative; /* For stacking context */
+        }
+
+        .left-panel {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .album-art {
+            width: 250px;
+            height: 250px;
+            border-radius: 15px; /* Kept as requested */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+            object-fit: cover;
+        }
+
+        .song-info h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        .song-info h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #E0E0E0; /* Slightly brighter for better contrast on dark background */
+            margin-bottom: 15px;
+        }
+
+        .buttons-group {
+            display: flex;
+            flex-direction: column; /* Stack buttons vertically */
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 30px; /* Add margin below buttons for iframe */
+            width: 100%; /* Allow buttons to take full width of panel */
+            max-width: 250px; /* Constrain button width */
+        }
+
+        .action-button {
+            width: 100%; /* Make button take full width of its container */
+            /* Default button style (light background, black text) as per image */
+            background-color: rgba(255, 255, 255, 0.5); /* Increased transparency */
+            color: #000; /* Black text */
+            padding: 10px 20px;
+            border-radius: 25px; /* Increased radius */
+            font-weight: 600;
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease, border 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(0, 0, 0, 0.1); /* Subtle dark border */
+            display: flex;
+            justify-content: center; /* Center text and icon */
+            align-items: center;
+            gap: 8px;
+            text-decoration: none; /* Remove underline for links */
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+            backdrop-filter: blur(2px); /* Light blur for a hint of glass */
+            -webkit-backdrop-filter: blur(2px);
+        }
+
+        .action-button:hover {
+            /* Hover button style (blue background, white text) as per image */
+            background-color: rgba(33, 150, 243, 0.8); /* Blue background with transparency */
+            color: #fff; /* White text */
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3); /* Stronger shadow on hover */
+            border: 1px solid rgba(33, 150, 243, 0.8); /* Solid blue border on hover */
+            backdrop-filter: none; /* Make it solid on hover */
+            -webkit-backdrop-filter: none;
+        }
+
+        .action-button .svg-icon {
+            color: #000; /* Default icon color */
+            transition: color 0.3s ease;
+        }
+
+        .action-button:hover .svg-icon {
+            color: #fff; /* White icon on hover */
+        }
+
+        /* Responsive iframe container */
+        .video-container {
+            position: relative;
+            width: 100%;
+            /* 16:9 aspect ratio (height / width = 9 / 16 = 0.5625) */
+            padding-bottom: 56.25%;
+            margin-bottom: 20px; /* Space below video */
+            border-radius: 15px; /* Kept as requested */
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 15px; /* Kept as requested */
+        }
+
+        .video-fallback-message {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.7); /* Dark overlay */
+            color: #fff;
+            font-size: 1.1rem;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            opacity: 0; /* Hidden by default */
+            transition: opacity 0.3s ease;
+            pointer-events: none; /* Allow interaction with iframe underneath if visible */
+        }
+
+        .video-fallback-message p {
+            background-color: rgba(0,0,0,0.5);
+            border-radius: 20px; /* Increased radius */
+            padding: 10px 15px;
+        }
+
+
+        .lyrics-panel {
+            flex: 2;
+            min-width: 500px;
+            /* Enhanced Liquid Glass effect for the lyrics panel */
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2)); /* Slightly more opaque dark gradient */
+            border-radius: 35px; /* Increased radius */
+            padding: 25px;
+            backdrop-filter: blur(25px); /* Increased blur for glass effect */
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border for definition */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Stronger shadow */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: flex-end; /* Align tabs to the right as per image */
+            margin-bottom: 20px;
+            /* Enhanced Liquid Glass effect for tabs */
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08)); /* Slightly more opaque */
+            border-radius: 25px; /* Increased radius */
+            padding: 8px;
+            gap: 5px;
+            backdrop-filter: blur(15px); /* Added blur for glass effect */
+            -webkit-backdrop-filter: blur(15px);
+        }
+
+        .tab-button {
+            background-color: transparent;
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 20px; /* Increased radius */
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            border: none;
+            outline: none;
+        }
+
+        .tab-button.active {
+            background-color: rgba(255, 255, 255, 0.35); /* More opaque when active */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* Stronger shadow for active state */
+        }
+
+        .tab-button:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.2); /* More opaque on hover */
+        }
+
+        .lyrics-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: 70vh; /* Adjust max height for scrolling */
+            padding-right: 10px; /* For scrollbar space */
+            color: #eee;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .lyrics-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .lyrics-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .lyrics-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .lyrics-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .lyrics-line {
+            margin-bottom: 15px;
+        }
+
+        /* Default style for original Japanese lyrics */
+        .lyrics-line .japanese {
+            font-weight: 600;
+            color: #fff;
+            font-size: 1.05rem;
+        }
+
+        /* Default style for romanized/kana/translated text when original Japanese is shown */
+        .lyrics-line .romanized,
+        .lyrics-line .kana, /* Added kana class */
+        .lyrics-line .english,
+        .lyrics-line .chinese {
+            font-size: 0.95rem;
+            color: #bbb;
+            font-weight: 400; /* Explicitly set default font weight */
+        }
+
+        /* Style for translations when original is hidden - higher specificity */
+        /* This ensures these styles override the default translation styles */
+        .lyrics-line span.romanized.translation-styled-as-original,
+        .lyrics-line span.kana.translation-styled-as-original, /* Added kana styling */
+        .lyrics-line span.english.translation-styled-as-original,
+        .lyrics-line span.chinese.translation-styled-as-original {
+            font-weight: 600;
+            color: #fff;
+            font-size: 1.05rem;
+            display: block; /* Ensure it takes full line if original is hidden */
+        }
+        /* Specific style for Chinese font to ensure proper rendering */
+        .lyrics-line .chinese,
+        .lyrics-line span.chinese.translation-styled-as-original {
+            font-family: 'Noto Sans SC', 'Inter', sans-serif;
+        }
+
+
+        /* Floating Menu for Japanese Original Toggle */
+        .floating-menu {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            /* Enhanced Liquid Glass effect for floating menu */
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.12)); /* Slightly more opaque */
+            backdrop-filter: blur(20px); /* Increased blur */
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 30px; /* Increased radius */
+            padding: 15px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Stronger border */
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5); /* Stronger shadow */
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .floating-menu.hidden {
+            opacity: 0;
+            pointer-events: none; /* Disable interactions when hidden */
+        }
+
+        .floating-menu label {
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        /* Custom Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(16px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+                padding: 20px;
+            }
+
+            .left-panel, .lyrics-panel {
+                min-width: unset;
+                width: 100%;
+            }
+
+            .album-art {
+                width: 200px;
+                height: 200px;
+            }
+
+            .song-info h1 {
+                font-size: 1.75rem;
+            }
+
+            .song-info h2 {
+                font-size: 1.2rem;
+            }
+
+            .tabs {
+                justify-content: center;
+                flex-wrap: wrap;
+                padding: 5px;
+            }
+
+            .tab-button {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+
+            .lyrics-content {
+                font-size: 0.9rem;
+            }
+
+            .floating-menu {
+                bottom: 20px;
+                right: 20px;
+                padding: 10px 15px;
+            }
+        }
+
+        /* SVG Icons */
+        .svg-icon {
+            width: 1em;
+            height: 1em;
+            fill: currentColor;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <!-- Album Art from the image -->
+            <img src="./cover.jpg" alt="Album Art" class="album-art">
+
+            <div class="song-info">
+                <h1>もうじき夏が終わるから</h1>
+                <h2>n-buna</h2>
+            </div>
+
+            <div class="buttons-group">
+                <!-- Streaming/DL Link -->
+                <a  target="_blank" class="action-button">
+                    <svg class="svg-icon" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
+                    </svg>
+                    Streaming/DL
+                </a>
+                <!-- MV Link -->
+                <a href="https://www.youtube.com/watch?v=jI__9qmmhNM" target="_blank" class="action-button">
+                    <svg class="svg-icon" viewBox="0 0 24 24">
+                        <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                    </svg>
+                    MV
+                </a>
+            </div>
+
+            <!-- YouTube iframe embed code -->
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/jI__9qmmhNM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <div class="video-fallback-message">
+                    <p>如果视频无法在此处播放，这可能是由于YouTube的嵌入限制。请点击“MV”按钮在YouTube上观看。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="lyrics-panel">
+            <div class="tabs">
+                <button class="tab-button active" data-lang="original">Original</button>
+                <button class="tab-button" data-lang="romanized">Romanized</button>
+                <button class="tab-button" data-lang="kana">Kana</button> <!-- Added Kana button -->
+                <button class="tab-button" data-lang="english">English Translation</button>
+                <button class="tab-button" data-lang="chinese">Chinese Translation</button>
+            </div>
+
+            <div class="lyrics-content" id="lyricsContent">
+                <!-- Lyrics will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Menu -->
+    <div class="floating-menu hidden" id="japaneseOriginalToggleMenu">
+        <label for="showJapaneseOriginal">Original Lyrics</label>
+        <label class="switch">
+            <input type="checkbox" id="showJapaneseOriginal" checked>
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <script>
+        // Lyrics data
+        const lyricsData = [
+            {
+                "jp": "朝、小説を読んだ",
+                "kana": "あさ、しょうせつをよんだ",
+                "romaji": "Asa, shousetsu o yonda",
+                "en": "In the morning, I read a novel",
+                "zh": "早上，我读了小说"
+            },
+            {
+                "jp": "君を待っていた",
+                "kana": "きみをまっていた",
+                "romaji": "Kimi o matte ita",
+                "en": "I was waiting for you",
+                "zh": "我一直在等你"
+            },
+            {
+                "jp": "夜になって気がついた",
+                "kana": "よるになってきがついた",
+                "romaji": "Yoru ni natte kigatsuita",
+                "en": "Night came, and I realized",
+                "zh": "到了晚上，我意识到"
+            },
+            {
+                "jp": "花火の音",
+                "kana": "はなびのおと",
+                "romaji": "Hanabi no oto",
+                "en": "The sound of fireworks",
+                "zh": "烟花的声音"
+            },
+            {
+                "jp": "花揺ら 歌い 今日藍を飛ばせ",
+                "kana": "はなゆら うたい きょう あいを とばせ",
+                "romaji": "Hana yura utai kyou ai o tobase",
+                "en": "Flowers sway, sing, make the indigo fly today",
+                "zh": "花儿摇曳，歌唱，让青色在今天飞舞"
+            },
+            {
+                "jp": "貴方に聞こえないように消えて",
+                "kana": "あなたにきこえないようにきえて",
+                "romaji": "Anata ni kikoenai you ni kiete",
+                "en": "Disappear so you can't hear it",
+                "zh": "消失得让你听不见"
+            },
+            {
+                "jp": "それを言えない",
+                "kana": "それをいえない",
+                "romaji": "Sore o ienai",
+                "en": "I can't say that",
+                "zh": "我无法说出口"
+            },
+            {
+                "jp": "僕じゃ言えないよ 今に夏が",
+                "kana": "ぼくじゃいえないよ いまになつが",
+                "romaji": "Boku ja ienai yo ima ni natsu ga",
+                "en": "I can't say it, because now summer is",
+                "zh": "我无法说出口，因为现在夏天"
+            },
+            {
+                "jp": "終わってくから",
+                "kana": "おわってくから",
+                "romaji": "Owatteku kara",
+                "en": "Coming to an end",
+                "zh": "即将结束"
+            },
+            {
+                "jp": "昼顔 鳥居 鳳仙花 バス停",
+                "kana": "ひるがお とりい ほうせんか ばすてい",
+                "romaji": "Hirugao torii housenka basutei",
+                "en": "Morning glory, shrine gate, impatiens, bus stop",
+                "zh": "牵牛花、鸟居、凤仙花、公交车站"
+            },
+            {
+                "jp": "日の落ちる街を歩いていた",
+                "kana": "ひのおちるまちをあるいていた",
+                "romaji": "Hi no ochiru machi o aruite ita",
+                "en": "I was walking through the town where the sun sets",
+                "zh": "我走在日落的街道上"
+            },
+            {
+                "jp": "今日も",
+                "kana": "きょうも",
+                "romaji": "Kyou mo",
+                "en": "Today too",
+                "zh": "今天也一样"
+            },
+            {
+                "jp": "また",
+                "kana": "また",
+                "romaji": "Mata",
+                "en": "Again",
+                "zh": "又是这样"
+            },
+            {
+                "jp": "朝、ラジオを聞いた 君を待っていた",
+                "kana": "あさ、らじおをきいた きみをまっていた",
+                "romaji": "Asa, rajio o kiita kimi o matte ita",
+                "en": "In the morning, I listened to the radio, I was waiting for you",
+                "zh": "早上，我听着广播，我一直在等你"
+            },
+            {
+                "jp": "夜になって気がついた",
+                "kana": "よるになってきがついた",
+                "romaji": "Yoru ni natte kigatsuita",
+                "en": "Night came, and I realized",
+                "zh": "到了晚上，我意识到"
+            },
+            {
+                "jp": "ことを覚えている",
+                "kana": "ことをおぼえている",
+                "romaji": "Koto o oboete iru",
+                "en": "I remember that",
+                "zh": "我还记得那件事"
+            },
+            {
+                "jp": "昨日もピアノを弾いた",
+                "kana": "きのうもぴあのをひいた",
+                "romaji": "Kinou mo piano o hiita",
+                "en": "Yesterday too, I played the piano",
+                "zh": "昨天我也弹了钢琴"
+            },
+            {
+                "jp": "朝を待っている",
+                "kana": "あさをまっている",
+                "romaji": "Asa o matte iru",
+                "en": "I'm waiting for morning",
+                "zh": "我在等待早晨"
+            },
+            {
+                "jp": "唄を歌っている",
+                "kana": "うたをうたっている",
+                "romaji": "Uta o utatte iru",
+                "en": "I'm singing a song",
+                "zh": "我正在唱一首歌"
+            },
+            {
+                "jp": "花詩 誓い 今日藍を飛ばせ",
+                "kana": "はなしい ちかい きょう あいを とばせ",
+                "romaji": "Hanashi chikai kyou ai o tobase",
+                "en": "Flower poetry, vows, make the indigo fly today",
+                "zh": "花语、誓言，让青色在今天飞舞"
+            },
+            {
+                "jp": "貴方に聞こえないように叫べ",
+                "kana": "あなたにきこえないようにさけべ",
+                "romaji": "Anata ni kikoenai you ni sakebe",
+                "en": "Shout so you can't hear it",
+                "zh": "喊叫得让你听不见"
+            },
+            {
+                "jp": "夢を見れない僕に花咲いた",
+                "kana": "ゆめをみれないぼくにはなさいた",
+                "romaji": "Yume o mirenai boku ni hana saita",
+                "en": "Flowers bloomed for me, who can't see dreams",
+                "zh": "花儿为我这个无法做梦的人绽放"
+            },
+            {
+                "jp": "終わる夏よ 止まってしまえ",
+                "kana": "おわるなつよ とまってしまえ",
+                "romaji": "Owaru natsu yo tomatte shimae",
+                "en": "Summer that's ending, stop already",
+                "zh": "即将结束的夏天啊，快停止吧"
+            },
+            {
+                "jp": "アベリア 始発 終電車 緑青",
+                "kana": "あべりあ しはつ しゅうでんしゃ ろくしょう",
+                "romaji": "Aberia shihatsu shuudensha rokushou",
+                "en": "Abelia, first train, last train, verdigris",
+                "zh": "六道木、首班车、末班车、铜绿"
+            },
+            {
+                "jp": "蝉の鳴く街を歩いていた",
+                "kana": "せみのなくまちをあるいていた",
+                "romaji": "Semi no naku machi o aruite ita",
+                "en": "I was walking through the town where cicadas sing",
+                "zh": "我走在蝉鸣的街道上"
+            },
+            {
+                "jp": "今日も",
+                "kana": "きょうも",
+                "romaji": "Kyou mo",
+                "en": "Today too",
+                "zh": "今天也一样"
+            },
+            {
+                "jp": "また",
+                "kana": "また",
+                "romaji": "Mata",
+                "en": "Again",
+                "zh": "又是这样"
+            },
+            {
+                "jp": "朝、今日も駅の裏",
+                "kana": "あさ、きょうもえきのうら",
+                "romaji": "Asa, kyou mo eki no ura",
+                "en": "In the morning, behind the station again today",
+                "zh": "早上，今天也在车站后面"
+            },
+            {
+                "jp": "人が立っていた",
+                "kana": "ひとがたっていた",
+                "romaji": "Hito ga tatte ita",
+                "en": "A person was standing",
+                "zh": "站着一个人"
+            },
+            {
+                "jp": "夜の藍に花が咲く",
+                "kana": "よるのあいにそらにかなさく",
+                "romaji": "Yoru no ai ni hana ga saku",
+                "en": "Flowers bloom in the night's indigo",
+                "zh": "花儿在夜晚的青色中绽放"
+            },
+            {
+                "jp": "絵をえがいていた",
+                "kana": "えをえがいていた",
+                "romaji": "E o egaite ita",
+                "en": "I was drawing a picture",
+                "zh": "我正在画一幅画"
+            },
+            {
+                "jp": "帰ってピアノを弾いた",
+                "kana": "かえってぴあのをひいた",
+                "romaji": "Kaette piano o hiita",
+                "en": "I returned home and played the piano",
+                "zh": "我回家弹了钢琴"
+            },
+            {
+                "jp": "夜になっていた",
+                "kana": "よるになっていた",
+                "romaji": "Yoru ni natte ita",
+                "en": "It had become night",
+                "zh": "天已经黑了"
+            },
+            {
+                "jp": "君を待っていた",
+                "kana": "きみをまっていた",
+                "romaji": "Kimi o matte ita",
+                "en": "I was waiting for you",
+                "zh": "我一直在等你"
+            },
+            {
+                "jp": "花詩 誓い 明日藍を飛ばせ",
+                "kana": "はなしい ちかい あす あいを とばせ",
+                "romaji": "Hanashi chikai ashita ai o tobase",
+                "en": "Flower poetry, vows, make the indigo fly tomorrow",
+                "zh": "花语、誓言，让青色在明天飞舞"
+            },
+            {
+                "jp": "貴方が居たくない今日を叫べ",
+                "kana": "あなたがいたくないきょうをさけべ",
+                "romaji": "Anata ga itakunai kyou o sakebe",
+                "en": "Shout about today, when you don't want to be here",
+                "zh": "喊出今天，你不想待在这里"
+            },
+            {
+                "jp": "夢が言えないことに気がついた",
+                "kana": "ゆめがいえないことにきがついた",
+                "romaji": "Yume ga ienai koto ni kigatsuita",
+                "en": "I realized that I can't talk about my dreams",
+                "zh": "我意识到我无法说出我的梦想"
+            },
+            {
+                "jp": "浅い夏よ 終わってくれよ",
+                "kana": "あさいなつよ おわってくれよ",
+                "romaji": "Asai natsu yo owatte kure yo",
+                "en": "Shallow summer, please end",
+                "zh": "浅薄的夏天啊，请结束吧"
+            },
+            {
+                "jp": "昼顔 鳥居 鳳仙花 バス停",
+                "kana": "ひるがお とりい ほうせんか ばすてい",
+                "romaji": "Hirugao torii housenka basutei",
+                "en": "Morning glory, shrine gate, impatiens, bus stop",
+                "zh": "牵牛花、鸟居、凤仙花、公交车站"
+            },
+            {
+                "jp": "夜が明けた街を歩いていた",
+                "kana": "よるがあけたまちをあるいていた",
+                "romaji": "Yoru ga aketa machi o aruite ita",
+                "en": "I was walking through the town after night broke",
+                "zh": "我走在黎明后的街道上"
+            },
+            {
+                "jp": "今日も",
+                "kana": "きょうも",
+                "romaji": "Kyou mo",
+                "en": "Today too",
+                "zh": "今天也一样"
+            },
+            {
+                "jp": "また",
+                "kana": "また",
+                "romaji": "Mata",
+                "en": "Again",
+                "zh": "又是这样"
+            }
+        ];
+
+        const lyricsContentDiv = document.getElementById('lyricsContent');
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const japaneseOriginalToggle = document.getElementById('showJapaneseOriginal');
+        const japaneseOriginalToggleMenu = document.getElementById('japaneseOriginalToggleMenu');
+        let currentLang = 'original';
+        let showJapanese = true; // Default to showing Japanese when translations are active
+
+        // Function to render lyrics based on selected language and toggle state
+        function renderLyrics(lang) {
+            lyricsContentDiv.innerHTML = ''; // Clear previous content
+            lyricsData.forEach(line => {
+                const lineDiv = document.createElement('div');
+                lineDiv.classList.add('lyrics-line');
+
+                if (lang === 'original') {
+                    lineDiv.innerHTML = `<span class="japanese">${line.jp}</span>`;
+                } else {
+                    let translationContent = '';
+                    let translationClass = '';
+
+                    if (lang === 'romanized') {
+                        translationContent = line.romaji;
+                        translationClass = 'romanized';
+                    } else if (lang === 'kana') { // Handle Kana display
+                        translationContent = line.kana;
+                        translationClass = 'kana';
+                    } else if (lang === 'english') {
+                        translationContent = line.en;
+                        translationClass = 'english';
+                    } else if (lang === 'chinese') {
+                        translationContent = line.zh;
+                        translationClass = 'chinese';
+                    }
+
+                    // Add Japanese original if the toggle is on
+                    if (showJapanese) {
+                        lineDiv.innerHTML += `<span class="japanese">${line.jp}</span><br>`;
+                    }
+
+                    // Determine the class for the translation based on showJapanese
+                    // If showJapanese is false, apply the 'translation-styled-as-original' class
+                    const finalTranslationClass = showJapanese ? translationClass : `${translationClass} translation-styled-as-original`;
+
+                    // Append the translation/romanized/kana text
+                    lineDiv.innerHTML += `<span class="${finalTranslationClass}">${translationContent}</span>`;
+                }
+                lyricsContentDiv.appendChild(lineDiv);
+            });
+        }
+
+        // Add event listeners to tab buttons
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to the clicked button
+                button.classList.add('active');
+                // Update current language
+                currentLang = button.dataset.lang;
+
+                // Show/hide floating menu based on selected tab
+                if (currentLang === 'original') {
+                    japaneseOriginalToggleMenu.classList.add('hidden');
+                } else {
+                    japaneseOriginalToggleMenu.classList.remove('hidden');
+                }
+
+                // Re-render lyrics
+                renderLyrics(currentLang);
+            });
+        });
+
+        // Add event listener for the Japanese original toggle
+        japaneseOriginalToggle.addEventListener('change', (event) => {
+            showJapanese = event.target.checked;
+            renderLyrics(currentLang); // Re-render with new toggle state
+        });
+
+        // Initial render on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set initial state of toggle based on whether the 'original' tab is active
+            if (currentLang === 'original') {
+                japaneseOriginalToggleMenu.classList.add('hidden');
+            } else {
+                japaneseOriginalToggleMenu.classList.remove('hidden');
+            }
+            renderLyrics(currentLang);
+        });
+    </script>
+</body>
+</html>

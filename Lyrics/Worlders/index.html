@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Song Lyrics - ハローセカイ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Include Noto Sans SC for better Chinese character rendering -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+SC:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif; /* Add Noto Sans SC for Chinese font support */
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            position: relative; /* For background positioning */
+            z-index: 1; /* Ensure content is above background */
+            /* Define a CSS variable for the background image URL */
+            --background-image-url: url('./cover.jpg'); /* Default background image */
+        }
+
+        /* Blurred background from album art - reduced blur radius */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Use the CSS variable for background-image */
+            background-image: var(--background-image-url);
+            background-size: cover;
+            background-position: center;
+            filter: blur(15px); /* Reduced Gaussian blur effect */
+            z-index: -1; /* Place behind content */
+            transform: scale(1.05); /* To avoid harsh edges after blur */
+            transition: background-image 0.5s ease-in-out; /* Smooth transition for background image change */
+        }
+
+        .container {
+            /* Enhanced Liquid Glass effect for the main container */
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1)); /* Slightly more opaque gradient */
+            border-radius: 30px; /* Increased radius */
+            padding: 30px;
+            backdrop-filter: blur(25px); /* Increased blur for glass effect */
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.25); /* Slightly more prominent border */
+            box-shadow: 0 8px 40px 0 rgba(0, 0, 0, 0.5); /* Slightly stronger shadow */
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            z-index: 2; /* Ensure container is above blurred background */
+            position: relative; /* For stacking context */
+        }
+
+        .left-panel {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .album-art {
+            width: 250px;
+            height: 250px;
+            border-radius: 15px; /* Kept as requested */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+            object-fit: cover;
+        }
+
+        .song-info h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #000;
+        }
+
+        .song-info h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #000000; /* Slightly brighter for better contrast on dark background */
+            margin-bottom: 15px;
+        }
+
+        .buttons-group {
+            display: flex;
+            flex-direction: column; /* Stack buttons vertically */
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 30px; /* Add margin below buttons for iframe */
+            width: 100%;
+            max-width: 250px; /* Constrain button width */
+        }
+        
+        /* New styling for button arrangement */
+        .buttons-group .button-row {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .action-button {
+            width: 100%; /* Make button take full width of its container */
+            /* Default button style (light background, black text) as per image */
+            background-color: rgba(255, 255, 255, 0.5); /* Increased transparency */
+            color: #000; /* Black text */
+            padding: 10px 20px;
+            border-radius: 25px; /* Increased radius */
+            font-weight: 600;
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease, border 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(0, 0, 0, 0.1); /* Subtle dark border */
+            display: flex;
+            justify-content: center; /* Center text and icon */
+            align-items: center;
+            gap: 8px;
+            text-decoration: none; /* Remove underline for links */
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+            backdrop-filter: blur(2px); /* Light blur for a hint of glass */
+            -webkit-backdrop-filter: blur(2px);
+        }
+
+        .action-button:hover {
+            /* Hover button style (blue background, white text) as per image */
+            background-color: rgba(33, 150, 243, 0.8); /* Blue background with transparency */
+            color: #fff; /* White text */
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3); /* Stronger shadow on hover */
+            border: 1px solid rgba(33, 150, 243, 0.8); /* Solid blue border on hover */
+            backdrop-filter: none; /* Make it solid on hover */
+            -webkit-backdrop-filter: none;
+        }
+
+        .action-button .svg-icon {
+            color: #000; /* Default icon color */
+            transition: color 0.3s ease;
+        }
+
+        .action-button:hover .svg-icon {
+            color: #fff; /* White icon on hover */
+        }
+
+        /* Responsive iframe container */
+        .video-container {
+            position: relative;
+            width: 100%;
+            /* 16:9 aspect ratio (height / width = 9 / 16 = 0.5625) */
+            padding-bottom: 56.25%;
+            margin-bottom: 20px; /* Space below video */
+            border-radius: 15px; /* Kept as requested */
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 15px; /* Kept as requested */
+        }
+
+        .video-fallback-message {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.7); /* Dark overlay */
+            color: #fff;
+            font-size: 1.1rem;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            opacity: 0; /* Hidden by default */
+            transition: opacity 0.3s ease;
+            pointer-events: none; /* Allow interaction with iframe underneath if visible */
+        }
+
+        .video-fallback-message p {
+            background-color: rgba(0,0,0,0.5);
+            border-radius: 20px; /* Increased radius */
+            padding: 10px 15px;
+        }
+
+
+        .lyrics-panel {
+            flex: 2;
+            min-width: 500px;
+            /* Enhanced Liquid Glass effect for the lyrics panel */
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2)); /* Slightly more opaque dark gradient */
+            border-radius: 35px; /* Increased radius */
+            padding: 25px;
+            backdrop-filter: blur(25px); /* Increased blur for glass effect */
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border for definition */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Stronger shadow */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: flex-end; /* Align tabs to the right as per image */
+            margin-bottom: 20px;
+            /* Enhanced Liquid Glass effect for tabs */
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08)); /* Slightly more opaque */
+            border-radius: 25px; /* Increased radius */
+            padding: 8px;
+            gap: 5px;
+            backdrop-filter: blur(15px); /* Added blur for glass effect */
+            -webkit-backdrop-filter: blur(15px);
+        }
+
+        .tab-button {
+            background-color: transparent;
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 20px; /* Increased radius */
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            border: none;
+            outline: none;
+        }
+
+        .tab-button.active {
+            background-color: rgba(255, 255, 255, 0.35); /* More opaque when active */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* Stronger shadow for active state */
+        }
+
+        .tab-button:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.2); /* More opaque on hover */
+        }
+
+        .lyrics-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: 70vh; /* Adjust max height for scrolling */
+            padding-right: 10px; /* For scrollbar space */
+            color: #eee;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .lyrics-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .lyrics-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .lyrics-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .lyrics-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .lyrics-line {
+            margin-bottom: 15px;
+        }
+
+        /* Default style for original Japanese lyrics */
+        .lyrics-line .japanese {
+            font-weight: 600;
+            color: #fff;
+            font-size: 1.05rem;
+        }
+
+        /* Default style for romanized/kana/translated text when original Japanese is shown */
+        .lyrics-line .romanized,
+        .lyrics-line .kana, /* Added kana class */
+        .lyrics-line .english,
+        .lyrics-line .chinese {
+            font-size: 0.95rem;
+            color: #bbb;
+            font-weight: 400; /* Explicitly set default font weight */
+        }
+
+        /* Style for translations when original is hidden - higher specificity */
+        /* This ensures these styles override the default translation styles */
+        .lyrics-line span.romanized.translation-styled-as-original,
+        .lyrics-line span.kana.translation-styled-as-original, /* Added kana styling */
+        .lyrics-line span.english.translation-styled-as-original,
+        .lyrics-line span.chinese.translation-styled-as-original {
+            font-weight: 600;
+            color: #fff;
+            font-size: 1.05rem;
+            display: block; /* Ensure it takes full line if original is hidden */
+        }
+        /* Specific style for Chinese font to ensure proper rendering */
+        .lyrics-line .chinese,
+        .lyrics-line span.chinese.translation-styled-as-original {
+            font-family: 'Noto Sans SC', 'Inter', sans-serif;
+        }
+
+
+        /* Floating Menu for Japanese Original Toggle */
+        .floating-menu {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            /* Enhanced Liquid Glass effect for floating menu */
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.12)); /* Slightly more opaque */
+            backdrop-filter: blur(20px); /* Increased blur */
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 30px; /* Increased radius */
+            padding: 15px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Stronger border */
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5); /* Stronger shadow */
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .floating-menu.hidden {
+            opacity: 0;
+            pointer-events: none; /* Disable interactions when hidden */
+        }
+
+        .floating-menu label {
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        /* Custom Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(16px);
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.2); /* Increased transparency for the overlay */
+            backdrop-filter: blur(5px); /* Added blur to the entire overlay */
+            -webkit-backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* Ensure modal is on top */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            /* Enhanced Liquid Glass effect for modal */
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)); /* Increased transparency */
+            /* Adjusted blur for a more pronounced glass effect on the modal content itself */
+            backdrop-filter: blur(20px); /* Increased blur for clearer glass */
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 35px; /* More rounded for softer edges, contributing to liquid feel */
+            padding: 30px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.7); /* Stronger, diffused shadow for depth */
+            border: 1px solid rgba(255, 255, 255, 0.4); /* Clearer border for definition and more light reflection */
+            color: #fff;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            position: relative; /* For the close button */
+            /* Adding a subtle skew or perspective for a "distorted" glass look */
+            transform: perspective(1000px) rotateY(0deg); /* Initial state, no distortion */
+            transition: transform 0.3s ease-in-out; /* Smooth transition for potential future interactions */
+        }
+        /* You could add a hover effect to emphasize the distortion for example: */
+        /*
+        .modal-content:hover {
+            transform: perspective(1000px) rotateY(5deg) scale(1.02);
+        }
+        */
+
+        .modal-content h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .modal-select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background-color: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            -webkit-appearance: none; /* Remove default select arrow */
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http://www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23ffffff%22%3E%3Cpath%20d%3D%22M7%2010l5%205%205-5z%22/%3E%3C/svg%3E'); /* Custom arrow */
+            background-repeat: no-repeat;
+            background-position: right 10px top 50%;
+            background-size: 16px auto;
+        }
+
+        .modal-select option {
+            background-color: #333; /* Darker background for options */
+            color: #fff;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .modal-button {
+            background-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: none;
+            outline: none;
+        }
+
+        .modal-button.confirm {
+            background-color: rgba(33, 150, 243, 0.7); /* Blue for confirm */
+        }
+
+        .modal-button:hover {
+            transform: translateY(-2px);
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .modal-button.confirm:hover {
+            background-color: rgba(33, 150, 243, 0.9);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+                padding: 20px;
+            }
+
+            .left-panel, .lyrics-panel {
+                min-width: unset;
+                width: 100%;
+            }
+
+            .album-art {
+                width: 200px;
+                height: 200px;
+            }
+
+            .song-info h1 {
+                font-size: 1.75rem;
+            }
+
+            .song-info h2 {
+                font-size: 1.2rem;
+            }
+
+            .tabs {
+                justify-content: center;
+                flex-wrap: wrap;
+                padding: 5px;
+            }
+
+            .tab-button {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+
+            .lyrics-content {
+                font-size: 0.9rem;
+            }
+
+            .floating-menu {
+                bottom: 20px;
+                right: 20px;
+                padding: 10px 15px;
+            }
+        }
+
+        /* SVG Icons */
+        .svg-icon {
+            width: 1em;
+            height: 1em;
+            fill: currentColor;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <!-- Album Art dynamically loaded -->
+            <img src="./cover.jpg" alt="Album Art" class="album-art" id="albumArt">
+
+            <div class="song-info">
+                <h1 id="songTitle">ハローセカイ</h1>
+                <h2 id="artistName">DECO*27</h2>
+            </div>
+
+            <div class="buttons-group">
+                <!-- Streaming/DL Link dynamically loaded -->
+                <a  href="https://karent.jp/album/4596" target="_blank" class="action-button" id="streamingDlLink">
+                    Streaming/DL
+                </a>
+                <!-- Versions and MV buttons in one row -->
+                <div class="button-row">
+                    <!-- New button for version switching -->
+                    <button class="action-button" id="versionSwitchButton" style="width: 50%;">
+                        Versions
+                    </button>
+                    <!-- MV Link dynamically loaded -->
+                    <a href="https://www.youtube.com/watch?v=t5U0rrj0dio" target="_blank" class="action-button" id="mvLink" style="width: 50%;">
+                        MV
+                    </a>
+                </div>
+            </div>
+
+
+            <!-- YouTube iframe embed code dynamically loaded -->
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/t5U0rrj0dio" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen id="youtubeIframe"></iframe>
+                <div class="video-fallback-message">
+                    <p>如果视频无法在此处播放，这可能是由于YouTube的嵌入限制。请点击“MV”按钮在YouTube上观看。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="lyrics-panel">
+            <div class="tabs">
+                <button class="tab-button active" data-lang="original">Original</button>
+                <button class="tab-button" data-lang="romanized">Romanized</button>
+                <button class="tab-button" data-lang="kana">Kana</button> <!-- Added Kana button -->
+                <button class="tab-button" data-lang="english">English Translation</button>
+                <button class="tab-button" data-lang="chinese">Chinese Translation</button>
+            </div>
+
+            <div class="lyrics-content" id="lyricsContent">
+                <!-- Lyrics will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Menu -->
+    <div class="floating-menu hidden" id="japaneseOriginalToggleMenu">
+        <label for="showJapaneseOriginal">Original Lyrics</label>
+        <label class="switch">
+            <input type="checkbox" id="showJapaneseOriginal" checked>
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <!-- Version Switch Modal -->
+    <div class="modal" id="versionSwitchModal">
+        <div class="modal-content">
+            <h3>选择版本</h3>
+            <select id="versionSelect" class="modal-select">
+                <option value="virtualSinger">VIRTUAL SINGER Ver.</option>
+                <option value="sekai">SEKAI Ver.</option>
+            </select>
+            <div class="modal-buttons">
+                <button class="modal-button confirm" id="confirmVersionButton">确定</button>
+                <button class="modal-button" id="cancelVersionButton">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lyrics data (remains the same as it's common for both versions)
+        const lyricsData = [
+  {
+    "jp": "きっと君も",
+    "kana": "きっときみも",
+    "romaji": "Kitto kimi mo",
+    "en": "Surely you too",
+    "zh": "你一定也"
+  },
+  {
+    "jp": "きっと「あの声が呼んでいた」って",
+    "kana": "きっと「あのこえがよんでいた」って",
+    "romaji": "Kitto 'ano koe ga yonde ita' tte",
+    "en": "Surely, you'll say 'that voice was calling'",
+    "zh": "一定会说“是那个声音在呼唤”"
+  },
+  {
+    "jp": "言うと思うんだ",
+    "kana": "いうとおもうんだ",
+    "romaji": "Iu to omounda",
+    "en": "I think",
+    "zh": "我想"
+  },
+  {
+    "jp": "最初の一歩 響いて",
+    "kana": "さいしょのいっぽ ひびいて",
+    "romaji": "Saisho no ippo hibiite",
+    "en": "The first step echoes",
+    "zh": "最初的一步 回响着"
+  },
+  {
+    "jp": "流れ出した 不可思議な ブルーズ",
+    "kana": "ながれだした ふかしぎな ブルーズ",
+    "romaji": "Nagaredashita fukashigi na buruuzu",
+    "en": "An inexplicable blues began to flow",
+    "zh": "流淌而出的 不可思议的 蓝调"
+  },
+  {
+    "jp": "足りないものばかり 何度も何度も数えて",
+    "kana": "たりないものばかり なんどもなんどもかぞえて",
+    "romaji": "Tarinai mono bakari nando mo nando mo kazoete",
+    "en": "Counting only what's lacking, over and over again",
+    "zh": "总是数着 缺少的 总是总是地数着"
+  },
+  {
+    "jp": "いらないものばかり 何個も何個も抱えて",
+    "kana": "いらないものばかり なんこもなんこもかかえて",
+    "romaji": "Iranai mono bakari nanko mo nanko mo kakaete",
+    "en": "Holding only what's unnecessary, so many of them",
+    "zh": "总是抱着 不需要的东西 总是总是地抱着"
+  },
+  {
+    "jp": "目を閉じた瞬間 始まった物語",
+    "kana": "めをとじたしゅんかん はじまったものがたり",
+    "romaji": "Me o tojita shunkan hajimatta monogatari",
+    "en": "The moment I closed my eyes, a story began",
+    "zh": "闭上眼睛的瞬间 开始的故事"
+  },
+  {
+    "jp": "頭に鎖で 錠をした",
+    "kana": "あたまにくさりで じょうをした",
+    "romaji": "Atama ni kusari de jou o shita",
+    "en": "I locked my head with a chain",
+    "zh": "用锁链锁住了头脑"
+  },
+  {
+    "jp": "言葉じゃ ずっと頼りないから",
+    "kana": "ことばじゃ ずっとたよりないから",
+    "romaji": "Kotoba ja zutto tayorinai kara",
+    "en": "Because words are always unreliable",
+    "zh": "因为言语 总是不可靠"
+  },
+  {
+    "jp": "その代わり 震えた喉の奥が",
+    "kana": "そのかわり ふるえたのどのおくが",
+    "romaji": "Sono kawari furueta nodo no oku ga",
+    "en": "Instead, the depths of my trembling throat",
+    "zh": "取而代之的是 颤抖的喉咙深处"
+  },
+  {
+    "jp": "そっと空気を揺らして",
+    "kana": "そっとくうきをゆらして",
+    "romaji": "Sotto kuuki o yurashite",
+    "en": "Gently shakes the air",
+    "zh": "轻轻地摇动着空气"
+  },
+  {
+    "jp": "何度だって 鳴り渡る",
+    "kana": "なんだって なりわたる",
+    "romaji": "Nando datte nariwataru",
+    "en": "Rings out any number of times",
+    "zh": "无论多少次 都会响彻"
+  },
+  {
+    "jp": "「Do」「Re」「Meet」 を重ねて",
+    "kana": "「ド」「レ」「ミート」をかさねて",
+    "romaji": "“Do” “Re” “Meet” o kasanete",
+    "en": "Layering 'Do', 'Re', 'Meet'",
+    "zh": "重叠着“Do”“Re”“Meet”"
+  },
+  {
+    "jp": "紡いだ 君のまっさらな歌",
+    "kana": "つむいだ きみのまっさらなうた",
+    "romaji": "Tsumuida kimi no massara na uta",
+    "en": "Spinning your brand new song",
+    "zh": "纺织着 你纯洁的歌曲"
+  },
+  {
+    "jp": "青く 赤く",
+    "kana": "あおく あかく",
+    "romaji": "Aoku akaku",
+    "en": "Blue, red",
+    "zh": "蓝色 红色"
+  },
+  {
+    "jp": "淡く 熱く",
+    "kana": "あわく あつく",
+    "romaji": "Awaku atsuku",
+    "en": "Faint, hot",
+    "zh": "淡薄 热烈"
+  },
+  {
+    "jp": "未来だって 描き上げる 染め上げて",
+    "kana": "みらいだって えがきあげる そめあげて",
+    "romaji": "Mirai datte egakiageru someagete",
+    "en": "Even the future is drawn, dyed",
+    "zh": "连未来 也描绘出来 染色"
+  },
+  {
+    "jp": "風に濯がれて",
+    "kana": "かぜにそそがれて",
+    "romaji": "Kaze ni susugarete",
+    "en": "Rinsed by the wind",
+    "zh": "被风冲刷"
+  },
+  {
+    "jp": "夢の前で 立ち尽くしたまま",
+    "kana": "ゆめのまえで たちつくしたまま",
+    "romaji": "Yume no mae de tachitsukushita mama",
+    "en": "Standing still before a dream",
+    "zh": "在梦想面前 仍然站立不动"
+  },
+  {
+    "jp": "僕は 君は",
+    "kana": "ぼくは きみは",
+    "romaji": "Boku wa kimi wa",
+    "en": "I am, you are",
+    "zh": "我是 你是"
+  },
+  {
+    "jp": "知らない 消えない",
+    "kana": "しらない きえない",
+    "romaji": "Shiranai kienai",
+    "en": "Unknown, undying",
+    "zh": "不知晓 不会消失"
+  },
+  {
+    "jp": "メロディを 思い出して",
+    "kana": "メロディをおもいだして",
+    "romaji": "Merodi o omoidashite",
+    "en": "Remembering the melody",
+    "zh": "回忆起旋律"
+  },
+  {
+    "jp": "戸惑い気味に",
+    "kana": "とまどいぎみに",
+    "romaji": "Tomadoi gimi ni",
+    "en": "Hesitantly",
+    "zh": "略带困惑"
+  },
+  {
+    "jp": "笑いながら",
+    "kana": "わらいながら",
+    "romaji": "Warai nagara",
+    "en": "While laughing",
+    "zh": "笑着"
+  },
+  {
+    "jp": "今日も 歩き出した",
+    "kana": "きょうも あるきだした",
+    "romaji": "Kyou mo arukidashita",
+    "en": "Today, I started walking again",
+    "zh": "今天 也再次迈出步伐"
+  },
+  {
+    "jp": "きっと君も",
+    "kana": "きっときみも",
+    "romaji": "Kitto kimi mo",
+    "en": "Surely you too",
+    "zh": "你一定也"
+  },
+  {
+    "jp": "ふとした時に 浮かぶ歌が",
+    "kana": "ふとしたときに うかぶうたが",
+    "romaji": "Futo shita toki ni ukabu uta ga",
+    "en": "A song that comes to mind at some moment",
+    "zh": "在不经意间 浮现出的歌曲"
+  },
+  {
+    "jp": "あると思うんだ",
+    "kana": "あるとおもうんだ",
+    "romaji": "Aru to omounda",
+    "en": "I think you have",
+    "zh": "我想你也有"
+  },
+  {
+    "jp": "最初の方が",
+    "kana": "さいしょのほうが",
+    "romaji": "Saisho no hou ga",
+    "en": "The beginning part",
+    "zh": "最初的部分"
+  },
+  {
+    "jp": "ちょっと歌えなくなった",
+    "kana": "ちょっとうたえなくなった",
+    "romaji": "Chotto utaenakunatta",
+    "en": "I can't quite sing it anymore",
+    "zh": "变得有点唱不出来了"
+  },
+  {
+    "jp": "いつかのブルーズ",
+    "kana": "いつかのブルーズ",
+    "romaji": "Itsuka no buruuzu",
+    "en": "That blues from some time ago",
+    "zh": "不知何时的 蓝调"
+  },
+  {
+    "jp": "間違ってる 合ってる ばかり何度も唱えて",
+    "kana": "まちがってる あってる ばかりなんどもとなえて",
+    "romaji": "Machigatteru atteru bakari nando mo tonaete",
+    "en": "Repeating only 'wrong, right' over and over",
+    "zh": "总是重复吟唱着“错误 正确”"
+  },
+  {
+    "jp": "怖がってるばっかで にっちもさっちも進めない",
+    "kana": "こわがってるばっかで にっちもさっちもすすめない",
+    "romaji": "Kowagatteru bakkade nicchi mo sacchi mo susumenai",
+    "en": "Just being afraid, unable to move forward at all",
+    "zh": "只是一味害怕 什么也无法前进"
+  },
+  {
+    "jp": "誰もが主役で 語り役の物語",
+    "kana": "だれもがしゅやくで かたりやくのものがたり",
+    "romaji": "Dare mo ga shuyaku de katari yaku no monogatari",
+    "en": "A story where everyone is the protagonist and narrator",
+    "zh": "每个人都是主角 又是讲述者的故事"
+  },
+  {
+    "jp": "心の呪いを 解いたって",
+    "kana": "こころののろいを といたって",
+    "romaji": "Kokoro no noroi o toita tte",
+    "en": "Even if I break the curse on my heart",
+    "zh": "即使解开了心中的诅咒"
+  },
+  {
+    "jp": "正しい道は 見つからないけど",
+    "kana": "ただしいみちは みつからないけど",
+    "romaji": "Tadashii michi wa mitsukaranai kedo",
+    "en": "I won't find the right path, but",
+    "zh": "虽然找不到正确的道路"
+  },
+  {
+    "jp": "その代わり 理屈の重いドアを",
+    "kana": "そのかわり りくつの おもいドアを",
+    "romaji": "Sono kawari rikutsu no omoi doa o",
+    "en": "Instead, the heavy doors of reason",
+    "zh": "取而代之的是 那扇沉重的理论之门"
+  },
+  {
+    "jp": "こじ開けていく魔法を 乗り越えていく魔法を",
+    "kana": "こじあけていくまほうを のりこえていくまほうを",
+    "romaji": "Kojiakete iku mahou o norikoete iku mahou o",
+    "en": "The magic to pry it open, the magic to overcome it",
+    "zh": "撬开的魔法 克服的魔法"
+  },
+  {
+    "jp": "いくつも見つけたろ",
+    "kana": "いくつもみつけたろ",
+    "romaji": "Ikutsu mo mitsuketaro",
+    "en": "I've found so many, haven't I?",
+    "zh": "我找到了很多吧"
+  },
+  {
+    "jp": "同じ道のりが 奏でた",
+    "kana": "おなじみちのりが かなでた",
+    "romaji": "Onaji michinori ga kanadeta",
+    "en": "The same journey played",
+    "zh": "同样的旅程 演奏着"
+  },
+  {
+    "jp": "それは泣き声の歌",
+    "kana": "それはなきごえのうた",
+    "romaji": "Sore wa nakigoe no uta",
+    "en": "It's a song of crying voices",
+    "zh": "那是哭泣之声的歌"
+  },
+  {
+    "jp": "側で 隣で",
+    "kana": "そばで となりで",
+    "romaji": "Soba de tonari de",
+    "en": "Beside, next to",
+    "zh": "在旁边 在隔壁"
+  },
+  {
+    "jp": "道の先で",
+    "kana": "みちのさきで",
+    "romaji": "Michi no saki de",
+    "en": "At the end of the road",
+    "zh": "在道路的前方"
+  },
+  {
+    "jp": "何処にいたって 聴き取れる 輝いて",
+    "kana": "どこにいたって ききとれる かがやいて",
+    "romaji": "Doko ni itatte kikitoreiru kagayaite",
+    "en": "Wherever you are, you can hear it, shining",
+    "zh": "无论在哪里 都能听到 闪耀着光芒"
+  },
+  {
+    "jp": "震える体が",
+    "kana": "ふるえるからだが",
+    "romaji": "Furueteru karada ga",
+    "en": "A trembling body",
+    "zh": "颤抖的身体"
+  },
+  {
+    "jp": "動かなくても 構わないから",
+    "kana": "うごかなくても かまわないから",
+    "romaji": "Ugokanakute mo kamawanai kara",
+    "en": "Even if it doesn't move, it's okay",
+    "zh": "即使无法动弹 也没有关系"
+  },
+  {
+    "jp": "いつか ここで",
+    "kana": "いつか ここで",
+    "romaji": "Itsuka koko de",
+    "en": "Someday, here",
+    "zh": "总有一天 在这里"
+  },
+  {
+    "jp": "聞いた 聞こえた",
+    "kana": "きいた きこえた",
+    "romaji": "Kiita kikoeta",
+    "en": "Heard, I heard",
+    "zh": "听到 听到了"
+  },
+  {
+    "jp": "声を 思い出して",
+    "kana": "こえをおもいだして",
+    "romaji": "Koe o omoidashite",
+    "en": "Remembering the voice",
+    "zh": "回忆起声音"
+  },
+  {
+    "jp": "Oh yeah",
+    "kana": "Oh yeah",
+    "romaji": "Oh yeah",
+    "en": "Oh yeah",
+    "zh": "哦 耶"
+  },
+  {
+    "jp": "Changing the world",
+    "kana": "Changing the world",
+    "romaji": "Changing the world",
+    "en": "Changing the world",
+    "zh": "改变世界"
+  },
+  {
+    "jp": "Oh yeah",
+    "kana": "Oh yeah",
+    "romaji": "Oh yeah",
+    "en": "Oh yeah",
+    "zh": "哦 耶"
+  },
+  {
+    "jp": "Singing loudly",
+    "kana": "Singing loudly",
+    "romaji": "Singing loudly",
+    "en": "Singing loudly",
+    "zh": "大声歌唱"
+  },
+  {
+    "jp": "Oh yeah",
+    "kana": "Oh yeah",
+    "romaji": "Oh yeah",
+    "en": "Oh yeah",
+    "zh": "哦 耶"
+  },
+  {
+    "jp": "Turning the world",
+    "kana": "Turning the world",
+    "romaji": "Turning the world",
+    "en": "Turning the world",
+    "zh": "转动世界"
+  },
+  {
+    "jp": "Oh yeah",
+    "kana": "Oh yeah",
+    "romaji": "Oh yeah",
+    "en": "Oh yeah",
+    "zh": "哦 耶"
+  },
+  {
+    "jp": "Let's keep singing",
+    "kana": "Let's keep singing",
+    "romaji": "Let's keep singing",
+    "en": "Let's keep singing",
+    "zh": "让我们继续歌唱"
+  },
+  {
+    "jp": "Oh yeah",
+    "kana": "Oh yeah",
+    "romaji": "Oh yeah",
+    "en": "Oh yeah",
+    "zh": "哦 耶"
+  },
+  {
+    "jp": "Changing the world",
+    "kana": "Changing the world",
+    "romaji": "Changing the world",
+    "en": "Changing the world",
+    "zh": "改变世界"
+  },
+  {
+    "jp": "Oh yeah",
+    "kana": "Oh yeah",
+    "romaji": "Oh yeah",
+    "en": "Oh yeah",
+    "zh": "哦 耶"
+  },
+  {
+    "jp": "Singing loudly",
+    "kana": "Singing loudly",
+    "romaji": "Singing loudly",
+    "en": "Singing loudly",
+    "zh": "大声歌唱"
+  },
+  {
+    "jp": "Oh yeah",
+    "kana": "Oh yeah",
+    "romaji": "Oh yeah",
+    "en": "Oh yeah",
+    "zh": "哦 耶"
+  },
+  {
+    "jp": "Turning the world",
+    "kana": "Turning the world",
+    "romaji": "Turning the world",
+    "en": "Turning the world",
+    "zh": "转动世界"
+  },
+  {
+    "jp": "Oh yeah",
+    "kana": "Oh yeah",
+    "romaji": "Oh yeah",
+    "en": "Oh yeah",
+    "zh": "哦 耶"
+  },
+  {
+    "jp": "Let hear love song",
+    "kana": "Let hear love song",
+    "romaji": "Let hear love song",
+    "en": "Let hear love song",
+    "zh": "让我们听爱的歌"
+  },
+  {
+    "jp": "「Do」「Re」「Meet」 を重ねて",
+    "kana": "「ド」「レ」「ミート」をかさねて",
+    "romaji": "“Do” “Re” “Meet” o kasanete",
+    "en": "Layering 'Do', 'Re', 'Meet'",
+    "zh": "重叠着“Do”“Re”“Meet”"
+  },
+  {
+    "jp": "紡いだ 君のまっさらな歌",
+    "kana": "つむいだ きみのまっさらなうた",
+    "romaji": "Tsumuida kimi no massara na uta",
+    "en": "Spinning your brand new song",
+    "zh": "纺织着 你纯洁的歌曲"
+  },
+  {
+    "jp": "青く 赤く",
+    "kana": "あおく あかく",
+    "romaji": "Aoku akaku",
+    "en": "Blue, red",
+    "zh": "蓝色 红色"
+  },
+  {
+    "jp": "淡く 熱く",
+    "kana": "あわく あつく",
+    "romaji": "Awaku atsuku",
+    "en": "Faint, hot",
+    "zh": "淡薄 热烈"
+  },
+  {
+    "jp": "何度だって 鳴り響く 響かせて",
+    "kana": "なんだって なりひびく ひびかせて",
+    "romaji": "Nando datte narihibiku hibikasete",
+    "en": "Rings out any number of times, let it ring out",
+    "zh": "无论多少次 都会回响 让它回响"
+  },
+  {
+    "jp": "風に濯がれて",
+    "kana": "かぜにそそがれて",
+    "romaji": "Kaze ni susugarete",
+    "en": "Rinsed by the wind",
+    "zh": "被风冲刷"
+  },
+  {
+    "jp": "夢の意味も わからないまま",
+    "kana": "ゆめのいみも わからないまま",
+    "romaji": "Yume no imi mo wakaranai mama",
+    "en": "Without even knowing the meaning of the dream",
+    "zh": "甚至不知道梦想的意义"
+  },
+  {
+    "jp": "僕は 君は",
+    "kana": "ぼくは きみは",
+    "romaji": "Boku wa kimi wa",
+    "en": "I am, you are",
+    "zh": "我是 你是"
+  },
+  {
+    "jp": "知らない 消えない",
+    "kana": "しらない きえない",
+    "romaji": "Shiranai kienai",
+    "en": "Unknown, undying",
+    "zh": "不知晓 不会消失"
+  },
+  {
+    "jp": "メロディを 追いかけて",
+    "kana": "メロディをおいかけて",
+    "romaji": "Merodi o oikakete",
+    "en": "Chasing the melody",
+    "zh": "追逐着旋律"
+  },
+  {
+    "jp": "音に乗せて",
+    "kana": "おとにのせて",
+    "romaji": "Oto ni nosete",
+    "en": "Putting it on the sound",
+    "zh": "乘着声音"
+  },
+  {
+    "jp": "笑いながら",
+    "kana": "わらいながら",
+    "romaji": "Warai nagara",
+    "en": "While laughing",
+    "zh": "笑着"
+  },
+  {
+    "jp": "歌う 未来の歌を",
+    "kana": "うたう みらいのうたを",
+    "romaji": "Utau mirai no uta o",
+    "en": "Singing the song of the future",
+    "zh": "歌唱着 未来的歌"
+  },
+  {
+    "jp": "今 ありのまま",
+    "kana": "いま ありのまま",
+    "romaji": "Ima ari no mama",
+    "en": "Now, as it is",
+    "zh": "现在 如实地"
+  },
+  {
+    "jp": "Oh yeah",
+    "kana": "Oh yeah",
+    "romaji": "Oh yeah",
+    "en": "Oh yeah",
+    "zh": "哦 耶"
+  },
+  {
+    "jp": "Changing the world",
+    "kana": "Changing the world",
+    "romaji": "Changing the world",
+    "en": "Changing the world",
+    "zh": "改变世界"
+  },
+  {
+    "jp": "Oh yeah",
+    "kana": "Oh yeah",
+    "romaji": "Oh yeah",
+    "en": "Oh yeah",
+    "zh": "哦 耶"
+  },
+  {
+    "jp": "Singing loudly",
+    "kana": "Singing loudly",
+    "romaji": "Singing loudly",
+    "en": "Singing loudly",
+    "zh": "大声歌唱"
+  },
+  {
+    "jp": "Oh yeah",
+    "kana": "Oh yeah",
+    "romaji": "Oh yeah",
+    "en": "Oh yeah",
+    "zh": "哦 耶"
+  },
+  {
+    "jp": "Turning the world",
+    "kana": "Turning the world",
+    "romaji": "Turning the world",
+    "en": "Turning the world",
+    "zh": "转动世界"
+  },
+  {
+    "jp": "Oh yeah",
+    "kana": "Oh yeah",
+    "romaji": "Oh yeah",
+    "en": "Oh yeah",
+    "zh": "哦 耶"
+  },
+  {
+    "jp": "Let's keep singing",
+    "kana": "Let's keep singing",
+    "romaji": "Let's keep singing",
+    "en": "Let's keep singing",
+    "zh": "让我们继续歌唱"
+  }
+];
+
+        // Song version data
+        const songVersions = {
+            "virtualSinger": {
+                albumArt: './cover.jpg', // Path to VIRTUAL SINGER Ver. cover
+                songTitle: 'Worlders (BLUE BACK Ver.)',
+                artist: 'じん',
+                streamingDlLink: 'https://Jin.lnk.to/worlders_bbvID',
+                mvLink: 'https://www.youtube.com/watch?v=UoptEaMrnok',
+                youtubeEmbed: 'https://www.youtube.com/embed/UoptEaMrnok',
+                backgroundImage: './cover.jpg' // Background for Virtual Singer version
+            },
+            "sekai": {
+                albumArt: './cover_sekai.jpg', // Placeholder for SEKAI Ver. cover
+                songTitle: 'Worlders',
+                artist: 'ALL UNITS', // Example artist for SEKAI Ver.
+                streamingDlLink: 'https://karent.jp/album/4589', // Example Streaming/DL link for SEKAI Ver.
+                mvLink: 'https://www.youtube.com/watch?v=lgAlH2HwbGA', // Example MV link for SEKAI Ver. (Rick Astley!)
+                youtubeEmbed: 'https://www.youtube.com/embed/lgAlH2HwbGA', // Example YouTube embed for SEKAI Ver.
+                backgroundImage: './cover_sekai.jpg' // Background for SEKAI version
+            }
+        };
+
+        const lyricsContentDiv = document.getElementById('lyricsContent');
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const japaneseOriginalToggle = document.getElementById('showJapaneseOriginal');
+        const japaneseOriginalToggleMenu = document.getElementById('japaneseOriginalToggleMenu');
+        const versionSwitchButton = document.getElementById('versionSwitchButton'); // New version switch button
+        const versionSwitchModal = document.getElementById('versionSwitchModal'); // Modal dialog
+        const confirmVersionButton = document.getElementById('confirmVersionButton'); // Confirm button in modal
+        const cancelVersionButton = document.getElementById('cancelVersionButton'); // Cancel button in modal
+        const versionSelect = document.getElementById('versionSelect'); // Version select dropdown in modal
+
+        // Elements to be updated based on version
+        const albumArtElement = document.getElementById('albumArt');
+        const songTitleElement = document.getElementById('songTitle');
+        const artistNameElement = document.getElementById('artistName');
+        const streamingDlLinkElement = document.getElementById('streamingDlLink');
+        const mvLinkElement = document.getElementById('mvLink');
+        const youtubeIframeElement = document.getElementById('youtubeIframe');
+
+
+        let currentLang = 'original';
+        let showJapanese = true; // Default to showing Japanese when translations are active
+        let currentVersion = 'virtualSinger'; // Default version
+
+        // Function to update song info based on the selected version
+        function updateSongInfo(version) {
+            const versionData = songVersions[version];
+            if (versionData) {
+                albumArtElement.src = versionData.albumArt;
+                songTitleElement.textContent = versionData.songTitle;
+                artistNameElement.textContent = versionData.artist;
+                streamingDlLinkElement.href = versionData.streamingDlLink;
+                mvLinkElement.href = versionData.mvLink;
+                youtubeIframeElement.src = versionData.youtubeEmbed;
+                // Update the CSS custom property for the background image
+                document.body.style.setProperty('--background-image-url', `url('${versionData.backgroundImage}')`);
+            }
+        }
+
+        // Function to render lyrics based on selected language and toggle state
+        function renderLyrics(lang) {
+            lyricsContentDiv.innerHTML = ''; // Clear previous content
+            lyricsData.forEach(line => {
+                const lineDiv = document.createElement('div');
+                lineDiv.classList.add('lyrics-line');
+
+                if (lang === 'original') {
+                    lineDiv.innerHTML = `<span class="japanese">${line.jp}</span>`;
+                } else {
+                    let translationContent = '';
+                    let translationClass = '';
+
+                    if (lang === 'romanized') {
+                        translationContent = line.romaji;
+                        translationClass = 'romanized';
+                    } else if (lang === 'kana') { // Handle Kana display
+                        translationContent = line.kana;
+                        translationClass = 'kana';
+                    } else if (lang === 'english') {
+                        translationContent = line.en;
+                        translationClass = 'english';
+                    } else if (lang === 'chinese') {
+                        translationContent = line.zh;
+                        translationClass = 'chinese';
+                    }
+
+                    // Add Japanese original if the toggle is on
+                    if (showJapanese) {
+                        lineDiv.innerHTML += `<span class="japanese">${line.jp}</span><br>`;
+                    }
+
+                    // Determine the class for the translation based on showJapanese
+                    // If showJapanese is false, apply the 'translation-styled-as-original' class
+                    const finalTranslationClass = showJapanese ? translationClass : `${translationClass} translation-styled-as-original`;
+
+                    // Append the translation/romanized/kana text
+                    lineDiv.innerHTML += `<span class="${finalTranslationClass}">${translationContent}</span>`;
+                }
+                lyricsContentDiv.appendChild(lineDiv);
+            });
+        }
+
+        // Add event listeners to tab buttons
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to the clicked button
+                button.classList.add('active');
+                // Update current language
+                currentLang = button.dataset.lang;
+
+                // Show/hide floating menu based on selected tab
+                if (currentLang === 'original') {
+                    japaneseOriginalToggleMenu.classList.add('hidden');
+                } else {
+                    japaneseOriginalToggleMenu.classList.remove('hidden');
+                }
+
+                // Re-render lyrics
+                renderLyrics(currentLang);
+            });
+        });
+
+        // Add event listener for the Japanese original toggle
+        japaneseOriginalToggle.addEventListener('change', (event) => {
+            showJapanese = event.target.checked;
+            renderLyrics(currentLang); // Re-render with new toggle state
+        });
+
+        // Event listener for the "Versions" button to show the modal
+        versionSwitchButton.addEventListener('click', () => {
+            // Set the dropdown to the currently active version when opening the modal
+            versionSelect.value = currentVersion;
+            versionSwitchModal.classList.add('show');
+        });
+
+        // Event listener for the "确定" button in the modal
+        confirmVersionButton.addEventListener('click', () => {
+            const selectedVersion = versionSelect.value;
+            currentVersion = selectedVersion; // Update the current version state
+            updateSongInfo(currentVersion); // Update song information based on the new version
+            // No need to re-render lyrics as lyrics content is common for both versions.
+            versionSwitchModal.classList.remove('show'); // Hide modal after confirmation
+        });
+
+        // Event listener for the "取消" button in the modal
+        cancelVersionButton.addEventListener('click', () => {
+            versionSwitchModal.classList.remove('show'); // Hide modal
+        });
+
+        // Event listener to close modal when clicking outside of it
+        versionSwitchModal.addEventListener('click', (event) => {
+            if (event.target === versionSwitchModal) {
+                versionSwitchModal.classList.remove('show');
+            }
+        });
+
+        // Initial render on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set initial state of toggle based on whether the 'original' tab is active
+            if (currentLang === 'original') {
+                japaneseOriginalToggleMenu.classList.add('hidden');
+            } else {
+                japaneseOriginalToggleMenu.classList.remove('hidden');
+            }
+            renderLyrics(currentLang);
+            updateSongInfo(currentVersion); // Load initial song info for the default version
+        });
+    </script>
+</body>
+</html>
