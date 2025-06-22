@@ -7,181 +7,497 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Material Symbols Outlined Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
     <style>
+        /* Material Design 3 Expressive - Color Variables */
+        :root {
+            /* Light Theme */
+            --md-sys-color-primary: #6750A4; /* Indigo */
+            --md-sys-color-on-primary: #FFFFFF;
+            --md-sys-color-primary-container: #EADDFF;
+            --md-sys-color-on-primary-container: #21005D;
+
+            --md-sys-color-secondary: #625B71; /* Purple-Gray */
+            --md-sys-color-on-secondary: #FFFFFF;
+            --md-sys-color-secondary-container: #E8DEF8;
+            --md-sys-color-on-secondary-container: #1D192B;
+
+            --md-sys-color-tertiary: #7D5260; /* Deep Rose */
+            --md-sys-color-on-tertiary: #FFFFFF;
+            --md-sys-color-tertiary-container: #FFD8E4;
+            --md-sys-color-on-tertiary-container: #31111D;
+
+            --md-sys-color-error: #B3261E;
+            --md-sys-color-on-error: #FFFFFF;
+            --md-sys-color-error-container: #F9DEDC;
+            --md-sys-color-on-error-container: #410E0B;
+
+            --md-sys-color-background: #FFFBFE; /* Off-white */
+            --md-sys-color-on-background: #1C1B1F; /* Dark gray */
+
+            --md-sys-color-surface: #FFFBFE; /* Off-white */
+            --md-sys-color-on-surface: #1C1B1F; /* Dark gray */
+            --md-sys-color-surface-variant: #E7E0EC; /* Light gray-purple */
+            --md-sys-color-on-surface-variant: #49454F; /* Medium gray-purple */
+            --md-sys-color-outline: #79747E; /* Medium gray */
+            --md-sys-color-shadow: #000000;
+            --md-sys-color-inverse-surface: #313033;
+            --md-sys-color-inverse-on-surface: #F4EFF4;
+            --md-sys-color-inverse-primary: #D0BCFF;
+
+            /* Custom Explicit Phrase Color - Light */
+            --color-explicit-phrase: #DB2777; /* Tailwind pink-600 */
+        }
+
+        /* Dark Theme */
+        html.dark {
+            --md-sys-color-primary: #D0BCFF; /* Light Indigo */
+            --md-sys-color-on-primary: #381E72;
+            --md-sys-color-primary-container: #4F378B;
+            --md-sys-color-on-primary-container: #EADDFF;
+
+            --md-sys-color-secondary: #CCC2DC; /* Light Purple-Gray */
+            --md-sys-color-on-secondary: #332D41;
+            --md-sys-color-secondary-container: #4A4458;
+            --md-sys-color-on-secondary-container: #E8DEF8;
+
+            --md-sys-color-tertiary: #EFB8C8; /* Light Deep Rose */
+            --md-sys-color-on-tertiary: #492532;
+            --md-sys-color-tertiary-container: #633B48;
+            --md-sys-color-on-tertiary-container: #FFD8E4;
+
+            --md-sys-color-error: #F2B8B5;
+            --md-sys-color-on-error: #601410;
+            --md-sys-color-error-container: #8C1D18;
+            --md-sys-color-on-error-container: #F9DEDC;
+
+            --md-sys-color-background: #1C1B1F; /* Dark gray */
+            --md-sys-color-on-background: #E6E1E5; /* Light gray */
+
+            --md-sys-color-surface: #1C1B1F; /* Dark gray */
+            --md-sys-color-on-surface: #E6E1E5; /* Light gray */
+            --md-sys-color-surface-variant: #49454F; /* Medium dark gray-purple */
+            --md-sys-color-on-surface-variant: #CCC2DC; /* Light purple-gray */
+            --md-sys-color-outline: #938F99; /* Medium gray */
+            --md-sys-color-shadow: #000000;
+            --md-sys-color-inverse-surface: #E6E1E5;
+            --md-sys-color-inverse-on-surface: #313033;
+            --md-sys-color-inverse-primary: #6750A4;
+
+            /* Custom Explicit Phrase Color - Dark */
+            --color-explicit-phrase: #F472B6; /* Tailwind pink-400 */
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(to bottom right, #6366F1, #EC4899); /* Violet to Pink Gradient */
+            background-color: var(--md-sys-color-background);
+            color: var(--md-sys-color-on-background);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 1rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
-        /* Custom scrollbar for better aesthetics, iOS-like */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+
+        .main-container {
+            background-color: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface);
+            border: 1px solid var(--md-sys-color-outline);
+            border-radius: 1.5rem; /* rounded-3xl */
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); /* More prominent shadow for M3 elevation */
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         }
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.5);
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: #ffffff;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-        /* Custom styles for the explicit phrases */
+
+        /* General element styling with M3 variables */
+        h1, h2 { color: var(--md-sys-color-on-surface); }
+        p, label, select, input[type="file"] { color: var(--md-sys-color-on-surface-variant); }
+        .text-indigo-600 { color: var(--md-sys-color-primary); } /* Header accent color */
+        .text-pink-600 { color: var(--md-sys-color-tertiary); } /* Header accent color */
         .explicit-phrase {
-            font-size: 2.25rem; /* text-4xl equivalent */
-            line-height: 2.5rem; /* leading-10 equivalent */
-            font-weight: 800; /* font-extrabold equivalent */
-            color: #DB2777; /* pink-600 equivalent */
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2); /* subtle shadow */
+            color: var(--color-explicit-phrase);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.15); /* Subtle shadow for text */
+        }
+        #scoreDisplay { color: var(--md-sys-color-primary); } /* Score uses primary color */
+
+
+        /* Input/Select/File Button common styles */
+        .form-element-base {
+            border: 1px solid var(--md-sys-color-outline);
+            background-color: var(--md-sys-color-surface-variant);
+            color: var(--md-sys-color-on-surface-variant);
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+            transition: all 0.2s ease;
+        }
+        .form-element-base:focus {
+            outline: none;
+            border-color: var(--md-sys-color-primary);
+            box-shadow: 0 0 0 2px var(--md-sys-color-primary-container);
         }
 
-        /* Custom toggle switch styles */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 44px; /* Slightly wider for iOS feel */
-            height: 24px; /* Standard iOS switch height */
+        select.form-element-base {
+            appearance: none; /* Remove default arrow */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2349454F'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.25em 1.25em;
+            padding-right: 2.5rem; /* Make space for the custom arrow */
         }
 
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
+        input[type="file"].form-element-base {
+            padding: 0; /* Override default input padding */
         }
-
-        .slider {
-            position: absolute;
+        input[type="file"].form-element-base::file-selector-button {
+            margin-right: 1rem; /* mr-4 */
+            padding: 0.5rem 1rem; /* py-2 px-4 */
+            border-radius: 9999px; /* rounded-full */
+            border: 0;
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 600; /* font-semibold */
+            background-color: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
             cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            -webkit-transition: .4s;
-            transition: .4s;
-            border-radius: 34px; /* Make it round */
+            transition: background-color 0.2s ease;
+        }
+        input[type="file"].form-element-base::file-selector-button:hover {
+            background-color: var(--md-sys-color-primary-container);
+            opacity: 0.9;
         }
 
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px; /* Slightly smaller than slider height */
-            width: 18px; /* Square for circle */
-            left: 3px; /* Offset from left */
-            bottom: 3px; /* Offset from bottom */
-            background-color: white;
-            -webkit-transition: .4s;
-            transition: .4s;
-            border-radius: 50%; /* Make it circular */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+
+        /* Image preview container */
+        #imagePreviewContainer {
+            background-color: var(--md-sys-color-surface-variant);
+            border-color: var(--md-sys-color-outline);
         }
 
+        /* Custom toggle switch styles (M3 compliant) */
+        .toggle-switch .slider {
+            background-color: var(--md-sys-color-outline);
+        }
         input:checked + .slider {
-            background-color: #6366F1; /* Indigo color when checked */
+            background-color: var(--md-sys-color-primary);
         }
-
         input:focus + .slider {
-            box-shadow: 0 0 1px #6366F1;
+            box-shadow: 0 0 1px var(--md-sys-color-primary);
         }
 
-        input:checked + .slider:before {
-            -webkit-transform: translateX(20px); /* Move 20px to the right */
-            -ms-transform: translateX(20px);
-            transform: translateX(20px);
-        }
-
-        /* Language Switch Button Styles */
+        /* Language Switch Button Styles (M3 Expressive) */
         .language-button-container {
             display: flex;
-            border: 1px solid #d1d5db; /* gray-300 */
+            border: 1px solid var(--md-sys-color-outline);
             border-radius: 9999px; /* rounded-full */
             overflow: hidden;
-            background-color: #f3f4f6; /* gray-100 */
-            width: 100%; /* Make it full width */
-            max-width: 200px; /* Limit max width for aesthetics */
+            background-color: var(--md-sys-color-surface-variant); /* Background for the whole segment control */
+            width: 100%;
+            max-width: 240px; /* Adjusted max-width */
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); /* Subtle inset shadow */
         }
 
         .language-button-half {
-            padding: 0.5rem 1rem; /* py-2 px-4 */
+            padding: 0.625rem 1.25rem; /* py-2.5 px-5 (more generous padding) */
             font-size: 0.875rem; /* text-sm */
-            line-height: 1.25rem;
-            color: #4b5563; /* gray-700 */
-            cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
-            flex-grow: 1; /* Make them take equal space */
-            text-align: center;
-            user-select: none; /* Prevent text selection */
             font-weight: 500; /* Medium weight */
+            color: var(--md-sys-color-on-surface-variant);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-grow: 1;
+            text-align: center;
+            user-select: none;
+            position: relative; /* For the active state overlay */
+            isolation: isolate; /* Create new stacking context */
         }
 
         .language-button-half.active {
-            background-color: #6366F1; /* indigo-500 */
-            color: #ffffff; /* white */
-            font-weight: 600; /* font-semibold */
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); /* subtle inset shadow */
+            font-weight: 600; /* Bolder text for active */
+            color: var(--md-sys-color-on-primary); /* White text on primary background */
+            z-index: 1; /* Bring active segment to front */
+        }
+
+        .language-button-half.active::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-color: var(--md-sys-color-primary);
+            border-radius: 9999px; /* rounded-full for the active background */
+            z-index: -1; /* Place behind text */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15); /* Subtle shadow for active segment */
+            transition: all 0.2s ease;
+        }
+
+        /* Dark Mode Toggle Button */
+        #darkModeToggle {
+            background-color: var(--md-sys-color-surface-variant);
+            border: 1px solid var(--md-sys-color-outline);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Slight shadow */
+            transition: all 0.2s ease;
+            width: 48px; /* Fixed width */
+            height: 48px; /* Fixed height for 1:1 aspect ratio */
+            display: flex; /* Use flexbox to center content */
+            align-items: center; /* Center vertically */
+            justify-content: center; /* Center horizontally */
+            padding: 0; /* Remove default padding as size is fixed */
+        }
+        #darkModeToggle:hover {
+            background-color: color-mix(in srgb, var(--md-sys-color-surface-variant) 90%, var(--md-sys-color-primary)); /* Slight primary tint on hover */
+            border-color: var(--md-sys-color-primary); /* Border changes to primary on hover */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* Stronger shadow on hover */
+        }
+        #darkModeToggle .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; /* Ensure icon is 24px default size */
+            color: var(--md-sys-color-on-surface-variant); /* Icon color based on text color */
+            transition: color 0.2s ease; /* Smooth icon color transition */
+        }
+        #darkModeToggle:hover .material-symbols-outlined {
+            color: var(--md-sys-color-primary); /* Icon becomes primary color on hover */
+        }
+
+
+        /* Action Button (Analyze Button) */
+        #analyzeButton {
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            border: 2px solid var(--md-sys-color-outline); /* Border with outline color for distinction */
+            transition: all 0.3s ease; /* Ensure all transitions are smooth */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Initial shadow */
+        }
+
+        #analyzeButton:hover {
+            background-color: var(--md-sys-color-primary-container); /* Lighter primary tint on hover */
+            color: var(--md-sys-color-on-primary-container); /* Darker text on lighter background */
+            border-color: var(--md-sys-color-primary); /* Border changes to primary on hover for a "pop" */
+            transform: translateY(-2px); /* Lift effect */
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3); /* Stronger shadow */
+        }
+
+        #analyzeButton:disabled {
+            background-color: var(--md-sys-color-surface-variant); /* Muted background */
+            color: var(--md-sys-color-on-surface-variant); /* Muted text */
+            border-color: var(--md-sys-color-outline); /* Muted border */
+            opacity: 0.6; /* Slight opacity for disabled state */
+            cursor: not-allowed;
+            transform: none; /* No lift effect when disabled */
+            box-shadow: none; /* No shadow when disabled */
+        }
+
+
+        /* Result Container Styling */
+        #resultContainer {
+            background-color: var(--md-sys-color-secondary-container);
+            color: var(--md-sys-color-on-secondary-container);
+            border: 1px solid var(--md-sys-color-outline); /* Use outline for border */
+        }
+        #resultHeaderText {
+            color: var(--md-sys-color-on-secondary-container);
+        }
+        #descriptionDisplay, #reasonDisplay {
+            color: var(--md-sys-color-on-secondary-container);
+        }
+
+        /* Error Message Styling */
+        #errorMessage {
+            background-color: var(--md-sys-color-error-container);
+            color: var(--md-sys-color-on-error-container);
+            border-color: var(--md-sys-color-error); /* Use error color for border */
+        }
+        #errorPrefix {
+            color: var(--md-sys-color-on-error-container);
+        }
+
+        /* Disclaimer Styling */
+        #disclaimerText {
+            color: var(--md-sys-color-on-surface-variant);
+        }
+        #disclaimerPrefix {
+            color: var(--md-sys-color-on-surface-variant);
+        }
+
+        /* Spinners use on-primary for better visibility on primary button */
+        .spinner {
+            border-left-color: var(--md-sys-color-on-primary);
+        }
+
+        /* Modal specific styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Dark overlay */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000; /* High z-index to cover everything */
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface);
+            padding: 1.5rem;
+            border-radius: 1.5rem; /* rounded-3xl */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--md-sys-color-outline);
+            padding-bottom: 0.5rem;
+        }
+
+        .modal-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--md-sys-color-on-surface);
+        }
+
+        .modal-close-button {
+            background: none;
+            border: none;
+            color: var(--md-sys-color-on-surface-variant);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 50%;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .modal-close-button:hover {
+            background-color: var(--md-sys-color-surface-variant);
+            color: var(--md-sys-color-primary);
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .modal-buttons button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .modal-buttons .primary-button {
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .modal-buttons .primary-button:hover {
+            background-color: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
+        }
+        .modal-buttons .secondary-button {
+            background-color: var(--md-sys-color-surface-variant);
+            color: var(--md-sys-color-on-surface-variant);
+            border: 1px solid var(--md-sys-color-outline);
+        }
+        .modal-buttons .secondary-button:hover {
+            background-color: var(--md-sys-color-outline);
+            color: var(--md-sys-color-surface);
+        }
+        .modal-text p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            color: var(--md-sys-color-on-surface-variant);
         }
     </style>
 </head>
 <body class="selection:bg-pink-300 selection:text-white">
-    <div class="relative w-full max-w-md mx-auto bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-6 md:p-8 flex flex-col items-center border border-white/30">
-        <!-- iOS-like Header -->
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6 text-center tracking-tight">
+    <!-- Age Verification Modal -->
+    <div id="ageVerificationModal" class="modal-overlay">
+        <div class="modal-content text-center">
+            <h3 class="text-xl font-bold mb-4" id="ageModalTitle"></h3>
+            <p class="mb-6" id="ageModalMessage"></p>
+            <div class="modal-buttons justify-center">
+                <button id="confirmAdultBtn" class="primary-button" id="ageConfirmButton"></button>
+                <button id="declineAdultBtn" class="secondary-button" id="ageDeclineButton"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Agreement / Disclaimer Modal -->
+    <div id="userAgreementModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="agreementModalTitle"></h3>
+                <button class="modal-close-button" id="agreementCloseBtn">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="modal-text" id="agreementModalContent"></div>
+            <div class="modal-buttons">
+                <button id="agreementOkBtn" class="primary-button"></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="relative w-full max-w-md mx-auto p-6 md:p-8 flex flex-col items-center main-container">
+        <!-- Header -->
+        <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center tracking-tight">
             <span class="text-indigo-600" id="headerTextPart1">上</span><span id="headerTextPart2">或者 </span><span class="text-pink-600" id="headerTextPart3">不上</span>
         </h1>
-        <p class="text-gray-600 text-center mb-6" id="taglineText">上传图片，评估其有多他妈的性感或可操</p>
+        <p class="text-center mb-6" id="taglineText">上传图片，评估其有多他妈的性感或可操</p>
+
+        <!-- Dark/Light Mode Toggle -->
+        <button id="darkModeToggle" class="absolute top-4 right-4 rounded-full shadow-md">
+            <span id="darkModeIcon" class="material-symbols-outlined">
+                <!-- Icon text will be set dynamically by JS -->
+            </span>
+        </button>
 
         <!-- Image Upload Area -->
         <div class="w-full mb-6">
-            <label for="imageUpload" class="block text-sm font-medium text-gray-700 mb-2" id="labelImageUpload">选择图片</label>
-            <input type="file" id="imageUpload" accept="image/*" class="block w-full text-sm text-gray-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-full file:border-0
-                file:text-sm file:font-semibold
-                file:bg-indigo-50 file:text-indigo-700
-                hover:file:bg-indigo-100 cursor-pointer transition-colors duration-200"
+            <label for="imageUpload" class="block text-sm font-medium mb-2" id="labelImageUpload">选择图片</label>
+            <input type="file" id="imageUpload" accept="image/*" class="block w-full text-sm form-element-base"
             >
         </div>
 
         <!-- Image Preview and Collapse (Initially Hidden) -->
         <div id="imagePreviewControls" class="w-full mb-6 hidden">
             <div class="flex items-center justify-between mb-2">
-                <label class="block text-sm font-medium text-gray-700 cursor-pointer select-none" id="labelToggleImagePreview">折叠图片</label>
+                <label class="block text-sm font-medium cursor-pointer select-none" id="labelToggleImagePreview">折叠图片</label>
                 <label class="toggle-switch">
                     <input type="checkbox" id="toggleImagePreview" checked>
                     <span class="slider"></span>
                 </label>
             </div>
-            <div id="imagePreviewContainer" class="w-full flex justify-center items-center p-4 bg-gray-100 rounded-2xl border border-gray-200">
+            <div id="imagePreviewContainer" class="w-full flex justify-center items-center p-4 rounded-xl border form-element-base">
                 <img id="imagePreview" src="#" alt="Image Preview" class="max-w-full h-auto max-h-64 rounded-xl shadow-lg object-contain">
             </div>
-            <p class="text-xs text-gray-500 text-center mt-2" id="hdrSupportText">
+            <p class="text-xs text-center mt-2" id="hdrSupportText">
                 本应用支持显示HDR图片，实际效果取决于您的设备和浏览器支持。
             </p>
         </div>
 
         <!-- Mode Selection -->
         <div class="w-full mb-6">
-            <label for="modeSelect" class="block text-sm font-medium text-gray-700 mb-2" id="labelModeSelect">理由长度</label>
-            <select id="modeSelect" class="block w-full py-2 px-3 border border-gray-300 bg-white rounded-xl shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <label for="modeSelect" class="block text-sm font-medium mb-2" id="labelModeSelect">理由长度</label>
+            <select id="modeSelect" class="block w-full py-2 px-3 form-element-base">
                 <option value="short" id="optionModeShort">简短模式 (1-2句话)</option>
                 <option value="medium" id="optionModeMedium">中等长度 (约80字)</option>
                 <option value="novel" id="optionModeNovel">小说模式 (约600字)</option>
@@ -190,8 +506,8 @@
 
         <!-- Image Role Selection -->
         <div class="w-full mb-6">
-            <label for="roleSelect" class="block text-sm font-medium text-gray-700 mb-2" id="labelRoleSelect">图片角色</label>
-            <select id="roleSelect" class="block w-full py-2 px-3 border border-gray-300 bg-white rounded-xl shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <label for="roleSelect" class="block text-sm font-medium mb-2" id="labelRoleSelect">图片角色</label>
+            <select id="roleSelect" class="block w-full py-2 px-3 form-element-base">
                 <option value="auto" id="optionRoleAuto">自动检测</option>
                 <option value="dominate_subject" id="optionRoleDominate">操 (Dominating)</option>
                 <option value="be_dominated_subject" id="optionRoleBeDominated">被操 (Submissive)</option>
@@ -200,43 +516,39 @@
 
         <!-- Perspective Selection -->
         <div class="w-full mb-6">
-            <label for="perspectiveSelect" class="block text-sm font-medium text-gray-700 mb-2" id="labelPerspectiveSelect">文字视角</label>
-            <select id="perspectiveSelect" class="block w-full py-2 px-3 border border-gray-300 bg-white rounded-xl shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <label for="perspectiveSelect" class="block text-sm font-medium mb-2" id="labelPerspectiveSelect">文字视角</label>
+            <select id="perspectiveSelect" class="block w-full py-2 px-3 form-element-base">
                 <option value="dominate_perspective" id="optionPerspectiveDominate">操 (Dominating)</option>
                 <option value="be_dominated_perspective" id="optionPerspectiveBeDominated">被操 (Submissive)</option>
             </select>
         </div>
 
         <!-- Action Button -->
-        <button id="analyzeButton" class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:shadow-xl
-            transform hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-indigo-300 disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled
-        >
+        <button id="analyzeButton" class="w-full font-semibold py-3 px-6 rounded-full shadow-lg transform hover:-translate-y-1 focus:outline-none focus:ring-4 disabled:opacity-50 disabled:cursor-not-allowed">
             <span id="buttonText">评估他妈的魅惑度</span>
             <div id="loadingSpinner" class="spinner inline-block ml-2 hidden"></div>
         </button>
 
         <!-- Result Display Area -->
-        <div id="resultContainer" class="w-full mt-8 p-6 bg-purple-50/70 rounded-2xl shadow-inner border border-purple-200 hidden">
-            <h2 class="text-xl font-bold text-purple-800 mb-3 text-center" id="resultHeaderText">评估结果</h2>
+        <div id="resultContainer" class="w-full mt-8 p-6 rounded-2xl shadow-inner hidden">
+            <h2 class="text-xl font-bold mb-3 text-center" id="resultHeaderText">评估结果</h2>
             <div class="flex flex-col items-center justify-center space-y-2">
-                <div class="text-6xl font-extrabold text-pink-600" id="scoreDisplay">--</div>
+                <div class="text-6xl font-extrabold" id="scoreDisplay">--</div>
                 <div class="explicit-phrase" id="phraseDisplay"></div> 
-                <p class="text-gray-700 text-center text-lg leading-relaxed whitespace-pre-wrap mt-2" id="descriptionDisplay"></p>
-                <p class="text-gray-700 text-center text-base leading-relaxed whitespace-pre-wrap mt-4" id="reasonDisplay"></p>
+                <p class="text-center text-lg leading-relaxed whitespace-pre-wrap mt-2" id="descriptionDisplay"></p>
+                <p class="text-center text-base leading-relaxed whitespace-pre-wrap mt-4" id="reasonDisplay"></p>
             </div>
         </div>
 
         <!-- Error Message Container -->
-        <div id="errorMessage" class="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-xl hidden" role="alert">
+        <div id="errorMessage" class="mt-4 p-3 rounded-xl hidden" role="alert">
             <p class="font-medium" id="errorPrefix">错误:</p>
             <p id="errorText"></p>
         </div>
 
-        <!-- Disclaimer -->
-        <p class="text-xs text-gray-500 text-center mt-8" id="disclaimerText">
-            <span class="font-bold" id="disclaimerPrefix">免责声明:</span> 本工具使用AI进行图像分析。结果仅供娱乐参考，AI的判断可能不准确或存在偏差。请勿将其用于任何严肃目的。
-            此API密钥直接嵌入在客户端代码中，不建议在生产环境中使用。
+        <!-- Disclaimer (Simplified for modal trigger) -->
+        <p class="text-xs text-center mt-8 text-on-surface-variant cursor-pointer hover:underline" id="disclaimerTriggerText">
+            免责声明: 本工具使用AI进行图像分析。结果仅供娱乐参考，AI的判断可能不准确或存在偏差。请勿将其用于任何严肃目的。
         </p>
 
         <!-- Language Switch -->
@@ -246,18 +558,38 @@
                 <div class="language-button-half" id="langZh">中文</div>
             </div>
         </div>
+
+        <!-- User Agreement & Disclaimer Button -->
+        <button id="userAgreementBtn" class="mt-4 py-2 px-4 rounded-full text-sm font-semibold transition-colors duration-200
+            bg-surface-variant text-on-surface-variant border border-outline hover:bg-outline hover:text-surface">
+            <span id="userAgreementButtonText">用户协议与免责声明</span>
+        </button>
     </div>
 
     <script>
-        // User provided API Key
+        // 用户提供的API密钥
         const API_KEY = 'AIzaSyALvO3HMppp4OKWja1A96gLgiYTpHsvLJI';
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
         // DOM Elements
+        const ageVerificationModal = document.getElementById('ageVerificationModal');
+        const ageModalTitle = document.getElementById('ageModalTitle');
+        const ageModalMessage = document.getElementById('ageModalMessage');
+        const confirmAdultBtn = document.getElementById('confirmAdultBtn');
+        const declineAdultBtn = document.getElementById('declineAdultBtn');
+
+        const userAgreementModal = document.getElementById('userAgreementModal');
+        const agreementModalTitle = document.getElementById('agreementModalTitle');
+        const agreementModalContent = document.getElementById('agreementModalContent');
+        const agreementCloseBtn = document.getElementById('agreementCloseBtn');
+        const agreementOkBtn = document.getElementById('agreementOkBtn');
+        const userAgreementBtn = document.getElementById('userAgreementBtn'); // Button to open agreement modal
+        const disclaimerTriggerText = document.getElementById('disclaimerTriggerText'); // Existing disclaimer text, now a trigger
+
         const imageUpload = document.getElementById('imageUpload');
         const imagePreview = document.getElementById('imagePreview');
         const imagePreviewContainer = document.getElementById('imagePreviewContainer');
-        const imagePreviewControls = document.getElementById('imagePreviewControls'); // Container for image preview and toggle
+        const imagePreviewControls = document.getElementById('imagePreviewControls');
         const toggleImagePreview = document.getElementById('toggleImagePreview');
         const modeSelect = document.getElementById('modeSelect');
         const roleSelect = document.getElementById('roleSelect');
@@ -272,11 +604,12 @@
         const reasonDisplay = document.getElementById('reasonDisplay');
         const errorMessage = document.getElementById('errorMessage');
         const errorText = document.getElementById('errorText');
-        const languageSwitch = document.getElementById('languageSwitch'); // Parent container for language buttons
-        const langEnButton = document.getElementById('langEn'); // EN button
-        const langZhButton = document.getElementById('langZh'); // ZH button
-        const hdrSupportText = document.getElementById('hdrSupportText'); // HDR support text element
-
+        const languageSwitch = document.getElementById('languageSwitch');
+        const langEnButton = document.getElementById('langEn');
+        const langZhButton = document.getElementById('langZh');
+        const hdrSupportText = document.getElementById('hdrSupportText');
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const darkModeIcon = document.getElementById('darkModeIcon');
 
         // Text Elements for Localization
         const elementsToTranslate = {
@@ -301,8 +634,14 @@
             buttonText: 'buttonText',
             resultHeaderText: 'resultHeaderText',
             errorPrefix: 'errorPrefix',
-            disclaimerText: 'disclaimerText',
-            disclaimerPrefix: 'disclaimerPrefix',
+            disclaimerTriggerText: 'disclaimerTriggerText', // Now a trigger
+            userAgreementButtonText: 'userAgreementButtonText', // New button text
+            ageModalTitle: 'ageModalTitle',
+            ageModalMessage: 'ageModalMessage',
+            ageConfirmButton: 'ageConfirmButton',
+            ageDeclineButton: 'ageDeclineButton',
+            agreementModalTitle: 'agreementModalTitle',
+            agreementOkBtn: 'agreementOkBtn',
             hdrSupportText: 'hdrSupportText',
         };
 
@@ -329,8 +668,28 @@
                 buttonText: '评估他妈的魅惑度',
                 resultHeaderText: '评估结果',
                 errorPrefix: '错误:',
-                disclaimerText: '免责声明: 本工具使用AI进行图像分析。结果仅供娱乐参考，AI的判断可能不准确或存在偏差。请勿将其用于任何严肃目的。此API密钥直接嵌入在客户端代码中，不建议在生产环境中使用。',
-                disclaimerPrefix: '免责声明:',
+                disclaimerTriggerText: '免责声明: 本工具使用AI进行图像分析。结果仅供娱乐参考，AI的判断可能不准确或存在偏差。请勿将其用于任何严肃目的。',
+                userAgreementButtonText: '用户协议与免责声明',
+                ageModalTitle: '年龄确认',
+                ageModalMessage: '本网站内容可能包含成人主题。您是否已满18周岁？',
+                ageConfirmButton: '我已成年',
+                ageDeclineButton: '我未成年',
+                agreementModalTitle: '用户协议与免责声明',
+                agreementModalContent: `
+                    <p><strong>用户协议</strong></p>
+                    <p>欢迎使用“上或者不上”！本工具旨在根据您上传的图片，通过AI技术对其进行魅惑程度评估。请您在使用本工具前，仔细阅读并同意以下条款：</p>
+                    <ol>
+                        <li>本工具仅供娱乐和个人消遣使用。请勿将其用于任何非法、侵权、诽谤、淫秽、骚扰或其他不道德的目的。</li>
+                        <li>您上传的所有图片内容，您需自行承担所有责任。请确保您拥有使用和分享该图片的合法权利，并且不侵犯任何第三方的版权、肖像权或其他合法权益。</li>
+                        <li>本工具使用的AI模型可能存在识别偏差或错误，评估结果不代表任何专业意见，也不构成对图片内容真实性、准确性或合法性的认可。</li>
+                        <li>请勿上传包含儿童色情、暴力、仇恨言论或任何违反当地法律法规的图片。我们保留在发现任何不当内容时，立即终止服务的权利。</li>
+                        <li>我们不会存储您上传的图片或评估结果，所有处理均在您的浏览器端完成，并通过匿名方式与Gemini API交互。</li>
+                    </ol>
+                    <p><strong>免责声明</strong></p>
+                    <p>在法律允许的最大范围内，本工具及其开发者不承担因您使用本工具而导致的任何直接、间接、附带、特殊、惩罚性或后果性损害，包括但不限于数据丢失、利润损失、业务中断或声誉损害。本工具按“现状”提供，不作任何明示或暗示的保证，包括但不限于适销性、特定用途适用性或非侵权的保证。</p>
+                    <p>您理解并同意，您对本工具的使用自行承担全部风险。通过点击“同意”或继续使用本工具，即表示您已阅读、理解并同意遵守本用户协议及免责声明的所有条款。</p>
+                `,
+                agreementOkBtn: '我已阅读并同意',
                 hdrSupportText: '本应用支持显示HDR图片，实际效果取决于您的设备和浏览器支持。',
                 // Result specific translations
                 scoreDescriptions: {
@@ -348,6 +707,10 @@
                     '7-8': '嗯了',
                     '9-10': '直接开导',
                     '0': '纯属答辩' // Fallback for 0
+                },
+                darkModeIcon: { // Icon names from Material Symbols
+                     light: `light_mode`,
+                     dark: `dark_mode`
                 }
             },
             'en': {
@@ -372,8 +735,28 @@
                 buttonText: 'Evaluate Fucking Seduction',
                 resultHeaderText: 'Evaluation Result',
                 errorPrefix: 'Error:',
-                disclaimerText: 'Disclaimer: This tool uses AI for image analysis. Results are for entertainment purposes only, and AI judgments may be inaccurate or biased. Do not use for any serious purposes. This API key is embedded directly in client-side code and is not recommended for production use.',
-                disclaimerPrefix: 'Disclaimer:',
+                disclaimerTriggerText: 'Disclaimer: This tool uses AI for image analysis. Results are for entertainment purposes only, and AI judgments may be inaccurate or biased. Do not use for any serious purposes.',
+                userAgreementButtonText: 'User Agreement & Disclaimer',
+                ageModalTitle: 'Age Confirmation',
+                ageModalMessage: 'This website may contain adult themes. Are you 18 years of age or older?',
+                ageConfirmButton: 'I am 18 or older',
+                ageDeclineButton: 'I am under 18',
+                agreementModalTitle: 'User Agreement & Disclaimer',
+                agreementModalContent: `
+                    <p><strong>User Agreement</strong></p>
+                    <p>Welcome to "Fuck or Not"! This tool is designed to evaluate the level of seductiveness in images you upload, using AI technology. Please read and agree to the following terms before using this tool:</p>
+                    <ol>
+                        <li>This tool is for entertainment and personal pastime use only. Do not use it for any illegal, infringing, defamatory, obscene, harassing, or otherwise unethical purposes.</li>
+                        <li>You are solely responsible for all image content you upload. Please ensure you have the legal right to use and share the images, and that they do not infringe upon any third-party copyrights, portrait rights, or other legitimate interests.</li>
+                        <li>The AI model used by this tool may have recognition biases or errors. The evaluation results do not represent professional opinions and do not constitute an endorsement of the truthfulness, accuracy, or legality of the image content.</li>
+                        <li>Do not upload images containing child pornography, violence, hate speech, or any content that violates local laws and regulations. We reserve the right to terminate service immediately upon detection of any inappropriate content.</li>
+                        <li>We do not store your uploaded images or evaluation results. All processing is done client-side in your browser, interacting with the Gemini API anonymously.</li>
+                    </ol>
+                    <p><strong>Disclaimer</strong></p>
+                    <p>To the maximum extent permitted by law, this tool and its developers shall not be liable for any direct, indirect, incidental, special, punitive, or consequential damages arising from your use of this tool, including but not limited to loss of data, loss of profits, business interruption, or reputational harm. This tool is provided "as is" without any warranties, express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, or non-infringement.</p>
+                    <p>You understand and agree that you use this tool at your sole risk. By clicking "Agree" or continuing to use this tool, you acknowledge that you have read, understood, and agreed to abide by all terms of this User Agreement and Disclaimer.</p>
+                `,
+                agreementOkBtn: 'I have read and agree',
                 hdrSupportText: 'This application supports HDR image display; actual results depend on your device and browser support.',
                 // Result specific translations
                 scoreDescriptions: {
@@ -391,30 +774,103 @@
                     '7-8': 'Got me a bit hard',
                     '9-10': 'Directly turn on',
                     '0': 'Pure garbage' // Fallback for 0
+                },
+                darkModeIcon: { // Icon names from Material Symbols
+                    light: `light_mode`,
+                    dark: `dark_mode`
                 }
             }
         };
 
         let currentLanguage = navigator.language.startsWith('zh') ? 'zh-CN' : 'en';
+        let currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         let base64ImageData = null;
 
-        // Function to render UI based on current language
+        // --- Modal Functions ---
+        function showModal(modalElement) {
+            modalElement.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling body
+        }
+
+        function hideModal(modalElement) {
+            modalElement.classList.remove('active');
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+
+        // --- Age Verification Logic ---
+        function checkAgeAndShowModal() {
+            const isAdultConfirmed = localStorage.getItem('isAdultConfirmed');
+            if (isAdultConfirmed === 'true') {
+                renderUI(); // Render UI immediately if already confirmed
+                return;
+            }
+
+            // Otherwise, show age verification modal
+            ageModalTitle.textContent = translations[currentLanguage].ageModalTitle;
+            ageModalMessage.textContent = translations[currentLanguage].ageModalMessage;
+            confirmAdultBtn.textContent = translations[currentLanguage].ageConfirmButton;
+            declineAdultBtn.textContent = translations[currentLanguage].ageDeclineButton;
+            showModal(ageVerificationModal);
+        }
+
+        confirmAdultBtn.addEventListener('click', () => {
+            localStorage.setItem('isAdultConfirmed', 'true');
+            hideModal(ageVerificationModal);
+            renderUI(); // Render UI after confirmation
+        });
+
+        declineAdultBtn.addEventListener('click', () => {
+            // Go back to the previous page if not adult
+            window.history.back();
+            // Or if there's no history, redirect to a neutral page or display a message
+            // window.location.href = 'about:blank'; // or a custom 'access denied' page
+        });
+
+        // --- User Agreement Modal Logic ---
+        userAgreementBtn.addEventListener('click', () => {
+            agreementModalTitle.textContent = translations[currentLanguage].agreementModalTitle;
+            agreementModalContent.innerHTML = translations[currentLanguage].agreementModalContent;
+            agreementOkBtn.textContent = translations[currentLanguage].agreementOkBtn;
+            showModal(userAgreementModal);
+        });
+
+        // Make the small disclaimer text also a trigger
+        disclaimerTriggerText.addEventListener('click', () => {
+            userAgreementBtn.click(); // Trigger the main agreement button click
+        });
+
+        agreementCloseBtn.addEventListener('click', () => {
+            hideModal(userAgreementModal);
+        });
+
+        agreementOkBtn.addEventListener('click', () => {
+            hideModal(userAgreementModal);
+        });
+
+
+        // Function to apply theme
+        function applyTheme(theme) {
+            document.documentElement.classList.toggle('dark', theme === 'dark');
+            darkModeIcon.textContent = translations[currentLanguage].darkModeIcon[theme]; // Set icon text content
+            localStorage.setItem('theme', theme);
+            currentTheme = theme; // Update currentTheme
+        }
+
+        // Function to render UI based on current language and theme
         function renderUI() {
             const lang = translations[currentLanguage];
             for (const id in elementsToTranslate) {
                 const element = document.getElementById(elementsToTranslate[id]);
-                if (element) {
-                    if (id === 'headerTextPart1' || id === 'headerTextPart2' || id === 'headerTextPart3') {
-                        element.textContent = lang[id];
-                    } else if (id === 'disclaimerText') {
-                        const disclaimerPrefixHtml = `<span class="font-bold" id="disclaimerPrefix">${lang.disclaimerPrefix}</span>`;
-                        const restOfDisclaimer = lang[id].replace(lang.disclaimerPrefix, '').trim(); // Get the rest of the text
-                        element.innerHTML = disclaimerPrefixHtml + ' ' + restOfDisclaimer; // Reconstruct with bold prefix
-                    } else {
-                        element.textContent = lang[id];
-                    }
+                if (element && id !== 'agreementModalContent') { // Skip agreementModalContent as it's HTML
+                    element.textContent = lang[id];
                 }
             }
+
+            // Special handling for disclaimerTriggerText
+            document.getElementById('disclaimerTriggerText').innerHTML = lang.disclaimerTriggerText;
+            // Special handling for agreement modal content
+            document.getElementById('agreementModalContent').innerHTML = lang.agreementModalContent;
+
 
             // Update language switch button active state
             if (currentLanguage === 'en') {
@@ -429,7 +885,7 @@
             if (!analyzeButton.disabled) {
                 document.getElementById('buttonText').textContent = lang.buttonText;
             }
-            
+
             // Re-render result descriptions and phrases if result is visible
             if (!resultContainer.classList.contains('hidden') && scoreDisplay.textContent !== '--') {
                 const score = parseInt(scoreDisplay.textContent);
@@ -438,10 +894,17 @@
                 descriptionDisplay.textContent = description;
             }
 
+            applyTheme(currentTheme); // Apply theme after language-specific icon update
         }
 
-        // Initialize UI on load
-        document.addEventListener('DOMContentLoaded', renderUI);
+        // Initialize UI and theme on load
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAgeAndShowModal(); // Call age verification on load
+            // Listen for system theme changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                applyTheme(e.matches ? 'dark' : 'light');
+            });
+        });
 
         // Language switch event listener
         langEnButton.addEventListener('click', () => {
@@ -452,6 +915,12 @@
         langZhButton.addEventListener('click', () => {
             currentLanguage = 'zh-CN';
             renderUI();
+        });
+
+        // Dark Mode Toggle event listener
+        darkModeToggle.addEventListener('click', () => {
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            applyTheme(newTheme);
         });
 
         // Hide an element
