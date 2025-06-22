@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="appTitle">上或者不上 - 魅惑度评估器</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Material Symbols Outlined Font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
     <style>
@@ -411,6 +409,13 @@
             background-color: var(--md-sys-color-primary-container);
             color: var(--md-sys-color-on-primary-container);
         }
+        .modal-buttons .primary-button:disabled {
+            background-color: var(--md-sys-color-surface-variant); /* Muted background */
+            color: var(--md-sys-color-on-surface-variant); /* Muted text */
+            opacity: 0.6; /* Slight opacity for disabled state */
+            cursor: not-allowed;
+            box-shadow: none; /* No shadow when disabled */
+        }
         .modal-buttons .secondary-button {
             background-color: var(--md-sys-color-surface-variant);
             color: var(--md-sys-color-on-surface-variant);
@@ -425,59 +430,134 @@
             line-height: 1.6;
             color: var(--md-sys-color-on-surface-variant);
         }
+        .modal-text ol {
+            list-style: decimal;
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--md-sys-color-on-surface-variant);
+        }
+        .modal-text li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Custom Checkbox Styling */
+        .custom-checkbox-container {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+        }
+
+        .custom-checkbox-input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .custom-checkbox-visual {
+            width: 20px; /* MD3 standard size */
+            height: 20px; /* MD3 standard size */
+            border: 2px solid var(--md-sys-color-outline);
+            border-radius: 4px; /* Slightly rounded corners */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0; /* Prevent it from shrinking */
+            transition: all 0.2s ease;
+            position: relative;
+            background-color: transparent;
+        }
+
+        .custom-checkbox-input:checked + .custom-checkbox-visual {
+            background-color: var(--md-sys-color-primary);
+            border-color: var(--md-sys-color-primary);
+        }
+
+        /* Checkmark SVG */
+        .custom-checkbox-visual svg {
+            fill: none;
+            stroke: var(--md-sys-color-on-primary);
+            stroke-width: 2.5; /* Thicker stroke for checkmark */
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 24; /* Make stroke length for animation */
+            stroke-dashoffset: 24;
+            transition: stroke-dashoffset 0.2s ease;
+            opacity: 0; /* Initially hidden */
+            width: 14px; /* Adjust size of checkmark */
+            height: 14px;
+        }
+
+        .custom-checkbox-input:checked + .custom-checkbox-visual svg {
+            stroke-dashoffset: 0; /* Animate checkmark in */
+            opacity: 1; /* Show checkmark */
+        }
+
+        /* Focus state */
+        .custom-checkbox-input:focus-visible + .custom-checkbox-visual {
+            box-shadow: 0 0 0 3px var(--md-sys-color-primary-container); /* Focus ring */
+        }
+
+        /* Hover state */
+        .custom-checkbox-container:hover .custom-checkbox-visual {
+            background-color: var(--md-sys-color-surface-variant); /* Slight background tint on hover */
+            border-color: var(--md-sys-color-primary); /* Primary border on hover */
+        }
+        .custom-checkbox-input:checked + .custom-checkbox-visual:hover {
+            background-color: var(--md-sys-color-primary); /* Keep primary color when checked and hovered */
+            opacity: 0.9; /* Slight opacity change on hover for checked state */
+        }
     </style>
 </head>
 <body class="selection:bg-pink-300 selection:text-white">
-    <!-- Age Verification Modal -->
-    <div id="ageVerificationModal" class="modal-overlay">
+    <div id="combinedAgreementModal" class="modal-overlay">
         <div class="modal-content text-center">
-            <h3 class="text-xl font-bold mb-4" id="ageModalTitle"></h3>
-            <p class="mb-6" id="ageModalMessage"></p>
-            <div class="modal-buttons justify-center">
-                <button id="confirmAdultBtn" class="primary-button" id="ageConfirmButton"></button>
-                <button id="declineAdultBtn" class="secondary-button" id="ageDeclineButton"></button>
-            </div>
-        </div>
-    </div>
-
-    <!-- User Agreement / Disclaimer Modal -->
-    <div id="userAgreementModal" class="modal-overlay">
-        <div class="modal-content">
             <div class="modal-header">
-                <h3 id="agreementModalTitle"></h3>
-                <button class="modal-close-button" id="agreementCloseBtn">
+                <h3 id="combinedModalTitle"></h3> <button class="modal-close-button" id="combinedModalCloseBtn">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
-            <div class="modal-text" id="agreementModalContent"></div>
-            <div class="modal-buttons">
-                <button id="agreementOkBtn" class="primary-button"></button>
+            <div class="modal-text text-left">
+                <p id="agePromptMessage" class="text-center"></p> <div class="my-4 text-center">
+                    <a href="#" id="agreementExpandLink" class="text-primary hover:underline font-semibold"></a> </div>
+                <div id="fullAgreementContent" class="hidden" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--md-sys-color-outline); border-radius: 0.5rem; padding: 0.75rem; margin-bottom: 1rem;">
+                    </div>
+
+                <label class="custom-checkbox-container mt-4">
+                    <input type="checkbox" id="agreeCheckbox" class="custom-checkbox-input">
+                    <span class="custom-checkbox-visual">
+                        <svg viewBox="0 0 24 24">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </span>
+                    <span class="ml-2 text-on-surface-variant text-sm" id="agreeCheckboxLabel"></span>
+                </label>
+            </div>
+            <div class="modal-buttons justify-center">
+                <button id="agreeAndEnterBtn" class="primary-button" disabled></button> <button id="declineAndExitBtn" class="secondary-button"></button>
             </div>
         </div>
     </div>
 
     <div class="relative w-full max-w-md mx-auto p-6 md:p-8 flex flex-col items-center main-container">
-        <!-- Header -->
         <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center tracking-tight">
             <span class="text-indigo-600" id="headerTextPart1">上</span><span id="headerTextPart2">或者 </span><span class="text-pink-600" id="headerTextPart3">不上</span>
         </h1>
         <p class="text-center mb-6" id="taglineText">上传图片，评估其有多他妈的性感或可操</p>
 
-        <!-- Dark/Light Mode Toggle -->
         <button id="darkModeToggle" class="absolute top-4 right-4 rounded-full shadow-md">
             <span id="darkModeIcon" class="material-symbols-outlined">
-                <!-- Icon text will be set dynamically by JS -->
-            </span>
+                </span>
         </button>
 
-        <!-- Image Upload Area -->
         <div class="w-full mb-6">
             <label for="imageUpload" class="block text-sm font-medium mb-2" id="labelImageUpload">选择图片</label>
             <input type="file" id="imageUpload" accept="image/*" class="block w-full text-sm form-element-base"
             >
         </div>
 
-        <!-- Image Preview and Collapse (Initially Hidden) -->
         <div id="imagePreviewControls" class="w-full mb-6 hidden">
             <div class="flex items-center justify-between mb-2">
                 <label class="block text-sm font-medium cursor-pointer select-none" id="labelToggleImagePreview">折叠图片</label>
@@ -494,7 +574,6 @@
             </p>
         </div>
 
-        <!-- Mode Selection -->
         <div class="w-full mb-6">
             <label for="modeSelect" class="block text-sm font-medium mb-2" id="labelModeSelect">理由长度</label>
             <select id="modeSelect" class="block w-full py-2 px-3 form-element-base">
@@ -504,7 +583,6 @@
             </select>
         </div>
 
-        <!-- Image Role Selection -->
         <div class="w-full mb-6">
             <label for="roleSelect" class="block text-sm font-medium mb-2" id="labelRoleSelect">图片角色</label>
             <select id="roleSelect" class="block w-full py-2 px-3 form-element-base">
@@ -514,7 +592,6 @@
             </select>
         </div>
 
-        <!-- Perspective Selection -->
         <div class="w-full mb-6">
             <label for="perspectiveSelect" class="block text-sm font-medium mb-2" id="labelPerspectiveSelect">文字视角</label>
             <select id="perspectiveSelect" class="block w-full py-2 px-3 form-element-base">
@@ -523,35 +600,30 @@
             </select>
         </div>
 
-        <!-- Action Button -->
         <button id="analyzeButton" class="w-full font-semibold py-3 px-6 rounded-full shadow-lg transform hover:-translate-y-1 focus:outline-none focus:ring-4 disabled:opacity-50 disabled:cursor-not-allowed">
             <span id="buttonText">评估他妈的魅惑度</span>
             <div id="loadingSpinner" class="spinner inline-block ml-2 hidden"></div>
         </button>
 
-        <!-- Result Display Area -->
         <div id="resultContainer" class="w-full mt-8 p-6 rounded-2xl shadow-inner hidden">
             <h2 class="text-xl font-bold mb-3 text-center" id="resultHeaderText">评估结果</h2>
             <div class="flex flex-col items-center justify-center space-y-2">
                 <div class="text-6xl font-extrabold" id="scoreDisplay">--</div>
-                <div class="explicit-phrase" id="phraseDisplay"></div> 
+                <div class="explicit-phrase" id="phraseDisplay"></div>
                 <p class="text-center text-lg leading-relaxed whitespace-pre-wrap mt-2" id="descriptionDisplay"></p>
                 <p class="text-center text-base leading-relaxed whitespace-pre-wrap mt-4" id="reasonDisplay"></p>
             </div>
         </div>
 
-        <!-- Error Message Container -->
         <div id="errorMessage" class="mt-4 p-3 rounded-xl hidden" role="alert">
             <p class="font-medium" id="errorPrefix">错误:</p>
             <p id="errorText"></p>
         </div>
 
-        <!-- Disclaimer (Simplified for modal trigger) -->
         <p class="text-xs text-center mt-8 text-on-surface-variant cursor-pointer hover:underline" id="disclaimerTriggerText">
             免责声明: 本工具使用AI进行图像分析。结果仅供娱乐参考，AI的判断可能不准确或存在偏差。请勿将其用于任何严肃目的。
         </p>
 
-        <!-- Language Switch -->
         <div class="w-full flex justify-center mt-4">
             <div id="languageSwitch" class="language-button-container">
                 <div class="language-button-half" id="langEn">EN</div>
@@ -559,9 +631,8 @@
             </div>
         </div>
 
-        <!-- User Agreement & Disclaimer Button -->
         <button id="userAgreementBtn" class="mt-4 py-2 px-4 rounded-full text-sm font-semibold transition-colors duration-200
-            bg-surface-variant text-on-surface-variant border border-outline hover:bg-outline hover:text-surface">
+            bg-surface-variant text-on-surface-variant border border-outline hover:bg-outline hover:text-surface hidden">
             <span id="userAgreementButtonText">用户协议与免责声明</span>
         </button>
     </div>
@@ -571,21 +642,19 @@
         const API_KEY = 'AIzaSyALvO3HMppp4OKWja1A96gLgiYTpHsvLJI';
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
-        // DOM Elements
-        const ageVerificationModal = document.getElementById('ageVerificationModal');
-        const ageModalTitle = document.getElementById('ageModalTitle');
-        const ageModalMessage = document.getElementById('ageModalMessage');
-        const confirmAdultBtn = document.getElementById('confirmAdultBtn');
-        const declineAdultBtn = document.getElementById('declineAdultBtn');
+        // DOM Elements for Combined Modal
+        const combinedAgreementModal = document.getElementById('combinedAgreementModal');
+        const combinedModalTitle = document.getElementById('combinedModalTitle');
+        const agePromptMessage = document.getElementById('agePromptMessage');
+        const agreementExpandLink = document.getElementById('agreementExpandLink');
+        const fullAgreementContent = document.getElementById('fullAgreementContent');
+        const agreeCheckbox = document.getElementById('agreeCheckbox');
+        const agreeCheckboxLabel = document.getElementById('agreeCheckboxLabel');
+        const agreeAndEnterBtn = document.getElementById('agreeAndEnterBtn');
+        const declineAndExitBtn = document.getElementById('declineAndExitBtn');
+        const combinedModalCloseBtn = document.getElementById('combinedModalCloseBtn');
 
-        const userAgreementModal = document.getElementById('userAgreementModal');
-        const agreementModalTitle = document.getElementById('agreementModalTitle');
-        const agreementModalContent = document.getElementById('agreementModalContent');
-        const agreementCloseBtn = document.getElementById('agreementCloseBtn');
-        const agreementOkBtn = document.getElementById('agreementOkBtn');
-        const userAgreementBtn = document.getElementById('userAgreementBtn'); // Button to open agreement modal
-        const disclaimerTriggerText = document.getElementById('disclaimerTriggerText'); // Existing disclaimer text, now a trigger
-
+        // Other existing DOM Elements
         const imageUpload = document.getElementById('imageUpload');
         const imagePreview = document.getElementById('imagePreview');
         const imagePreviewContainer = document.getElementById('imagePreviewContainer');
@@ -610,6 +679,8 @@
         const hdrSupportText = document.getElementById('hdrSupportText');
         const darkModeToggle = document.getElementById('darkModeToggle');
         const darkModeIcon = document.getElementById('darkModeIcon');
+        const disclaimerTriggerText = document.getElementById('disclaimerTriggerText');
+
 
         // Text Elements for Localization
         const elementsToTranslate = {
@@ -635,14 +706,14 @@
             resultHeaderText: 'resultHeaderText',
             errorPrefix: 'errorPrefix',
             disclaimerTriggerText: 'disclaimerTriggerText', // Now a trigger
-            userAgreementButtonText: 'userAgreementButtonText', // New button text
-            ageModalTitle: 'ageModalTitle',
-            ageModalMessage: 'ageModalMessage',
-            ageConfirmButton: 'ageConfirmButton',
-            ageDeclineButton: 'ageDeclineButton',
-            agreementModalTitle: 'agreementModalTitle',
-            agreementOkBtn: 'agreementOkBtn',
             hdrSupportText: 'hdrSupportText',
+            // Combined modal elements
+            combinedModalTitle: 'combinedModalTitle',
+            agePromptMessage: 'agePromptMessage',
+            agreementExpandLink: 'agreementExpandLink',
+            agreeCheckboxLabel: 'agreeCheckboxLabel',
+            agreeAndEnterBtn: 'agreeAndEnterBtn',
+            declineAndExitBtn: 'declineAndExitBtn',
         };
 
         const translations = {
@@ -669,13 +740,12 @@
                 resultHeaderText: '评估结果',
                 errorPrefix: '错误:',
                 disclaimerTriggerText: '免责声明: 本工具使用AI进行图像分析。结果仅供娱乐参考，AI的判断可能不准确或存在偏差。请勿将其用于任何严肃目的。',
-                userAgreementButtonText: '用户协议与免责声明',
-                ageModalTitle: '年龄确认',
-                ageModalMessage: '本网站内容可能包含成人主题。您是否已满18周岁？',
-                ageConfirmButton: '我已成年',
-                ageDeclineButton: '我未成年',
-                agreementModalTitle: '用户协议与免责声明',
-                agreementModalContent: `
+                hdrSupportText: '本应用支持显示HDR图片，实际效果取决于您的设备和浏览器支持。',
+                // Combined modal texts
+                combinedModalTitle: '访问确认',
+                agePromptMessage: '本网站内容可能包含成人主题。您是否已满18周岁？',
+                agreementExpandLink: '用户协议以及免责声明',
+                fullAgreementContentHTML: `
                     <p><strong>用户协议</strong></p>
                     <p>欢迎使用“上或者不上”！本工具旨在根据您上传的图片，通过AI技术对其进行魅惑程度评估。请您在使用本工具前，仔细阅读并同意以下条款：</p>
                     <ol>
@@ -687,10 +757,11 @@
                     </ol>
                     <p><strong>免责声明</strong></p>
                     <p>在法律允许的最大范围内，本工具及其开发者不承担因您使用本工具而导致的任何直接、间接、附带、特殊、惩罚性或后果性损害，包括但不限于数据丢失、利润损失、业务中断或声誉损害。本工具按“现状”提供，不作任何明示或暗示的保证，包括但不限于适销性、特定用途适用性或非侵权的保证。</p>
-                    <p>您理解并同意，您对本工具的使用自行承担全部风险。通过点击“同意”或继续使用本工具，即表示您已阅读、理解并同意遵守本用户协议及免责声明的所有条款。</p>
+                    <p>您理解并同意，您对本工具的使用自行承担全部风险。</p>
                 `,
-                agreementOkBtn: '我已阅读并同意',
-                hdrSupportText: '本应用支持显示HDR图片，实际效果取决于您的设备和浏览器支持。',
+                agreeCheckboxLabel: '我同意用户协议',
+                agreeAndEnterBtn: '我已成年并进入',
+                declineAndExitBtn: '我未成年并退出',
                 // Result specific translations
                 scoreDescriptions: {
                     '1-2': '完全不想碰，恶心透顶',
@@ -736,13 +807,12 @@
                 resultHeaderText: 'Evaluation Result',
                 errorPrefix: 'Error:',
                 disclaimerTriggerText: 'Disclaimer: This tool uses AI for image analysis. Results are for entertainment purposes only, and AI judgments may be inaccurate or biased. Do not use for any serious purposes.',
-                userAgreementButtonText: 'User Agreement & Disclaimer',
-                ageModalTitle: 'Age Confirmation',
-                ageModalMessage: 'This website may contain adult themes. Are you 18 years of age or older?',
-                ageConfirmButton: 'I am 18 or older',
-                ageDeclineButton: 'I am under 18',
-                agreementModalTitle: 'User Agreement & Disclaimer',
-                agreementModalContent: `
+                hdrSupportText: 'This application supports HDR image display; actual results depend on your device and browser support.',
+                // Combined modal texts
+                combinedModalTitle: 'Access Confirmation',
+                agePromptMessage: 'This website may contain adult themes. Are you 18 years of age or older?',
+                agreementExpandLink: 'User Agreement and Disclaimer',
+                fullAgreementContentHTML: `
                     <p><strong>User Agreement</strong></p>
                     <p>Welcome to "Fuck or Not"! This tool is designed to evaluate the level of seductiveness in images you upload, using AI technology. Please read and agree to the following terms before using this tool:</p>
                     <ol>
@@ -754,10 +824,11 @@
                     </ol>
                     <p><strong>Disclaimer</strong></p>
                     <p>To the maximum extent permitted by law, this tool and its developers shall not be liable for any direct, indirect, incidental, special, punitive, or consequential damages arising from your use of this tool, including but not limited to loss of data, loss of profits, business interruption, or reputational harm. This tool is provided "as is" without any warranties, express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, or non-infringement.</p>
-                    <p>You understand and agree that you use this tool at your sole risk. By clicking "Agree" or continuing to use this tool, you acknowledge that you have read, understood, and agreed to abide by all terms of this User Agreement and Disclaimer.</p>
+                    <p>You understand and agree that you use this tool at your sole risk.</p>
                 `,
-                agreementOkBtn: 'I have read and agree',
-                hdrSupportText: 'This application supports HDR image display; actual results depend on your device and browser support.',
+                agreeCheckboxLabel: 'I agree to the User Agreement',
+                agreeAndEnterBtn: 'I am 18+ and Enter',
+                declineAndExitBtn: 'I am under 18 / I Disagree',
                 // Result specific translations
                 scoreDescriptions: {
                     '1-2': 'Absolutely undesirable, utterly disgusting',
@@ -797,54 +868,71 @@
             document.body.style.overflow = ''; // Restore scrolling
         }
 
-        // --- Age Verification Logic ---
-        function checkAgeAndShowModal() {
-            const isAdultConfirmed = localStorage.getItem('isAdultConfirmed');
-            if (isAdultConfirmed === 'true') {
-                renderUI(); // Render UI immediately if already confirmed
+        // --- Combined Age & Agreement Logic ---
+        function checkAgreementAndAge() {
+            const hasAgreedToTerms = localStorage.getItem('hasAgreedToTerms'); // Check only this flag
+            if (hasAgreedToTerms === 'true') {
+                renderUI(); // Render main UI if already agreed
                 return;
             }
 
-            // Otherwise, show age verification modal
-            ageModalTitle.textContent = translations[currentLanguage].ageModalTitle;
-            ageModalMessage.textContent = translations[currentLanguage].ageModalMessage;
-            confirmAdultBtn.textContent = translations[currentLanguage].ageConfirmButton;
-            declineAdultBtn.textContent = translations[currentLanguage].ageDeclineButton;
-            showModal(ageVerificationModal);
+            // Otherwise, show combined modal
+            populateCombinedModal(); // Populate content based on current language
+            showModal(combinedAgreementModal);
         }
 
-        confirmAdultBtn.addEventListener('click', () => {
-            localStorage.setItem('isAdultConfirmed', 'true');
-            hideModal(ageVerificationModal);
-            renderUI(); // Render UI after confirmation
+        function populateCombinedModal() {
+            const lang = translations[currentLanguage];
+            combinedModalTitle.textContent = lang.combinedModalTitle;
+            agePromptMessage.textContent = lang.agePromptMessage;
+            agreementExpandLink.textContent = lang.agreementExpandLink;
+            fullAgreementContent.innerHTML = lang.fullAgreementContentHTML; // Set full HTML content
+            agreeCheckboxLabel.textContent = lang.agreeCheckboxLabel;
+            agreeAndEnterBtn.textContent = lang.agreeAndEnterBtn;
+            declineAndExitBtn.textContent = lang.declineAndExitBtn;
+            
+            // Ensure button is disabled if checkbox is not checked
+            agreeAndEnterBtn.disabled = !agreeCheckbox.checked;
+        }
+
+
+        // Event Listeners for Combined Modal
+        agreeAndEnterBtn.addEventListener('click', () => {
+            if (agreeCheckbox.checked) {
+                localStorage.setItem('hasAgreedToTerms', 'true'); // Set the flag
+                hideModal(combinedAgreementModal);
+                renderUI(); // Render main UI after agreement
+            }
         });
 
-        declineAdultBtn.addEventListener('click', () => {
-            // Go back to the previous page if not adult
-            window.history.back();
-            // Or if there's no history, redirect to a neutral page or display a message
-            // window.location.href = 'about:blank'; // or a custom 'access denied' page
+        declineAndExitBtn.addEventListener('click', () => {
+            localStorage.removeItem('hasAgreedToTerms'); // Ensure agreement is not saved
+            window.history.back(); // Go back to the previous page
         });
 
-        // --- User Agreement Modal Logic ---
-        userAgreementBtn.addEventListener('click', () => {
-            agreementModalTitle.textContent = translations[currentLanguage].agreementModalTitle;
-            agreementModalContent.innerHTML = translations[currentLanguage].agreementModalContent;
-            agreementOkBtn.textContent = translations[currentLanguage].agreementOkBtn;
-            showModal(userAgreementModal);
+        combinedModalCloseBtn.addEventListener('click', () => {
+            declineAndExitBtn.click(); // Close button acts as a decline
         });
 
-        // Make the small disclaimer text also a trigger
-        disclaimerTriggerText.addEventListener('click', () => {
-            userAgreementBtn.click(); // Trigger the main agreement button click
+        agreeCheckbox.addEventListener('change', () => {
+            agreeAndEnterBtn.disabled = !agreeCheckbox.checked; // Enable/disable button based on checkbox
         });
 
-        agreementCloseBtn.addEventListener('click', () => {
-            hideModal(userAgreementModal);
+        agreementExpandLink.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent default link behavior
+            fullAgreementContent.classList.toggle('hidden'); // Toggle visibility of full content
         });
 
-        agreementOkBtn.addEventListener('click', () => {
-            hideModal(userAgreementModal);
+        // The small disclaimer text now directly triggers the combined modal (for review)
+        disclaimerTriggerText.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent default link behavior for the disclaimer text
+            // Ensure the modal is populated with current language content before showing
+            populateCombinedModal();
+            // Ensure full content is visible if triggered from here, or user can toggle
+            fullAgreementContent.classList.remove('hidden'); 
+            agreeCheckbox.checked = false; // Reset checkbox if reviewing
+            agreeAndEnterBtn.disabled = true; // Disable button if reviewing
+            showModal(combinedAgreementModal);
         });
 
 
@@ -861,16 +949,19 @@
             const lang = translations[currentLanguage];
             for (const id in elementsToTranslate) {
                 const element = document.getElementById(elementsToTranslate[id]);
-                if (element && id !== 'agreementModalContent') { // Skip agreementModalContent as it's HTML
-                    element.textContent = lang[id];
+                // Skip modal content elements that are handled specifically or dynamically
+                if (element && !['fullAgreementContentHTML'].includes(id)) { // Exclude raw HTML content
+                    if (id === 'disclaimerTriggerText') { // Special handling for disclaimerTriggerText
+                        element.textContent = lang[id];
+                    } else if (id === 'agreeAndEnterBtn' || id === 'declineAndExitBtn' || id === 'agreementExpandLink' || id === 'agreeCheckboxLabel' || id === 'agePromptMessage' || id === 'combinedModalTitle') {
+                         // These are handled by populateCombinedModal() or specific listeners, ensure they are updated when renderUI is called
+                         // No direct textContent assignment here to avoid conflict with initial modal setup
+                    }
+                    else {
+                        element.textContent = lang[id];
+                    }
                 }
             }
-
-            // Special handling for disclaimerTriggerText
-            document.getElementById('disclaimerTriggerText').innerHTML = lang.disclaimerTriggerText;
-            // Special handling for agreement modal content
-            document.getElementById('agreementModalContent').innerHTML = lang.agreementModalContent;
-
 
             // Update language switch button active state
             if (currentLanguage === 'en') {
@@ -893,13 +984,16 @@
                 phraseDisplay.textContent = phrase;
                 descriptionDisplay.textContent = description;
             }
+            
+            // Re-populate modal content in case language changed while modal is hidden
+            populateCombinedModal();
 
             applyTheme(currentTheme); // Apply theme after language-specific icon update
         }
 
         // Initialize UI and theme on load
         document.addEventListener('DOMContentLoaded', () => {
-            checkAgeAndShowModal(); // Call age verification on load
+            checkAgreementAndAge(); // Call the combined check on load
             // Listen for system theme changes
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
                 applyTheme(e.matches ? 'dark' : 'light');
