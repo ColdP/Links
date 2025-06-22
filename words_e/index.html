@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文字评析系统</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Material Symbols CDN -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Marked.js CDN for Markdown parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.10/marked.min.js"></script>
+    <style>
+        /* Define base color variables (default to blue light theme) */
+        :root {
+            --primary: #00677F;
+            --on-primary: #FFFFFF;
+            --primary-light: #4DD8FF; /* For focus rings */
+            --primary-dark: #004D60; /* For hover states */
+            --secondary-container: #CFF7FF;
+            --on-secondary-container: #001F25;
+            --neutral: #49454f;
+            --on-neutral: #FFFFFF; /* For text on neutral background */
+            --surface: #F7FBFC;
+            --on-surface: #1A1C1E;
+            --surface-container: #FFFFFF; /* Light mode card background */
+            --border: #79747e;
+            --error: #ba1a1a;
+            --on-error-container: #ffdad6;
+
+            /* Current active colors - these will be dynamically updated */
+            --current-primary: var(--primary);
+            --current-on-primary: var(--on-primary);
+            --current-primary-light: var(--primary-light);
+            --current-primary-dark: var(--primary-dark);
+            --current-secondary-container: var(--secondary-container);
+            --current-on-secondary-container: var(--on-secondary-container);
+            --current-neutral: var(--neutral);
+            --current-on-neutral: var(--on-neutral);
+            --current-surface: var(--surface);
+            --current-on-surface: var(--on-surface);
+            --current-surface-container: var(--surface-container); /* Apply to cards */
+            --current-border: var(--border);
+            --current-error: var(--error);
+            --current-on-error-container: var(--on-error-container);
+        }
+
+        /* Dark mode overrides (applied when body has 'dark-mode' class) */
+        body.dark-mode {
+            --current-primary: #80D2EF; /* Dark mode primary */
+            --current-on-primary: #003542;
+            --current-primary-light: #A5E4FF; /* A lighter shade for focus/active in dark mode */
+            --current-primary-dark: #50B6DA; /* Darker shade for hover in dark mode */
+            --current-secondary-container: #004D60;
+            --current-on-secondary-container: #CFF7FF;
+            --current-neutral: #C7C6CA; /* Lighter neutral for dark mode */
+            --current-on-neutral: #1A1C1E; /* Dark text on neutral background in dark mode */
+            --current-surface: #121314; /* Dark surface */
+            --current-on-surface: #E3E2E6; /* Light text on dark surface */
+            --current-surface-container: #222224; /* Dark mode card background - adjusted for contrast */
+            --current-border: #928F95; /* Lighter border for dark mode */
+            --current-error: #FFB4AB;
+            --current-on-error-container: #690005;
+        }
+
+        /* Apply current variables to elements */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--current-surface); /* Background uses current surface color */
+            color: var(--current-on-surface); /* Text color uses current on-surface color */
+            margin: 0;
+            padding: 4rem 2rem;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for dark mode */
+        }
+
+        .content-wrapper {
+            max-width: 960px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        h1 {
+            color: var(--current-primary); /* Heading color */
+            transition: color 0.3s ease;
+        }
+
+        .input-group label {
+            font-weight: 500;
+            color: var(--current-neutral); /* Label color */
+            margin-bottom: 0.5rem;
+            transition: color 0.3s ease;
+        }
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid var(--current-border); /* Input border color */
+            border-radius: 16px;
+            background-color: var(--current-surface-container); /* Inputs have a surface-container background */
+            color: var(--current-on-surface); /* Input text color */
+            transition: border-color 0.2s, box-shadow 0.2s, background-color 0.3s ease, color 0.3s ease;
+        }
+        .input-group input:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: var(--current-primary); /* Focus border color */
+            box-shadow: 0 0 0 2px var(--current-primary-light); /* Focus ring color */
+        }
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            background-color: var(--current-secondary-container); /* Radio item background */
+            color: var(--current-on-secondary-container); /* Radio item text color */
+            cursor: pointer;
+            transition: background-color 0.2s, box-shadow 0.2s, color 0.3s ease;
+        }
+        .radio-group label:hover {
+            background-color: color-mix(in srgb, var(--current-secondary-container) 90%, black); /* Subtle darker hover */
+        }
+        .radio-group input[type="radio"]:checked + span {
+            background-color: var(--current-primary); /* Checked radio background */
+            color: var(--current-on-primary); /* Checked radio text color */
+            font-weight: 500;
+        }
+        .submit-button {
+            background-color: var(--current-primary); /* Button background */
+            color: var(--current-on-primary); /* Button text color */
+            padding: 1rem 2rem;
+            border-radius: 20px;
+            font-size: 1.125rem;
+            font-weight: 500;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s, box-shadow 0.2s, color 0.3s ease;
+        }
+        .submit-button:hover {
+            background-color: var(--current-primary-dark); /* Button hover background */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        .results-section {
+            background-color: var(--current-surface-container); /* Results section background uses surface-container */
+            padding: 2rem;
+            border-radius: 28px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
+            margin-top: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        .score-display {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--current-primary); /* Score color */
+            text-align: center;
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+        .aspect-score {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px dashed color-mix(in srgb, var(--current-neutral) 30%, transparent); /* Subtle separator, adapts to theme */
+        }
+        .aspect-score:last-child {
+            border-bottom: none;
+        }
+        .aspect-score span:first-child {
+            font-weight: 500;
+            color: var(--current-neutral); /* Aspect label color */
+            transition: color 0.3s ease;
+        }
+        .aspect-score span:last-child {
+            font-weight: 600;
+            color: var(--current-on-surface); /* Aspect score number color */
+            transition: color 0.3s ease;
+        }
+        .analysis-text {
+            line-height: 1.6;
+            color: var(--current-neutral); /* Analysis text color */
+            background-color: var(--current-secondary-container); /* Analysis box background */
+            padding: 1rem;
+            border-radius: 0.75rem; /* Match radio group for consistency */
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        /* Markdown specific styling (basic) */
+        .analysis-text h1, .analysis-text h2, .analysis-text h3 {
+            color: var(--current-on-surface);
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+            font-weight: bold;
+        }
+        .analysis-text h1 { font-size: 1.5em; }
+        .analysis-text h2 { font-size: 1.3em; }
+        .analysis-text h3 { font-size: 1.1em; }
+        .analysis-text p {
+            margin-bottom: 1em;
+        }
+        .analysis-text ul, .analysis-text ol {
+            margin-left: 1.5em;
+            margin-bottom: 1em;
+            list-style-type: disc;
+        }
+        .analysis-text ol {
+            list-style-type: decimal;
+        }
+        .analysis-text strong {
+            font-weight: bold;
+        }
+        .analysis-text em {
+            font-style: italic;
+        }
+
+
+        .loading-spinner {
+            border: 4px solid color-mix(in srgb, var(--current-surface) 50%, transparent);
+            border-top: 4px solid var(--current-primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+            display: none;
+            transition: border-top-color 0.3s ease;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error-message {
+            color: var(--current-error);
+            background-color: var(--current-on-error-container);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+            display: none;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Top controls for theme and dark/light mode */
+        .top-controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            width: 100%;
+            max-width: 960px; /* Align with content-wrapper */
+        }
+        .control-button {
+            background-color: var(--current-secondary-container);
+            color: var(--current-on-secondary-container);
+            padding: 0.75rem; /* Adjusted padding for icon only */
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Center icon */
+            /* Removed gap: 0.5rem; */
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+        }
+        .control-button:hover {
+            background-color: color-mix(in srgb, var(--current-secondary-container) 90%, black);
+        }
+        .control-button .material-symbols-outlined {
+            font-size: 1.5rem;
+        }
+        .theme-select {
+            background-color: var(--current-secondary-container);
+            color: var(--current-on-secondary-container);
+            padding: 0.75rem 1rem;
+            border-radius: 16px;
+            border: 1px solid var(--current-border);
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s, border-color 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <!-- Top Controls -->
+        <div class="top-controls">
+            <select id="themeSelector" class="theme-select">
+                <option value="blue">蓝色主题</option>
+                <option value="green">绿色主题</option>
+                <option value="purple">紫色主题</option>
+                <option value="orange">橙色主题</option>
+                <option value="teal">青色主题</option>
+            </select>
+            <button id="darkModeToggle" class="control-button">
+                <span id="darkModeIcon" class="material-symbols-outlined">light_mode</span>
+                <!-- <span id="darkModeText">切换到深色模式</span> Removed text -->
+            </button>
+        </div>
+
+        <h1 class="text-4xl font-bold text-center mb-4">文字评析系统</h1>
+
+        <!-- Input Section -->
+        <div class="input-group surface-container-bg p-6 rounded-2xl shadow-md">
+            <label for="title" class="block text-lg mb-2">文本标题 (可选):</label>
+            <input type="text" id="title" class="w-full" placeholder="输入文本标题">
+        </div>
+        <div class="input-group surface-container-bg p-6 rounded-2xl shadow-md">
+            <label for="content" class="block text-lg mb-2">文本正文 <span class="text-red-500">*</span>:</label>
+            <textarea id="content" rows="10" class="w-full resize-y" placeholder="输入您想要评析的文本正文..."></textarea>
+        </div>
+
+        <!-- Analysis Mode Selection -->
+        <div class="analysis-mode-group surface-container-bg p-6 rounded-2xl shadow-md">
+            <label class="block text-lg font-medium mb-2">选择评语模式:</label>
+            <div class="flex flex-wrap gap-4 radio-group">
+                <label>
+                    <input type="radio" name="analysisMode" value="short" class="hidden" checked>
+                    <span class="px-4 py-2 rounded-lg text-base cursor-pointer transition-colors duration-200">简短 (一句话)</span>
+                </label>
+                <label>
+                    <input type="radio" name="analysisMode" value="medium" class="hidden">
+                    <span class="px-4 py-2 rounded-lg text-base cursor-pointer transition-colors duration-200">中等长度 (~100字)</span>
+                </label>
+                <label>
+                    <input type="radio" name="analysisMode" value="long" class="hidden">
+                    <span class="px-4 py-2 rounded-lg text-base cursor-pointer transition-colors duration-200">较长解析 (~500字)</span>
+                </label>
+                <label>
+                    <input type="radio" name="analysisMode" value="essay" class="hidden">
+                    <span class="px-4 py-2 rounded-lg text-base cursor-pointer transition-colors duration-200">论文模式 (详细)</span>
+                </label>
+            </div>
+        </div>
+
+        <button id="submitBtn" class="submit-button self-center">开始评析</button>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="loading-spinner"></div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="error-message"></div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="results-section hidden">
+            <h2 class="text-2xl font-bold mb-4 text-center">评析结果</h2>
+
+            <!-- Overall Score -->
+            <div>
+                <p class="text-lg text-center mb-2">综合评分 (满分100):</p>
+                <p id="overallScore" class="score-display">--</p>
+            </div>
+
+            <!-- Aspect Scores -->
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold mb-3">各维度评分:</h3>
+                <div class="flex flex-col gap-2">
+                    <div class="aspect-score">
+                        <span>意象/感官细节:</span>
+                        <span id="scoreImagery">--</span>
+                    </div>
+                    <div class="aspect-score">
+                        <span>情感深度/氛围:</span>
+                        <span id="scoreEmotional">--</span>
+                    </div>
+                    <div class="aspect-score">
+                        <span>修辞/风格:</span>
+                        <span id="scoreFigurative">--</span>
+                    </div>
+                    <div class="aspect-score">
+                        <span>叙事流畅性/连贯性:</span>
+                        <span id="scoreNarrative">--</span>
+                    </div>
+                    <div class="aspect-score">
+                        <span>原创性/冲击力:</span>
+                        <span id="scoreOriginality">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Text -->
+            <div>
+                <h3 class="text-xl font-semibold mb-3">评析内容:</h3>
+                <div id="analysisContent" class="analysis-text">
+                    <!-- Analysis will be injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const titleInput = document.getElementById('title');
+        const contentInput = document.getElementById('content');
+        const analysisModeRadios = document.querySelectorAll('input[name="analysisMode"]');
+        const submitBtn = document.getElementById('submitBtn');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const errorMessage = document.getElementById('errorMessage');
+        const resultsSection = document.getElementById('resultsSection');
+        const overallScoreElem = document.getElementById('overallScore');
+        const scoreImageryElem = document.getElementById('scoreImagery');
+        const scoreEmotionalElem = document.getElementById('scoreEmotional');
+        const scoreFigurativeElem = document.getElementById('scoreFigurative');
+        const scoreNarrativeElem = document.getElementById('scoreNarrative');
+        const scoreOriginalityElem = document.getElementById('scoreOriginality');
+        const analysisContentElem = document.getElementById('analysisContent');
+
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const darkModeIcon = document.getElementById('darkModeIcon');
+        // const darkModeText = document.getElementById('darkModeText'); // Removed text element
+        const themeSelector = document.getElementById('themeSelector');
+
+        // Gemini API Key (provided by user)
+        const apiKey = "AIzaSyALvO3HMppp4OKWja1A96gLgiYTpHsvLJI";
+
+        // Define Material 3 Expressive color palettes
+        const themes = {
+            blue: {
+                primary: '#00677F', onPrimary: '#FFFFFF', primaryLight: '#4DD8FF', primaryDark: '#004D60',
+                secondaryContainer: '#CFF7FF', onSecondaryContainer: '#001F25',
+                neutral: '#49454f', onNeutral: '#FFFFFF',
+                surface: '#F7FBFC', onSurface: '#1A1C1E',
+                surfaceContainer: '#FFFFFF', /* Light mode card background */
+                border: '#79747e',
+                error: '#ba1a1a', onErrorContainer: '#ffdad6'
+            },
+            green: {
+                primary: '#006B36', onPrimary: '#FFFFFF', primaryLight: '#65D59C', primaryDark: '#004F2A',
+                secondaryContainer: '#82F1B0', onSecondaryContainer: '#00210E',
+                neutral: '#4C4639', onNeutral: '#FFFFFF',
+                surface: '#FBFBEE', onSurface: '#1A1C19',
+                surfaceContainer: '#FFFFFF', /* Light mode card background */
+                border: '#7C776D',
+                error: '#ba1a1a', onErrorContainer: '#ffdad6'
+            },
+            purple: {
+                primary: '#6750A4', onPrimary: '#FFFFFF', primaryLight: '#D0BCFF', primaryDark: '#4F378B',
+                secondaryContainer: '#E8DEF8', onSecondaryContainer: '#1D1B20',
+                neutral: '#49454F', onNeutral: '#FFFFFF',
+                surface: '#FFFBFE', onSurface: '#1C1B1F',
+                surfaceContainer: '#FFFFFF', /* Light mode card background */
+                border: '#79747E',
+                error: '#ba1a1a', onErrorContainer: '#ffdad6'
+            },
+            orange: {
+                primary: '#994B00', onPrimary: '#FFFFFF', primaryLight: '#FFBB99', primaryDark: '#733700',
+                secondaryContainer: '#FFDBCA', onSecondaryContainer: '#331300',
+                neutral: '#7B756C', onNeutral: '#FFFFFF',
+                surface: '#FFF8F6', onSurface: '#201B17',
+                surfaceContainer: '#FFFFFF', /* Light mode card background */
+                border: '#9B948A',
+                error: '#ba1a1a', onErrorContainer: '#ffdad6'
+            },
+            teal: {
+                primary: '#006A60', onPrimary: '#FFFFFF', primaryLight: '#4DDAD0', primaryDark: '#004F47',
+                secondaryContainer: '#7AFEE4', onSecondaryContainer: '#00201B',
+                neutral: '#737877', onNeutral: '#FFFFFF',
+                surface: '#FBFEFD', onSurface: '#1A1C1B',
+                surfaceContainer: '#FFFFFF', /* Light mode card background */
+                border: '#9CA3A1',
+                error: '#ba1a1a', onErrorContainer: '#ffdad6'
+            }
+        };
+
+        const darkThemes = {
+             blue: {
+                primary: '#80D2EF', onPrimary: '#003542', primaryLight: '#A5E4FF', primaryDark: '#50B6DA',
+                secondaryContainer: '#004D60', onSecondaryContainer: '#CFF7FF',
+                neutral: '#C7C6CA', onNeutral: '#1A1C1E',
+                surface: '#121314', onSurface: '#E3E2E6',
+                surfaceContainer: '#222224', /* Dark mode card background - adjusted for contrast */
+                border: '#928F95',
+                error: '#FFB4AB', onErrorContainer: '#690005'
+            },
+            green: {
+                primary: '#65D59C', onPrimary: '#00381B', primaryLight: '#A0FFCF', primaryDark: '#2FBA7C',
+                secondaryContainer: '#005128', onSecondaryContainer: '#82F1B0',
+                neutral: '#CFC5B4', onNeutral: '#1A1C19',
+                surface: '#1A1C19', onSurface: '#E3E2D9',
+                surfaceContainer: '#30342D', /* Dark mode card background - adjusted for contrast */
+                border: '#9A9285',
+                error: '#FFB4AB', onErrorContainer: '#690005'
+            },
+            purple: {
+                primary: '#D0BCFF', onPrimary: '#381E72', primaryLight: '#E8DEF8', primaryDark: '#AF9EEF',
+                secondaryContainer: '#4F378B', onSecondaryContainer: '#E8DEF8',
+                neutral: '#CFC5D0', onNeutral: '#1C1B1F',
+                surface: '#1C1B1F', onSurface: '#E6E1E5',
+                surfaceContainer: '#322F36', /* Dark mode card background - adjusted for contrast */
+                border: '#938F99',
+                error: '#FFB4AB', onErrorContainer: '#690005'
+            },
+            orange: {
+                primary: '#FFB68C', onPrimary: '#522600', primaryLight: '#FFDBC1', primaryDark: '#A65A00',
+                secondaryContainer: '#733700', onSecondaryContainer: '#FFDBC1',
+                neutral: '#E4DFD9', onNeutral: '#201B17',
+                surface: '#2B1400', onSurface: '#FFDBC1',
+                surfaceContainer: '#4A2A00', /* Dark mode card background - adjusted for contrast */
+                border: '#BBA496',
+                error: '#FFB4AB', onErrorContainer: '#690005'
+            },
+            teal: {
+                primary: '#7AFEE4', onPrimary: '#003730', primaryLight: '#B1FFEB', primaryDark: '#4FD5C9',
+                secondaryContainer: '#005047', onSecondaryContainer: '#7AFEE4',
+                neutral: '#E1E3E2', onNeutral: '#1A1C1B',
+                surface: '#0D1513', onSurface: '#E0FFFA',
+                surfaceContainer: '#243A36', /* Dark mode card background - adjusted for contrast */
+                border: '#ABB9B6',
+                error: '#FFB4AB', onErrorContainer: '#690005'
+            }
+        };
+
+
+        /**
+         * Applies the selected theme colors to the CSS variables.
+         * @param {string} themeName - The name of the theme (e.g., 'blue', 'green').
+         * @param {boolean} isDarkMode - Whether to apply dark mode specific colors for the theme.
+         */
+        function applyTheme(themeName, isDarkMode) {
+            const selectedTheme = isDarkMode ? darkThemes[themeName] : themes[themeName];
+            if (!selectedTheme) {
+                console.warn(`Theme '${themeName}' not found.`);
+                return;
+            }
+            for (const [key, value] of Object.entries(selectedTheme)) {
+                document.documentElement.style.setProperty(`--current-${key}`, value);
+            }
+            localStorage.setItem('selectedTheme', themeName);
+        }
+
+        /**
+         * Toggles between light and dark mode.
+         */
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+            updateDarkModeToggleButton(isDarkMode);
+            applyTheme(localStorage.getItem('selectedTheme') || 'blue', isDarkMode); // Reapply theme with current mode
+        }
+
+        /**
+         * Updates the dark mode toggle button icon and text.
+         * @param {boolean} isDarkMode - True if dark mode is active, false otherwise.
+         */
+        function updateDarkModeToggleButton(isDarkMode) {
+            if (isDarkMode) {
+                darkModeIcon.textContent = 'dark_mode';
+                // darkModeText.textContent = '切换到浅色模式'; // Removed text
+            } else {
+                darkModeIcon.textContent = 'light_mode';
+                // darkModeText.textContent = '切换到深色模式'; // Removed text
+            }
+        }
+
+        /**
+         * Initializes theme and dark mode from localStorage.
+         */
+        function initializeThemeAndDarkMode() {
+            const savedTheme = localStorage.getItem('selectedTheme') || 'blue';
+            const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+
+            if (savedDarkMode) {
+                document.body.classList.add('dark-mode');
+            }
+            updateDarkModeToggleButton(savedDarkMode);
+            themeSelector.value = savedTheme; // Set the dropdown to the saved theme
+            applyTheme(savedTheme, savedDarkMode); // Apply the theme and mode
+        }
+
+        /**
+         * Clears previous results and error messages, and hides the results section.
+         */
+        function clearResults() {
+            overallScoreElem.textContent = '--';
+            scoreImageryElem.textContent = '--';
+            scoreEmotionalElem.textContent = '--';
+            scoreFigurativeElem.textContent = '--';
+            scoreNarrativeElem.textContent = '--';
+            scoreOriginalityElem.textContent = '--';
+            analysisContentElem.innerHTML = ''; // Use innerHTML for Markdown
+            errorMessage.style.display = 'none';
+            resultsSection.classList.add('hidden');
+        }
+
+        /**
+         * Handles the submission of the text for analysis.
+         * Fetches scores and analysis from the Gemini API.
+         */
+        async function rateText() {
+            clearResults(); // Clear previous results
+            const title = titleInput.value.trim();
+            const content = contentInput.value.trim();
+            let selectedMode = '';
+            let modeText = '';
+
+            for (const radio of analysisModeRadios) {
+                if (radio.checked) {
+                    selectedMode = radio.value;
+                    break;
+                }
+            }
+
+            if (!content) {
+                errorMessage.textContent = '文本正文不能为空！';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            // Determine mode text for the prompt
+            switch (selectedMode) {
+                case 'short':
+                    modeText = '简短模式（一句话）';
+                    break;
+                case 'medium':
+                    modeText = '中等长度模式（约100字）';
+                    break;
+                case 'long':
+                    modeText = '较长解析模式（约500字）';
+                    break;
+                case 'essay':
+                    modeText = '论文模式（详细、深度，约1000字，支持Markdown格式）';
+                    break;
+                default:
+                    modeText = '简短模式（一句话）';
+            }
+
+            // Show loading spinner
+            loadingSpinner.style.display = 'block';
+            submitBtn.disabled = true; // Disable button during processing
+
+            try {
+                // Construct the prompt for the Gemini API
+                const prompt = `
+请对以下文本进行评析，并从其意象/感官细节、情感深度/氛围、修辞/风格、叙事流畅性/连贯性、原创性/冲击力这五个维度给出0-100分的评分。同时，请根据所选的评语模式生成相应的评析（评析内容应包含Markdown格式，例如使用**粗体**、*斜体*、列表等）。请严格按照以下JSON Schema返回结果：
+{
+    "overallScore": { "type": "NUMBER", "description": "总评分，0-100" },
+    "aspectScores": {
+        "type": "OBJECT",
+        "properties": {
+            "imagerySensoryDetail": { "type": "NUMBER", "description": "意象/感官细节评分" },
+            "emotionalDepthAtmosphere": { "type": "NUMBER", "description": "情感深度/氛围评分" },
+            "figurativeLanguageStyle": { "type": "NUMBER", "description": "修辞/风格评分" },
+            "narrativeFlowCohesion": { "type": "NUMBER", "description": "叙事流畅性/连贯性评分" },
+            "originalityImpact": { "type": "NUMBER", "description": "原创性/冲击力评分" }
+        },
+        "required": [
+            "imagerySensoryDetail",
+            "emotionalDepthAtmosphere",
+            "figurativeLanguageStyle",
+            "narrativeFlowCohesion",
+            "originalityImpact"
+        ]
+    },
+    "analysis": { "type": "STRING", "description": "根据所选模式生成的评析内容，应包含Markdown格式" }
+}
+
+**文本标题 (可选):** ${title ? title : '无标题'}
+**文本正文:**
+${content}
+
+**评语模式:** ${modeText}
+                `;
+
+                // Define the payload for the Gemini API request
+                const chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = {
+                    contents: chatHistory,
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                "overallScore": { "type": "NUMBER" },
+                                "aspectScores": {
+                                    "type": "OBJECT",
+                                    "properties": {
+                                        "imagerySensoryDetail": { "type": "NUMBER" },
+                                        "emotionalDepthAtmosphere": { "type": "NUMBER" },
+                                        "figurativeLanguageStyle": { "type": "NUMBER" },
+                                        "narrativeFlowCohesion": { "type": "NUMBER" },
+                                        "originalityImpact": { "type": "NUMBER" }
+                                    },
+                                    "required": [
+                                        "imagerySensoryDetail",
+                                        "emotionalDepthAtmosphere",
+                                        "figurativeLanguageStyle",
+                                        "narrativeFlowCohesion",
+                                        "originalityImpact"
+                                    ]
+                                },
+                                "analysis": { "type": "STRING" }
+                            },
+                            "required": ["overallScore", "aspectScores", "analysis"]
+                        }
+                    }
+                };
+
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`API error: ${response.status} ${response.statusText} - ${errorData.error.message || 'Unknown error'}`);
+                }
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const jsonString = result.candidates[0].content.parts[0].text;
+                    const parsedData = JSON.parse(jsonString);
+
+                    // Update UI with results
+                    overallScoreElem.textContent = parsedData.overallScore !== undefined ? parsedData.overallScore.toFixed(0) : '--';
+                    if (parsedData.aspectScores) {
+                        scoreImageryElem.textContent = parsedData.aspectScores.imagerySensoryDetail !== undefined ? parsedData.aspectScores.imagerySensoryDetail.toFixed(0) : '--';
+                        scoreEmotionalElem.textContent = parsedData.aspectScores.emotionalDepthAtmosphere !== undefined ? parsedData.aspectScores.emotionalDepthAtmosphere.toFixed(0) : '--';
+                        scoreFigurativeElem.textContent = parsedData.aspectScores.figurativeLanguageStyle !== undefined ? parsedData.aspectScores.figurativeLanguageStyle.toFixed(0) : '--';
+                        scoreNarrativeElem.textContent = parsedData.aspectScores.narrativeFlowCohesion !== undefined ? parsedData.aspectScores.narrativeFlowCohesion.toFixed(0) : '--';
+                        scoreOriginalityElem.textContent = parsedData.aspectScores.originalityImpact !== undefined ? parsedData.aspectScores.originalityImpact.toFixed(0) : '--';
+                    }
+                    // Parse Markdown content before setting it
+                    analysisContentElem.innerHTML = parsedData.analysis ? marked.parse(parsedData.analysis) : '未能生成评析内容。';
+                    resultsSection.classList.remove('hidden');
+
+                } else {
+                    throw new Error('API响应结构异常或内容缺失。');
+                }
+
+            } catch (error) {
+                console.error('评析失败:', error);
+                errorMessage.textContent = `评析失败: ${error.message || '未知错误'}`;
+                errorMessage.style.display = 'block';
+            } finally {
+                loadingSpinner.style.display = 'none'; // Hide loading spinner
+                submitBtn.disabled = false; // Re-enable button
+            }
+        }
+
+        // Event Listeners
+        submitBtn.addEventListener('click', rateText);
+        darkModeToggle.addEventListener('click', toggleDarkMode);
+        themeSelector.addEventListener('change', (event) => {
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            applyTheme(event.target.value, isDarkMode);
+        });
+
+        // Initialize theme and dark mode on page load
+        document.addEventListener('DOMContentLoaded', initializeThemeAndDarkMode);
+    </script>
+</body>
+</html>
