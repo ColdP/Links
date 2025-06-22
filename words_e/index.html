@@ -10,8 +10,6 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
     <!-- Google Fonts - Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Marked.js CDN for Markdown parsing -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.10/marked.min.js"></script>
     <style>
         /* Define base color variables (default to blue light theme) */
         :root {
@@ -30,7 +28,7 @@
             --error: #ba1a1a;
             --on-error-container: #ffdad6;
 
-            /* Current active colors - these will be dynamically updated */
+            /* Current active colors - these will be dynamically updated based on dark mode */
             --current-primary: var(--primary);
             --current-on-primary: var(--on-primary);
             --current-primary-light: var(--primary-light);
@@ -164,24 +162,55 @@
         }
         .aspect-score {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column; /* Stack info row and progress bar row vertically */
             padding: 0.75rem 0;
-            border-bottom: 1px dashed color-mix(in srgb, var(--current-neutral) 30%, transparent); /* Subtle separator, adapts to theme */
+            border-bottom: 1px dashed color-mix(in srgb, var(--current-neutral) 30%, transparent);
         }
         .aspect-score:last-child {
             border-bottom: none;
         }
-        .aspect-score span:first-child {
+
+        .aspect-info { /* This is the top row: label + score */
+            display: flex;
+            justify-content: space-between; /* Push label left, score right */
+            align-items: baseline; /* Align text baselines */
+            width: 100%; /* Make it span full width of aspect-score */
+            margin-bottom: 0.25rem; /* Space between info and progress bar */
+        }
+
+        .aspect-label { /* The text label */
             font-weight: 500;
-            color: var(--current-neutral); /* Aspect label color */
+            color: var(--current-neutral);
             transition: color 0.3s ease;
         }
-        .aspect-score span:last-child {
+
+        .aspect-value { /* The score number */
             font-weight: 600;
-            color: var(--current-on-surface); /* Aspect score number color */
+            color: var(--current-on-surface);
             transition: color 0.3s ease;
         }
+
+        .progress-bar-area { /* Container for the progress bar */
+            width: 100%; /* Make it span full width of aspect-score */
+        }
+
+        /* Progress Bar Styles */
+        .progress-bar-background {
+            width: 100%;
+            height: 8px; /* Height of the progress bar */
+            background-color: var(--current-secondary-container); /* Background of the bar */
+            border-radius: 4px; /* Rounded corners for the background */
+            overflow: hidden; /* Hide overflow of the fill */
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%; /* Initial width for animation */
+            background-color: var(--current-primary); /* Fill color */
+            border-radius: 4px; /* Rounded corners for the fill */
+            transition: width 0.8s ease-out; /* Smooth animation for width change */
+        }
+
         .analysis-text {
             line-height: 1.6;
             color: var(--current-neutral); /* Analysis text color */
@@ -190,7 +219,7 @@
             border-radius: 0.75rem; /* Match radio group for consistency */
             transition: background-color 0.3s ease, color 0.3s ease;
         }
-        /* Markdown specific styling (basic) */
+        /* Basic rich text styling for AI-generated content (if it includes HTML tags) */
         .analysis-text h1, .analysis-text h2, .analysis-text h3 {
             color: var(--current-on-surface);
             margin-top: 1em;
@@ -244,7 +273,7 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Top controls for theme and dark/light mode */
+        /* Top controls for dark/light mode toggle (theme selector removed) */
         .top-controls {
             display: flex;
             justify-content: flex-end;
@@ -264,7 +293,6 @@
             display: flex;
             align-items: center;
             justify-content: center; /* Center icon */
-            /* Removed gap: 0.5rem; */
             box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
             transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
         }
@@ -274,31 +302,15 @@
         .control-button .material-symbols-outlined {
             font-size: 1.5rem;
         }
-        .theme-select {
-            background-color: var(--current-secondary-container);
-            color: var(--current-on-secondary-container);
-            padding: 0.75rem 1rem;
-            border-radius: 16px;
-            border: 1px solid var(--current-border);
-            cursor: pointer;
-            transition: background-color 0.2s, color 0.2s, border-color 0.3s ease;
-        }
+        /* .theme-select removed */
     </style>
 </head>
 <body>
     <div class="content-wrapper">
         <!-- Top Controls -->
         <div class="top-controls">
-            <select id="themeSelector" class="theme-select">
-                <option value="blue">蓝色主题</option>
-                <option value="green">绿色主题</option>
-                <option value="purple">紫色主题</option>
-                <option value="orange">橙色主题</option>
-                <option value="teal">青色主题</option>
-            </select>
             <button id="darkModeToggle" class="control-button">
                 <span id="darkModeIcon" class="material-symbols-outlined">light_mode</span>
-                <!-- <span id="darkModeText">切换到深色模式</span> Removed text -->
             </button>
         </div>
 
@@ -360,24 +372,71 @@
                 <h3 class="text-xl font-semibold mb-3">各维度评分:</h3>
                 <div class="flex flex-col gap-2">
                     <div class="aspect-score">
-                        <span>意象/感官细节:</span>
-                        <span id="scoreImagery">--</span>
+                        <div class="aspect-info">
+                            <span class="aspect-label">意象/感官细节:</span>
+                            <span class="aspect-value" id="scoreImagery">--</span>
+                        </div>
+                        <div class="progress-bar-area">
+                            <div class="progress-bar-background">
+                                <div id="progressImagery" class="progress-bar-fill"></div>
+                            </div>
+                        </div>
                     </div>
                     <div class="aspect-score">
-                        <span>情感深度/氛围:</span>
-                        <span id="scoreEmotional">--</span>
+                        <div class="aspect-info">
+                            <span class="aspect-label">情感深度/氛围:</span>
+                            <span class="aspect-value" id="scoreEmotional">--</span>
+                        </div>
+                        <div class="progress-bar-area">
+                            <div class="progress-bar-background">
+                                <div id="progressEmotional" class="progress-bar-fill"></div>
+                            </div>
+                        </div>
                     </div>
                     <div class="aspect-score">
-                        <span>修辞/风格:</span>
-                        <span id="scoreFigurative">--</span>
+                        <div class="aspect-info">
+                            <span class="aspect-label">修辞/风格:</span>
+                            <span class="aspect-value" id="scoreFigurative">--</span>
+                        </div>
+                        <div class="progress-bar-area">
+                            <div class="progress-bar-background">
+                                <div id="progressFigurative" class="progress-bar-fill"></div>
+                            </div>
+                        </div>
                     </div>
                     <div class="aspect-score">
-                        <span>叙事流畅性/连贯性:</span>
-                        <span id="scoreNarrative">--</span>
+                        <div class="aspect-info">
+                            <span class="aspect-label">叙事流畅性/连贯性:</span>
+                            <span class="aspect-value" id="scoreNarrative">--</span>
+                        </div>
+                        <div class="progress-bar-area">
+                            <div class="progress-bar-background">
+                                <div id="progressNarrative" class="progress-bar-fill"></div>
+                            </div>
+                        </div>
                     </div>
                     <div class="aspect-score">
-                        <span>原创性/冲击力:</span>
-                        <span id="scoreOriginality">--</span>
+                        <div class="aspect-info">
+                            <span class="aspect-label">原创性/冲击力:</span>
+                            <span class="aspect-value" id="scoreOriginality">--</span>
+                        </div>
+                        <div class="progress-bar-area">
+                            <div class="progress-bar-background">
+                                <div id="progressOriginality" class="progress-bar-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- AI Rate -->
+                    <div class="aspect-score">
+                        <div class="aspect-info">
+                            <span class="aspect-label">AI 率:</span>
+                            <span class="aspect-value" id="scoreAIRate">--</span>
+                        </div>
+                        <div class="progress-bar-area">
+                            <div class="progress-bar-background">
+                                <div id="progressAIRate" class="progress-bar-fill"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -391,7 +450,6 @@
             </div>
         </div>
     </div>
-
     <script>
         // DOM Elements
         const titleInput = document.getElementById('title');
@@ -407,129 +465,55 @@
         const scoreFigurativeElem = document.getElementById('scoreFigurative');
         const scoreNarrativeElem = document.getElementById('scoreNarrative');
         const scoreOriginalityElem = document.getElementById('scoreOriginality');
+        const scoreAIRateElem = document.getElementById('scoreAIRate');
         const analysisContentElem = document.getElementById('analysisContent');
+
+        // Progress bar elements
+        const progressImageryElem = document.getElementById('progressImagery');
+        const progressEmotionalElem = document.getElementById('progressEmotional');
+        const progressFigurativeElem = document.getElementById('progressFigurative');
+        const progressNarrativeElem = document.getElementById('progressNarrative');
+        const progressOriginalityElem = document.getElementById('progressOriginality');
+        const progressAIRateElem = document.getElementById('progressAIRate');
+
 
         const darkModeToggle = document.getElementById('darkModeToggle');
         const darkModeIcon = document.getElementById('darkModeIcon');
-        // const darkModeText = document.getElementById('darkModeText'); // Removed text element
-        const themeSelector = document.getElementById('themeSelector');
 
         // Gemini API Key (provided by user)
         const apiKey = "AIzaSyALvO3HMppp4OKWja1A96gLgiYTpHsvLJI";
 
-        // Define Material 3 Expressive color palettes
-        const themes = {
-            blue: {
-                primary: '#00677F', onPrimary: '#FFFFFF', primaryLight: '#4DD8FF', primaryDark: '#004D60',
-                secondaryContainer: '#CFF7FF', onSecondaryContainer: '#001F25',
-                neutral: '#49454f', onNeutral: '#FFFFFF',
-                surface: '#F7FBFC', onSurface: '#1A1C1E',
-                surfaceContainer: '#FFFFFF', /* Light mode card background */
-                border: '#79747e',
-                error: '#ba1a1a', onErrorContainer: '#ffdad6'
-            },
-            green: {
-                primary: '#006B36', onPrimary: '#FFFFFF', primaryLight: '#65D59C', primaryDark: '#004F2A',
-                secondaryContainer: '#82F1B0', onSecondaryContainer: '#00210E',
-                neutral: '#4C4639', onNeutral: '#FFFFFF',
-                surface: '#FBFBEE', onSurface: '#1A1C19',
-                surfaceContainer: '#FFFFFF', /* Light mode card background */
-                border: '#7C776D',
-                error: '#ba1a1a', onErrorContainer: '#ffdad6'
-            },
-            purple: {
-                primary: '#6750A4', onPrimary: '#FFFFFF', primaryLight: '#D0BCFF', primaryDark: '#4F378B',
-                secondaryContainer: '#E8DEF8', onSecondaryContainer: '#1D1B20',
-                neutral: '#49454F', onNeutral: '#FFFFFF',
-                surface: '#FFFBFE', onSurface: '#1C1B1F',
-                surfaceContainer: '#FFFFFF', /* Light mode card background */
-                border: '#79747E',
-                error: '#ba1a1a', onErrorContainer: '#ffdad6'
-            },
-            orange: {
-                primary: '#994B00', onPrimary: '#FFFFFF', primaryLight: '#FFBB99', primaryDark: '#733700',
-                secondaryContainer: '#FFDBCA', onSecondaryContainer: '#331300',
-                neutral: '#7B756C', onNeutral: '#FFFFFF',
-                surface: '#FFF8F6', onSurface: '#201B17',
-                surfaceContainer: '#FFFFFF', /* Light mode card background */
-                border: '#9B948A',
-                error: '#ba1a1a', onErrorContainer: '#ffdad6'
-            },
-            teal: {
-                primary: '#006A60', onPrimary: '#FFFFFF', primaryLight: '#4DDAD0', primaryDark: '#004F47',
-                secondaryContainer: '#7AFEE4', onSecondaryContainer: '#00201B',
-                neutral: '#737877', onNeutral: '#FFFFFF',
-                surface: '#FBFEFD', onSurface: '#1A1C1B',
-                surfaceContainer: '#FFFFFF', /* Light mode card background */
-                border: '#9CA3A1',
-                error: '#ba1a1a', onErrorContainer: '#ffdad6'
-            }
+        // Define default light and dark mode colors (blue theme is now fixed)
+        const lightModeColors = {
+            primary: '#00677F', onPrimary: '#FFFFFF', primaryLight: '#4DD8FF', primaryDark: '#004D60',
+            secondaryContainer: '#CFF7FF', onSecondaryContainer: '#001F25',
+            neutral: '#49454f', onNeutral: '#FFFFFF',
+            surface: '#F7FBFC', onSurface: '#1A1C1E',
+            surfaceContainer: '#FFFFFF', /* Light mode card background */
+            border: '#79747e',
+            error: '#ba1a1a', onErrorContainer: '#ffdad6'
         };
 
-        const darkThemes = {
-             blue: {
-                primary: '#80D2EF', onPrimary: '#003542', primaryLight: '#A5E4FF', primaryDark: '#50B6DA',
-                secondaryContainer: '#004D60', onSecondaryContainer: '#CFF7FF',
-                neutral: '#C7C6CA', onNeutral: '#1A1C1E',
-                surface: '#121314', onSurface: '#E3E2E6',
-                surfaceContainer: '#222224', /* Dark mode card background - adjusted for contrast */
-                border: '#928F95',
-                error: '#FFB4AB', onErrorContainer: '#690005'
-            },
-            green: {
-                primary: '#65D59C', onPrimary: '#00381B', primaryLight: '#A0FFCF', primaryDark: '#2FBA7C',
-                secondaryContainer: '#005128', onSecondaryContainer: '#82F1B0',
-                neutral: '#CFC5B4', onNeutral: '#1A1C19',
-                surface: '#1A1C19', onSurface: '#E3E2D9',
-                surfaceContainer: '#30342D', /* Dark mode card background - adjusted for contrast */
-                border: '#9A9285',
-                error: '#FFB4AB', onErrorContainer: '#690005'
-            },
-            purple: {
-                primary: '#D0BCFF', onPrimary: '#381E72', primaryLight: '#E8DEF8', primaryDark: '#AF9EEF',
-                secondaryContainer: '#4F378B', onSecondaryContainer: '#E8DEF8',
-                neutral: '#CFC5D0', onNeutral: '#1C1B1F',
-                surface: '#1C1B1F', onSurface: '#E6E1E5',
-                surfaceContainer: '#322F36', /* Dark mode card background - adjusted for contrast */
-                border: '#938F99',
-                error: '#FFB4AB', onErrorContainer: '#690005'
-            },
-            orange: {
-                primary: '#FFB68C', onPrimary: '#522600', primaryLight: '#FFDBC1', primaryDark: '#A65A00',
-                secondaryContainer: '#733700', onSecondaryContainer: '#FFDBC1',
-                neutral: '#E4DFD9', onNeutral: '#201B17',
-                surface: '#2B1400', onSurface: '#FFDBC1',
-                surfaceContainer: '#4A2A00', /* Dark mode card background - adjusted for contrast */
-                border: '#BBA496',
-                error: '#FFB4AB', onErrorContainer: '#690005'
-            },
-            teal: {
-                primary: '#7AFEE4', onPrimary: '#003730', primaryLight: '#B1FFEB', primaryDark: '#4FD5C9',
-                secondaryContainer: '#005047', onSecondaryContainer: '#7AFEE4',
-                neutral: '#E1E3E2', onNeutral: '#1A1C1B',
-                surface: '#0D1513', onSurface: '#E0FFFA',
-                surfaceContainer: '#243A36', /* Dark mode card background - adjusted for contrast */
-                border: '#ABB9B6',
-                error: '#FFB4AB', onErrorContainer: '#690005'
-            }
+        const darkModeColors = {
+            primary: '#80D2EF', onPrimary: '#003542', primaryLight: '#A5E4FF', primaryDark: '#50B6DA',
+            secondaryContainer: '#004D60', onSecondaryContainer: '#CFF7FF',
+            neutral: '#C7C6CA', onNeutral: '#1A1C1E',
+            surface: '#121314', onSurface: '#E3E2E6',
+            surfaceContainer: '#222224', /* Dark mode card background - adjusted for contrast */
+            border: '#928F95',
+            error: '#FFB4AB', onErrorContainer: '#690005'
         };
 
 
         /**
          * Applies the selected theme colors to the CSS variables.
-         * @param {string} themeName - The name of the theme (e.g., 'blue', 'green').
-         * @param {boolean} isDarkMode - Whether to apply dark mode specific colors for the theme.
+         * @param {boolean} isDarkMode - Whether to apply dark mode specific colors.
          */
-        function applyTheme(themeName, isDarkMode) {
-            const selectedTheme = isDarkMode ? darkThemes[themeName] : themes[themeName];
-            if (!selectedTheme) {
-                console.warn(`Theme '${themeName}' not found.`);
-                return;
-            }
-            for (const [key, value] of Object.entries(selectedTheme)) {
+        function applyTheme(isDarkMode) {
+            const selectedColors = isDarkMode ? darkModeColors : lightModeColors;
+            for (const [key, value] of Object.entries(selectedColors)) {
                 document.documentElement.style.setProperty(`--current-${key}`, value);
             }
-            localStorage.setItem('selectedTheme', themeName);
         }
 
         /**
@@ -540,7 +524,7 @@
             const isDarkMode = document.body.classList.contains('dark-mode');
             localStorage.setItem('darkMode', isDarkMode);
             updateDarkModeToggleButton(isDarkMode);
-            applyTheme(localStorage.getItem('selectedTheme') || 'blue', isDarkMode); // Reapply theme with current mode
+            applyTheme(isDarkMode); // Apply the theme colors based on current mode
         }
 
         /**
@@ -550,10 +534,8 @@
         function updateDarkModeToggleButton(isDarkMode) {
             if (isDarkMode) {
                 darkModeIcon.textContent = 'dark_mode';
-                // darkModeText.textContent = '切换到浅色模式'; // Removed text
             } else {
                 darkModeIcon.textContent = 'light_mode';
-                // darkModeText.textContent = '切换到深色模式'; // Removed text
             }
         }
 
@@ -561,19 +543,18 @@
          * Initializes theme and dark mode from localStorage.
          */
         function initializeThemeAndDarkMode() {
-            const savedTheme = localStorage.getItem('selectedTheme') || 'blue';
             const savedDarkMode = localStorage.getItem('darkMode') === 'true';
 
             if (savedDarkMode) {
                 document.body.classList.add('dark-mode');
             }
             updateDarkModeToggleButton(savedDarkMode);
-            themeSelector.value = savedTheme; // Set the dropdown to the saved theme
-            applyTheme(savedTheme, savedDarkMode); // Apply the theme and mode
+            applyTheme(savedDarkMode); // Apply the initial theme based on saved mode
         }
 
         /**
          * Clears previous results and error messages, and hides the results section.
+         * Also resets progress bars.
          */
         function clearResults() {
             overallScoreElem.textContent = '--';
@@ -582,7 +563,16 @@
             scoreFigurativeElem.textContent = '--';
             scoreNarrativeElem.textContent = '--';
             scoreOriginalityElem.textContent = '--';
-            analysisContentElem.innerHTML = ''; // Use innerHTML for Markdown
+            scoreAIRateElem.textContent = '--'; // Clear AI Rate
+            
+            // Reset progress bars to 0% for animation
+            progressImageryElem.style.width = '0%';
+            progressEmotionalElem.style.width = '0%';
+            progressFigurativeElem.style.width = '0%';
+            progressNarrativeElem.style.width = '0%';
+            progressOriginalityElem.style.width = '0%';
+            progressAIRateElem.style.width = '0%';
+
             errorMessage.style.display = 'none';
             resultsSection.classList.add('hidden');
         }
@@ -623,7 +613,7 @@
                     modeText = '较长解析模式（约500字）';
                     break;
                 case 'essay':
-                    modeText = '论文模式（详细、深度，约1000字，支持Markdown格式）';
+                    modeText = '论文模式（详细、深度，约1000字）';
                     break;
                 default:
                     modeText = '简短模式（一句话）';
@@ -636,7 +626,11 @@
             try {
                 // Construct the prompt for the Gemini API
                 const prompt = `
-请对以下文本进行评析，并从其意象/感官细节、情感深度/氛围、修辞/风格、叙事流畅性/连贯性、原创性/冲击力这五个维度给出0-100分的评分。同时，请根据所选的评语模式生成相应的评析（评析内容应包含Markdown格式，例如使用**粗体**、*斜体*、列表等）。请严格按照以下JSON Schema返回结果：
+请对以下文本进行评析，并从其意象/感官细节、情感深度/氛围、修辞/风格、叙事流畅性/连贯性、原创性/冲击力这五个维度给出0-100分的评分。同时，**请评估文本的“AI 率”，即文本内容由AI生成的可能性，给出0-100的评分和相应的百分比（例如：“80%”）。**
+
+请在评分时尽可能地宽松和鼓励，突出文本的优点和潜力。在生成评析内容时，请使用积极、支持性的语言，提供建设性的反馈，并确保评析内容能够激发作者的创作热情。**请不要在评析内容中使用任何Markdown格式，直接生成纯HTML格式的内容，包括使用例如 <p>、<strong>、<em>、<ul>、<ol>、<li> 等标准的HTML标签进行排版。**
+
+请严格按照以下JSON Schema返回结果：
 {
     "overallScore": { "type": "NUMBER", "description": "总评分，0-100" },
     "aspectScores": {
@@ -646,17 +640,19 @@
             "emotionalDepthAtmosphere": { "type": "NUMBER", "description": "情感深度/氛围评分" },
             "figurativeLanguageStyle": { "type": "NUMBER", "description": "修辞/风格评分" },
             "narrativeFlowCohesion": { "type": "NUMBER", "description": "叙事流畅性/连贯性评分" },
-            "originalityImpact": { "type": "NUMBER", "description": "原创性/冲击力评分" }
+            "originalityImpact": { "type": "NUMBER", "description": "原创性/冲击力评分" },
+            "aiRate": { "type": "NUMBER", "description": "AI率评分，0-100" }
         },
         "required": [
             "imagerySensoryDetail",
             "emotionalDepthAtmosphere",
             "figurativeLanguageStyle",
             "narrativeFlowCohesion",
-            "originalityImpact"
+            "originalityImpact",
+            "aiRate"
         ]
     },
-    "analysis": { "type": "STRING", "description": "根据所选模式生成的评析内容，应包含Markdown格式" }
+    "analysis": { "type": "STRING", "description": "根据所选模式生成的评析内容，应包含HTML格式" }
 }
 
 **文本标题 (可选):** ${title ? title : '无标题'}
@@ -684,14 +680,16 @@ ${content}
                                         "emotionalDepthAtmosphere": { "type": "NUMBER" },
                                         "figurativeLanguageStyle": { "type": "NUMBER" },
                                         "narrativeFlowCohesion": { "type": "NUMBER" },
-                                        "originalityImpact": { "type": "NUMBER" }
+                                        "originalityImpact": { "type": "NUMBER" },
+                                        "aiRate": { "type": "NUMBER" }
                                     },
                                     "required": [
                                         "imagerySensoryDetail",
                                         "emotionalDepthAtmosphere",
                                         "figurativeLanguageStyle",
                                         "narrativeFlowCohesion",
-                                        "originalityImpact"
+                                        "originalityImpact",
+                                        "aiRate"
                                     ]
                                 },
                                 "analysis": { "type": "STRING" }
@@ -724,14 +722,27 @@ ${content}
                     // Update UI with results
                     overallScoreElem.textContent = parsedData.overallScore !== undefined ? parsedData.overallScore.toFixed(0) : '--';
                     if (parsedData.aspectScores) {
+                        // Update text scores
                         scoreImageryElem.textContent = parsedData.aspectScores.imagerySensoryDetail !== undefined ? parsedData.aspectScores.imagerySensoryDetail.toFixed(0) : '--';
                         scoreEmotionalElem.textContent = parsedData.aspectScores.emotionalDepthAtmosphere !== undefined ? parsedData.aspectScores.emotionalDepthAtmosphere.toFixed(0) : '--';
                         scoreFigurativeElem.textContent = parsedData.aspectScores.figurativeLanguageStyle !== undefined ? parsedData.aspectScores.figurativeLanguageStyle.toFixed(0) : '--';
                         scoreNarrativeElem.textContent = parsedData.aspectScores.narrativeFlowCohesion !== undefined ? parsedData.aspectScores.narrativeFlowCohesion.toFixed(0) : '--';
                         scoreOriginalityElem.textContent = parsedData.aspectScores.originalityImpact !== undefined ? parsedData.aspectScores.originalityImpact.toFixed(0) : '--';
+                        scoreAIRateElem.textContent = parsedData.aspectScores.aiRate !== undefined ? `${parsedData.aspectScores.aiRate.toFixed(0)}%` : '--';
+                        
+                        // Set progress bar widths to trigger animation
+                        // Using a setTimeout with a small delay ensures the transition is visible
+                        setTimeout(() => {
+                            progressImageryElem.style.width = `${parsedData.aspectScores.imagerySensoryDetail || 0}%`;
+                            progressEmotionalElem.style.width = `${parsedData.aspectScores.emotionalDepthAtmosphere || 0}%`;
+                            progressFigurativeElem.style.width = `${parsedData.aspectScores.figurativeLanguageStyle || 0}%`;
+                            progressNarrativeElem.style.width = `${parsedData.aspectScores.narrativeFlowCohesion || 0}%`;
+                            progressOriginalityElem.style.width = `${parsedData.aspectScores.originalityImpact || 0}%`;
+                            progressAIRateElem.style.width = `${parsedData.aspectScores.aiRate || 0}%`;
+                        }, 100); // Small delay to allow initial render before transition
                     }
-                    // Parse Markdown content before setting it
-                    analysisContentElem.innerHTML = parsedData.analysis ? marked.parse(parsedData.analysis) : '未能生成评析内容。';
+                    // Directly set innerHTML for rich text display
+                    analysisContentElem.innerHTML = parsedData.analysis || '未能生成评析内容。';
                     resultsSection.classList.remove('hidden');
 
                 } else {
@@ -751,10 +762,6 @@ ${content}
         // Event Listeners
         submitBtn.addEventListener('click', rateText);
         darkModeToggle.addEventListener('click', toggleDarkMode);
-        themeSelector.addEventListener('change', (event) => {
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            applyTheme(event.target.value, isDarkMode);
-        });
 
         // Initialize theme and dark mode on page load
         document.addEventListener('DOMContentLoaded', initializeThemeAndDarkMode);
