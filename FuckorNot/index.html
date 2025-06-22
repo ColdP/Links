@@ -446,7 +446,9 @@
             align-items: center;
             cursor: pointer;
             user-select: none;
-            -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+            -webkit-tap-highlight-color: transparent;
+            position: relative; /* For ripple effect */
+            overflow: hidden; /* For ripple effect */
         }
 
         .custom-checkbox-input {
@@ -465,7 +467,7 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0; /* Prevent it from shrinking */
-            transition: all 0.2s ease;
+            transition: all 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
             position: relative;
             background-color: transparent;
         }
@@ -484,7 +486,7 @@
             stroke-linejoin: round;
             stroke-dasharray: 24; /* Make stroke length for animation */
             stroke-dashoffset: 24;
-            transition: stroke-dashoffset 0.2s ease;
+            transition: stroke-dashoffset 0.2s ease, opacity 0.2s ease;
             opacity: 0; /* Initially hidden */
             width: 14px; /* Adjust size of checkmark */
             height: 14px;
@@ -498,17 +500,48 @@
         /* Focus state */
         .custom-checkbox-input:focus-visible + .custom-checkbox-visual {
             box-shadow: 0 0 0 3px var(--md-sys-color-primary-container); /* Focus ring */
+            border-color: var(--md-sys-color-primary); /* Keep primary border on focus */
         }
 
-        /* Hover state */
-        .custom-checkbox-container:hover .custom-checkbox-visual {
-            background-color: var(--md-sys-color-surface-variant); /* Slight background tint on hover */
-            border-color: var(--md-sys-color-primary); /* Primary border on hover */
+        /* Hover state for unchecked */
+        .custom-checkbox-container:hover .custom-checkbox-visual:not(.custom-checkbox-input:checked + .custom-checkbox-visual) {
+            background-color: color-mix(in srgb, var(--md-sys-color-surface-variant) 90%, var(--md-sys-color-primary)); /* subtle primary tint */
+            border-color: var(--md-sys-color-primary); /* primary border on hover */
         }
+
+        /* Hover state for checked */
         .custom-checkbox-input:checked + .custom-checkbox-visual:hover {
-            background-color: var(--md-sys-color-primary); /* Keep primary color when checked and hovered */
-            opacity: 0.9; /* Slight opacity change on hover for checked state */
+            background-color: var(--md-sys-color-primary); /* keep primary */
+            opacity: 0.9; /* slight dimming */
         }
+
+        /* Active/Press state (when holding click/tap) - subtle scale transform for material feel */
+        .custom-checkbox-container:active .custom-checkbox-visual {
+            transform: scale(0.95); /* subtle squash effect */
+        }
+        .custom-checkbox-input:checked + .custom-checkbox-visual:active {
+             transform: scale(0.95);
+        }
+
+        /* Ripple effect (optional, advanced MD3) */
+        .custom-checkbox-container .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background-color: var(--md-sys-color-primary);
+            width: 100px; /* Large enough for ripple */
+            height: 100px; /* Large enough for ripple */
+            margin-top: -50px;
+            margin-left: -50px;
+            opacity: 0;
+            transform: scale(0);
+            pointer-events: none;
+            transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+        }
+        .custom-checkbox-container.tapped .ripple {
+            transform: scale(1);
+            opacity: 0.1;
+        }
+
     </style>
 </head>
 <body class="selection:bg-pink-300 selection:text-white">
@@ -638,8 +671,11 @@
     </div>
 
     <script>
-        // 用户提供的API密钥
-        const API_KEY = 'AIzaSyALvO3HMppp4OKWja1A96gLgiYTpHsvLJI';
+        // The double Base64 encoded API key provided by the user
+        const ENCODED_API_KEY = 'UVVsNllWTjVRVXgyVHpOSVRYQndjRFJQUzFkcVlURkJPVFpuVEdkcFdWUndTSE4yVEVwSg==';
+
+        // Decode the API key twice
+        const API_KEY = atob(atob(ENCODED_API_KEY));
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
         // DOM Elements for Combined Modal
