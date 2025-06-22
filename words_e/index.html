@@ -8,17 +8,24 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Material Symbols CDN -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
-    <!-- Google Fonts - Inter -->
+    <!-- Google Fonts - Inter (Used as a visually similar alternative to Google Sans/Product Sans) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         /* Define base color variables (default to blue light theme) */
         :root {
-            --primary: #00677F;
-            --on-primary: #FFFFFF;
-            --primary-light: #4DD8FF; /* For focus rings */
-            --primary-dark: #004D60; /* For hover states */
-            --secondary-container: #CFF7FF;
-            --on-secondary-container: #001F25;
+            /* Material 3 Expressive Palette 1: Blue (Default) - Less Saturated */
+            --blue-primary: #0060A8; --blue-on-primary: #FFFFFF; --blue-primary-light: #5296E0; --blue-primary-dark: #004780;
+            --blue-secondary-container: #D1E4FF; --blue-on-secondary-container: #001B3B;
+            /* Material 3 Expressive Palette 2: Green - Less Saturated */
+            --green-primary: #386A20; --green-on-primary: #FFFFFF; --green-primary-light: #7E9C68; --green-primary-dark: #274D16;
+            --green-secondary-container: #C3EFB4; --green-on-secondary-container: #0B2100;
+            /* Material 3 Expressive Palette 3: Purple - Less Saturated */
+            --purple-primary: #6B4E99; --purple-on-primary: #FFFFFF; --purple-primary-light: #C0A9DD; --purple-primary-dark: #503A72;
+            --purple-secondary-container: #EADDFF; --purple-on-secondary-container: #250059;
+            /* Material 3 Expressive Palette 4: Orange - Less Saturated */
+            --orange-primary: #9E432A; --orange-on-primary: #FFFFFF; --orange-primary-light: #E48D6C; --orange-primary-dark: #78321F;
+            --orange-secondary-container: #FFDBCF; --orange-on-secondary-container: #3F0600;
+
             --neutral: #49454f;
             --on-neutral: #FFFFFF; /* For text on neutral background */
             --surface: #F7FBFC;
@@ -28,13 +35,13 @@
             --error: #ba1a1a;
             --on-error-container: #ffdad6;
 
-            /* Current active colors - these will be dynamically updated based on dark mode */
-            --current-primary: var(--primary);
-            --current-on-primary: var(--on-primary);
-            --current-primary-light: var(--primary-light);
-            --current-primary-dark: var(--primary-dark);
-            --current-secondary-container: var(--secondary-container);
-            --current-on-secondary-container: var(--on-secondary-container);
+            /* Current active colors - these will be dynamically updated based on dark mode and selected theme */
+            --current-primary: var(--blue-primary);
+            --current-on-primary: var(--blue-on-primary);
+            --current-primary-light: var(--blue-primary-light);
+            --current-primary-dark: var(--blue-primary-dark);
+            --current-secondary-container: var(--blue-secondary-container);
+            --current-on-secondary-container: var(--blue-on-secondary-container);
             --current-neutral: var(--neutral);
             --current-on-neutral: var(--on-neutral);
             --current-surface: var(--surface);
@@ -45,18 +52,26 @@
             --current-on-error-container: var(--on-error-container);
         }
 
-        /* Dark mode overrides (applied when body has 'dark-mode' class) */
+        /* Dark mode overrides */
         body.dark-mode {
-            --current-primary: #80D2EF; /* Dark mode primary */
-            --current-on-primary: #003542;
-            --current-primary-light: #A5E4FF; /* A lighter shade for focus/active in dark mode */
-            --current-primary-dark: #50B6DA; /* Darker shade for hover in dark mode */
-            --current-secondary-container: #004D60;
-            --current-on-secondary-container: #CFF7FF;
-            --current-neutral: #C7C6CA; /* Lighter neutral for dark mode */
+            /* Material 3 Expressive Palette 1: Blue (Dark) - Adjusted for lower saturation */
+            --blue-primary: #7DA5CC; --blue-on-primary: #002545; --blue-primary-light: #B8D3EB; --blue-primary-dark: #457BA5;
+            --blue-secondary-container: #003666; --blue-on-secondary-container: #C5E0F5;
+            /* Material 3 Expressive Palette 2: Green (Dark) - Adjusted for lower saturation */
+            --green-primary: #8CC078; --green-on-primary: #122900; --green-primary-light: #C7E0B9; --green-primary-dark: #5A8D3F;
+            --green-secondary-container: #1D3A00; --green-on-secondary-container: #B7E2A6;
+            /* Material 3 Expressive Palette 3: Purple (Dark) - Adjusted for lower saturation */
+            --purple-primary: #BCA1D0; --purple-on-primary: #2B1647; --purple-primary-light: #E0CCF0; --purple-primary-dark: #8F79A5;
+            --purple-secondary-container: #3B2A5F; --purple-on-secondary-container: #D9C3EC;
+            /* Material 3 Expressive Palette 4: Orange (Dark) - Adjusted for lower saturation */
+            --orange-primary: #D99F87; --orange-on-primary: #471100; --orange-primary-light: #EBBAB0; --orange-primary-dark: #A55A44;
+            --orange-secondary-container: #5C2200; --orange-on-secondary-container: #E0C8BC;
+
+            /* Neutral and Surface Colors for Dark Mode (Softer) */
+            --current-neutral: #B7B7B5; /* Softer light grey for neutral text */
             --current-on-neutral: #1A1C1E; /* Dark text on neutral background in dark mode */
             --current-surface: #121314; /* Dark surface */
-            --current-on-surface: #E3E2E6; /* Light text on dark surface */
+            --current-on-surface: #CFCFCD; /* Softer light text on dark surface */
             --current-surface-container: #222224; /* Dark mode card background - adjusted for contrast */
             --current-border: #928F95; /* Lighter border for dark mode */
             --current-error: #FFB4AB;
@@ -65,7 +80,7 @@
 
         /* Apply current variables to elements */
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', sans-serif; /* Applied 'Inter' font */
             background-color: var(--current-surface); /* Background uses current surface color */
             color: var(--current-on-surface); /* Text color uses current on-surface color */
             margin: 0;
@@ -112,24 +127,30 @@
             border-color: var(--current-primary); /* Focus border color */
             box-shadow: 0 0 0 2px var(--current-primary-light); /* Focus ring color */
         }
-        .radio-group label {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            border-radius: 12px;
-            background-color: var(--current-secondary-container); /* Radio item background */
-            color: var(--current-on-secondary-container); /* Radio item text color */
-            cursor: pointer;
-            transition: background-color 0.2s, box-shadow 0.2s, color 0.3s ease;
+
+        /* Custom Scrollbar for Webkit browsers (Chrome, Safari) */
+        .input-group textarea::-webkit-scrollbar {
+            width: 10px; /* Width of the vertical scrollbar */
+            border-radius: 5px; /* Rounded corners for the scrollbar track */
         }
-        .radio-group label:hover {
-            background-color: color-mix(in srgb, var(--current-secondary-container) 90%, black); /* Subtle darker hover */
+
+        .input-group textarea::-webkit-scrollbar-track {
+            background: var(--current-secondary-container); /* Color of the track */
+            border-radius: 5px;
         }
-        .radio-group input[type="radio"]:checked + span {
-            background-color: var(--current-primary); /* Checked radio background */
-            color: var(--current-on-primary); /* Checked radio text color */
-            font-weight: 500;
+
+        .input-group textarea::-webkit-scrollbar-thumb {
+            background: var(--current-primary); /* Color of the scrollbar thumb */
+            border-radius: 5px; /* Rounded corners for the thumb */
+            border: 2px solid var(--current-surface-container); /* Border to give it space from track */
         }
+
+        /* Hover effect on thumb */
+        .input-group textarea::-webkit-scrollbar-thumb:hover {
+            background: var(--current-primary-dark); /* Darker on hover */
+        }
+
+
         .submit-button {
             background-color: var(--current-primary); /* Button background */
             color: var(--current-on-primary); /* Button text color */
@@ -138,7 +159,7 @@
             font-size: 1.125rem;
             font-weight: 500;
             box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.2s, box-shadow 0.2s, color 0.3s ease;
+            transition: background-color 0.2s cubic-bezier(0.2, 0.0, 0, 1), box-shadow 0.2s cubic-bezier(0.2, 0.0, 0, 1), color 0.3s ease; /* Enhanced transition */
         }
         .submit-button:hover {
             background-color: var(--current-primary-dark); /* Button hover background */
@@ -208,20 +229,25 @@
             width: 0%; /* Initial width for animation */
             background-color: var(--current-primary); /* Fill color */
             border-radius: 4px; /* Rounded corners for the fill */
-            transition: width 0.8s ease-out; /* Smooth animation for width change */
+            transition: width 0.8s cubic-bezier(0.4, 0.0, 0.2, 1); /* Material 3-like cubic-bezier for expressive motion */
         }
 
         .analysis-text {
             line-height: 1.6;
-            color: var(--current-neutral); /* Analysis text color */
             background-color: var(--current-secondary-container); /* Analysis box background */
             padding: 1rem;
             border-radius: 0.75rem; /* Match radio group for consistency */
             transition: background-color 0.3s ease, color 0.3s ease;
+            color: var(--current-neutral); /* Default color for analysis text (light mode) */
+        }
+        /* Specific overrides for analysis-text in dark mode */
+        body.dark-mode .analysis-text {
+            color: #FFFFFF; /* Pure white in dark mode */
+            background-color: #1A1A1A; /* Darker background in dark mode */
         }
         /* Basic rich text styling for AI-generated content (if it includes HTML tags) */
         .analysis-text h1, .analysis-text h2, .analysis-text h3 {
-            color: var(--current-on-surface);
+            color: inherit; /* Inherit from .analysis-text */
             margin-top: 1em;
             margin-bottom: 0.5em;
             font-weight: bold;
@@ -230,9 +256,11 @@
         .analysis-text h2 { font-size: 1.3em; }
         .analysis-text h3 { font-size: 1.1em; }
         .analysis-text p {
+            color: inherit; /* Inherit from .analysis-text */
             margin-bottom: 1em;
         }
         .analysis-text ul, .analysis-text ol {
+            color: inherit; /* Inherit from .analysis-text */
             margin-left: 1.5em;
             margin-bottom: 1em;
             list-style-type: disc;
@@ -241,9 +269,11 @@
             list-style-type: decimal;
         }
         .analysis-text strong {
+            color: inherit; /* Inherit from .analysis-text */
             font-weight: bold;
         }
         .analysis-text em {
+            color: inherit; /* Inherit from .analysis-text */
             font-style: italic;
         }
 
@@ -273,7 +303,7 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Top controls for dark/light mode toggle (theme selector removed) */
+        /* Top controls for dark/light mode toggle and theme palette */
         .top-controls {
             display: flex;
             justify-content: flex-end;
@@ -281,6 +311,7 @@
             margin-bottom: 1.5rem;
             width: 100%;
             max-width: 960px; /* Align with content-wrapper */
+            align-items: center; /* Vertically align items */
         }
         .control-button {
             background-color: var(--current-secondary-container);
@@ -294,7 +325,7 @@
             align-items: center;
             justify-content: center; /* Center icon */
             box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
-            transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+            transition: background-color 0.2s cubic-bezier(0.2, 0.0, 0, 1), color 0.2s cubic-bezier(0.2, 0.0, 0, 1), box-shadow 0.2s cubic-bezier(0.2, 0.0, 0, 1);
         }
         .control-button:hover {
             background-color: color-mix(in srgb, var(--current-secondary-container) 90%, black);
@@ -302,13 +333,157 @@
         .control-button .material-symbols-outlined {
             font-size: 1.5rem;
         }
-        /* .theme-select removed */
+        /* Custom styles for select dropdown to match Material 3 Expressive */
+        .mode-select-wrapper {
+            position: relative; /* For custom arrow positioning */
+            width: 100%; /* Ensure it takes full width from parent */
+        }
+        .mode-select {
+            -webkit-appearance: none; /* Remove default styling for Chrome/Safari */
+            -moz-appearance: none; /* Remove default styling for Firefox */
+            appearance: none; /* Remove default styling for all browsers */
+            width: 100%; /* Ensure it fills the wrapper */
+            padding: 1rem;
+            padding-right: 2.5rem; /* Space for custom arrow */
+            border: 1px solid var(--current-border);
+            border-radius: 16px;
+            background-color: var(--current-surface-container);
+            color: var(--current-on-surface);
+            cursor: pointer;
+            font-size: 1rem; /* Consistent font size */
+            line-height: 1.5; /* Consistent line height */
+            
+            /* Custom dropdown arrow SVG: dark arrow for light mode */
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="%2349454f"><path d="M7 10l5 5 5-5z"/></svg>'); 
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center; /* Position the arrow */
+            background-size: 1.5rem; /* Size the arrow */
+            
+            /* Apply Material 3 Expressive motion to select element itself */
+            transition: border-color 0.2s cubic-bezier(0.4, 0.0, 0.2, 1), 
+                        box-shadow 0.2s cubic-bezier(0.4, 0.0, 0.2, 1), 
+                        background-color 0.2s cubic-bezier(0.2, 0.0, 0, 1), /* Faster transition for background */
+                        color 0.3s ease;
+        }
+        body.dark-mode .mode-select {
+            /* Custom dropdown arrow SVG: light arrow for dark mode (adjusted to better contrast with darker background) */
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="%23CFCFCD"><path d="M7 10l5 5 5-5z"/></svg>'); 
+        }
+        /* Hover state for custom select */
+        .mode-select:hover {
+            background-color: color-mix(in srgb, var(--current-surface-container) 90%, black); /* Slightly darker on hover */
+        }
+        /* Focus state for custom select */
+        .mode-select:focus {
+            outline: none; /* Remove default focus outline */
+            border-color: var(--current-primary); /* Focus border color */
+            box-shadow: 0 0 0 2px var(--current-primary-light); /* Focus ring color */
+        }
+
+        /* Color Palette Styles */
+        .color-palette {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-right: 1rem; /* Space between palette and dark mode toggle */
+        }
+        .color-swatch {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%; /* Circular swatches */
+            cursor: pointer;
+            border: 2px solid transparent; /* Default transparent border */
+            box-shadow: 0px 1px 2px rgba(0,0,0,0.1);
+            transition: transform 0.2s cubic-bezier(0.4, 0.0, 0.2, 1), border-color 0.2s ease;
+        }
+        .color-swatch:hover {
+            transform: scale(1.1);
+        }
+        .color-swatch.selected {
+            border-color: var(--current-neutral); /* Highlight selected swatch */
+            box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+            transform: scale(1.1);
+        }
+
+        /* Strict Mode Switch Styles (Tailwind custom styling) */
+        /* Group the switch label with the analysis mode select */
+        .analysis-mode-group .strict-mode-switch {
+            margin-top: 1.5rem; /* Space between select and switch */
+            padding-top: 1.5rem;
+            border-top: 1px dashed color-mix(in srgb, var(--current-neutral) 10%, transparent); /* Subtle separator */
+        }
+
+        .strict-mode-switch .switch-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            width: fit-content; /* Adjust width to content */
+        }
+
+        .strict-mode-switch .toggle-input {
+            /* Hide default checkbox */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            display: inline-block; /* Keep it in the flow for peer selector */
+            position: relative;
+            width: 38px; /* Width of the track */
+            height: 20px; /* Height of the track */
+            background-color: var(--current-border); /* Inactive track color */
+            border-radius: 9999px; /* Fully rounded */
+            transition: background-color 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            flex-shrink: 0; /* Prevent it from shrinking */
+        }
+
+        .strict-mode-switch .toggle-input::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px; /* Diameter of the thumb */
+            height: 16px; /* Diameter of the thumb */
+            background-color: var(--current-on-neutral); /* Thumb color */
+            border-radius: 9999px; /* Fully rounded */
+            transform: translateX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            box-shadow: 0px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .strict-mode-switch .toggle-input:checked {
+            background-color: var(--current-primary); /* Active track color */
+        }
+
+        .strict-mode-switch .toggle-input:checked::before {
+            transform: translateX(18px); /* Move thumb to the right (38px - 16px - 2*2px_padding = 18px) */
+            background-color: var(--current-on-primary); /* Active thumb color */
+        }
+
+        .strict-mode-switch .toggle-text {
+            margin-left: 0.75rem; /* Space between switch and text */
+            font-size: 1rem;
+            color: var(--current-neutral);
+            transition: color 0.3s ease;
+        }
+
+        /* Focus ring for switch */
+        .strict-mode-switch .toggle-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px var(--current-primary-light);
+        }
+
     </style>
 </head>
 <body>
     <div class="content-wrapper">
         <!-- Top Controls -->
         <div class="top-controls">
+            <!-- Color Palette -->
+            <div class="color-palette">
+                <button class="color-swatch" style="background-color: #0060A8;" data-theme="blue" title="蓝主题"></button>
+                <button class="color-swatch" style="background-color: #386A20;" data-theme="green" title="绿主题"></button>
+                <button class="color-swatch" style="background-color: #6B4E99;" data-theme="purple" title="紫主题"></button>
+                <button class="color-swatch" style="background-color: #9E432A;" data-theme="orange" title="橙主题"></button>
+            </div>
             <button id="darkModeToggle" class="control-button">
                 <span id="darkModeIcon" class="material-symbols-outlined">light_mode</span>
             </button>
@@ -326,25 +501,23 @@
             <textarea id="content" rows="10" class="w-full resize-y" placeholder="输入您想要评析的文本正文..."></textarea>
         </div>
 
-        <!-- Analysis Mode Selection -->
+        <!-- Analysis Mode Selection and Strict Mode Toggle -->
         <div class="analysis-mode-group surface-container-bg p-6 rounded-2xl shadow-md">
-            <label class="block text-lg font-medium mb-2">选择评语模式:</label>
-            <div class="flex flex-wrap gap-4 radio-group">
-                <label>
-                    <input type="radio" name="analysisMode" value="short" class="hidden" checked>
-                    <span class="px-4 py-2 rounded-lg text-base cursor-pointer transition-colors duration-200">简短 (一句话)</span>
-                </label>
-                <label>
-                    <input type="radio" name="analysisMode" value="medium" class="hidden">
-                    <span class="px-4 py-2 rounded-lg text-base cursor-pointer transition-colors duration-200">中等长度 (~100字)</span>
-                </label>
-                <label>
-                    <input type="radio" name="analysisMode" value="long" class="hidden">
-                    <span class="px-4 py-2 rounded-lg text-base cursor-pointer transition-colors duration-200">较长解析 (~500字)</span>
-                </label>
-                <label>
-                    <input type="radio" name="analysisMode" value="essay" class="hidden">
-                    <span class="px-4 py-2 rounded-lg text-base cursor-pointer transition-colors duration-200">论文模式 (详细)</span>
+            <label for="analysisModeSelect" class="block text-lg font-medium mb-2">选择评语模式:</label>
+            <div class="mode-select-wrapper">
+                <select id="analysisModeSelect" class="w-full mode-select">
+                    <option value="short">简短 (一句话)</option>
+                    <option value="medium" selected>中等长度 (~100字)</option>
+                    <option value="long">较长解析 (~500字)</option>
+                    <option value="essay">论文模式 (详细)</option>
+                </select>
+            </div>
+
+            <!-- Strict Mode Toggle (Moved inside this card) -->
+            <div class="strict-mode-switch">
+                <label class="switch-label">
+                    <input type="checkbox" id="strictModeToggle" class="toggle-input">
+                    <span class="toggle-text">严格模式</span>
                 </label>
             </div>
         </div>
@@ -454,7 +627,7 @@
         // DOM Elements
         const titleInput = document.getElementById('title');
         const contentInput = document.getElementById('content');
-        const analysisModeRadios = document.querySelectorAll('input[name="analysisMode"]');
+        const analysisModeSelect = document.getElementById('analysisModeSelect');
         const submitBtn = document.getElementById('submitBtn');
         const loadingSpinner = document.getElementById('loadingSpinner');
         const errorMessage = document.getElementById('errorMessage');
@@ -476,44 +649,76 @@
         const progressOriginalityElem = document.getElementById('progressOriginality');
         const progressAIRateElem = document.getElementById('progressAIRate');
 
-
         const darkModeToggle = document.getElementById('darkModeToggle');
         const darkModeIcon = document.getElementById('darkModeIcon');
+        const colorSwatches = document.querySelectorAll('.color-swatch'); // Color palette swatches
+        const strictModeToggle = document.getElementById('strictModeToggle'); // Strict mode switch
 
         // Gemini API Key (provided by user)
         const apiKey = "AIzaSyALvO3HMppp4OKWja1A96gLgiYTpHsvLJI";
 
-        // Define default light and dark mode colors (blue theme is now fixed)
-        const lightModeColors = {
-            primary: '#00677F', onPrimary: '#FFFFFF', primaryLight: '#4DD8FF', primaryDark: '#004D60',
-            secondaryContainer: '#CFF7FF', onSecondaryContainer: '#001F25',
-            neutral: '#49454f', onNeutral: '#FFFFFF',
-            surface: '#F7FBFC', onSurface: '#1A1C1E',
-            surfaceContainer: '#FFFFFF', /* Light mode card background */
-            border: '#79747e',
-            error: '#ba1a1a', onErrorContainer: '#ffdad6'
+        // Define color themes (updated with more muted M3-like tones and adjusted dark modes)
+        const allThemes = {
+            blue: {
+                light: {
+                    primary: '#0060A8', onPrimary: '#FFFFFF', primaryLight: '#5296E0', primaryDark: '#004780',
+                    secondaryContainer: '#D1E4FF', onSecondaryContainer: '#001B3B',
+                },
+                dark: {
+                    primary: '#7DA5CC', onPrimary: '#002545', primaryLight: '#B8D3EB', primaryDark: '#457BA5',
+                    secondaryContainer: '#003666', onSecondaryContainer: '#C5E0F5',
+                }
+            },
+            green: {
+                light: {
+                    primary: '#386A20', onPrimary: '#FFFFFF', primaryLight: '#7E9C68', primaryDark: '#274D16',
+                    secondaryContainer: '#C3EFB4', onSecondaryContainer: '#0B2100',
+                },
+                dark: {
+                    primary: '#8CC078', onPrimary: '#122900', primaryLight: '#C7E0B9', primaryDark: '#5A8D3F',
+                    secondaryContainer: '#1D3A00', onSecondaryContainer: '#B7E2A6',
+                }
+            },
+            purple: {
+                light: {
+                    primary: '#6B4E99', onPrimary: '#FFFFFF', primaryLight: '#C0A9DD', primaryDark: '#503A72',
+                    secondaryContainer: '#EADDFF', onSecondaryContainer: '#250059',
+                },
+                dark: {
+                    primary: '#BCA1D0', onPrimary: '#2B1647', primaryLight: '#E0CCF0', primaryDark: '#8F79A5',
+                    secondaryContainer: '#3B2A5F', onSecondaryContainer: '#D9C3EC',
+                }
+            },
+            orange: {
+                light: {
+                    primary: '#9E432A', onPrimary: '#FFFFFF', primaryLight: '#E48D6C', primaryDark: '#78321F',
+                    secondaryContainer: '#FFDBCF', onSecondaryContainer: '#3F0600',
+                },
+                dark: {
+                    primary: '#D99F87', onPrimary: '#471100', primaryLight: '#EBBAB0', primaryDark: '#A55A44',
+                    secondaryContainer: '#5C2200', onSecondaryContainer: '#E0C8BC',
+                }
+            }
         };
 
-        const darkModeColors = {
-            primary: '#80D2EF', onPrimary: '#003542', primaryLight: '#A5E4FF', primaryDark: '#50B6DA',
-            secondaryContainer: '#004D60', onSecondaryContainer: '#CFF7FF',
-            neutral: '#C7C6CA', onNeutral: '#1A1C1E',
-            surface: '#121314', onSurface: '#E3E2E6',
-            surfaceContainer: '#222224', /* Dark mode card background - adjusted for contrast */
-            border: '#928F95',
-            error: '#FFB4AB', onErrorContainer: '#690005'
-        };
-
+        let currentBaseTheme = localStorage.getItem('selectedTheme') || 'blue'; // Default to 'blue'
 
         /**
          * Applies the selected theme colors to the CSS variables.
          * @param {boolean} isDarkMode - Whether to apply dark mode specific colors.
          */
         function applyTheme(isDarkMode) {
-            const selectedColors = isDarkMode ? darkModeColors : lightModeColors;
-            for (const [key, value] of Object.entries(selectedColors)) {
+            const themeColors = allThemes[currentBaseTheme][isDarkMode ? 'dark' : 'light'];
+            for (const [key, value] of Object.entries(themeColors)) {
                 document.documentElement.style.setProperty(`--current-${key}`, value);
             }
+            // Apply neutral and surface colors which are independent of base theme but depend on dark mode
+            const neutralColors = isDarkMode ? { neutral: '#B7B7B5', onNeutral: '#1A1C1E', surface: '#121314', onSurface: '#CFCFCD', surfaceContainer: '#222224', border: '#928F95', error: '#FFB4AB', onErrorContainer: '#690005' } :
+                                  { neutral: '#49454f', onNeutral: '#FFFFFF', surface: '#F7FBFC', onSurface: '#1A1C1E', surfaceContainer: '#FFFFFF', border: '#79747e', error: '#ba1a1a', onErrorContainer: '#ffdad6' };
+            for (const [key, value] of Object.entries(neutralColors)) {
+                document.documentElement.style.setProperty(`--current-${key}`, value);
+            }
+            updateSelectedSwatch(); // Update active swatch
         }
 
         /**
@@ -524,7 +729,7 @@
             const isDarkMode = document.body.classList.contains('dark-mode');
             localStorage.setItem('darkMode', isDarkMode);
             updateDarkModeToggleButton(isDarkMode);
-            applyTheme(isDarkMode); // Apply the theme colors based on current mode
+            applyTheme(isDarkMode); // Re-apply theme to pick up correct dark/light colors
         }
 
         /**
@@ -540,16 +745,32 @@
         }
 
         /**
+         * Updates the visual state of the selected color swatch.
+         */
+        function updateSelectedSwatch() {
+            colorSwatches.forEach(swatch => {
+                if (swatch.dataset.theme === currentBaseTheme) {
+                    swatch.classList.add('selected');
+                } else {
+                    swatch.classList.remove('selected');
+                }
+            });
+        }
+
+        /**
          * Initializes theme and dark mode from localStorage.
          */
         function initializeThemeAndDarkMode() {
             const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+            currentBaseTheme = localStorage.getItem('selectedTheme') || 'blue'; // Default to 'blue'
+            const savedStrictMode = localStorage.getItem('strictMode') === 'true';
 
             if (savedDarkMode) {
                 document.body.classList.add('dark-mode');
             }
             updateDarkModeToggleButton(savedDarkMode);
-            applyTheme(savedDarkMode); // Apply the initial theme based on saved mode
+            applyTheme(savedDarkMode); // Apply initial theme colors
+            strictModeToggle.checked = savedStrictMode; // Set strict mode toggle state
         }
 
         /**
@@ -564,7 +785,7 @@
             scoreNarrativeElem.textContent = '--';
             scoreOriginalityElem.textContent = '--';
             scoreAIRateElem.textContent = '--'; // Clear AI Rate
-            
+
             // Reset progress bars to 0% for animation
             progressImageryElem.style.width = '0%';
             progressEmotionalElem.style.width = '0%';
@@ -585,15 +806,9 @@
             clearResults(); // Clear previous results
             const title = titleInput.value.trim();
             const content = contentInput.value.trim();
-            let selectedMode = '';
+            let selectedMode = analysisModeSelect.value;
+            const isStrictMode = strictModeToggle.checked; // Get strict mode state
             let modeText = '';
-
-            for (const radio of analysisModeRadios) {
-                if (radio.checked) {
-                    selectedMode = radio.value;
-                    break;
-                }
-            }
 
             if (!content) {
                 errorMessage.textContent = '文本正文不能为空！';
@@ -625,10 +840,17 @@
 
             try {
                 // Construct the prompt for the Gemini API
-                const prompt = `
+                let promptInstructions = `
 请对以下文本进行评析，并从其意象/感官细节、情感深度/氛围、修辞/风格、叙事流畅性/连贯性、原创性/冲击力这五个维度给出0-100分的评分。同时，**请评估文本的“AI 率”，即文本内容由AI生成的可能性，给出0-100的评分和相应的百分比（例如：“80%”）。**
 
-请在评分时尽可能地宽松和鼓励，突出文本的优点和潜力。在生成评析内容时，请使用积极、支持性的语言，提供建设性的反馈，并确保评析内容能够激发作者的创作热情。**请不要在评析内容中使用任何Markdown格式，直接生成纯HTML格式的内容，包括使用例如 <p>、<strong>、<em>、<ul>、<ol>、<li> 等标准的HTML标签进行排版。**
+`;
+                if (isStrictMode) {
+                    promptInstructions += `**请在评分和评析时非常严格和批判，指出所有不足之处，即使分数可能较低。**`;
+                } else {
+                    promptInstructions += `**请在评分时极其宽松和鼓励，给出相对较高的分数，并高度肯定文本的优点和潜力。在生成评析内容时，请使用极其积极、支持性的语言，提供非常有建设性的反馈，并确保评析内容能够最大限度地激发作者的创作热情和自信。**`;
+                }
+
+                promptInstructions += `**请不要在评析内容中使用任何Markdown格式，直接生成纯HTML格式的内容，包括使用例如 <p>、<strong>、<em>、<ul>、<ol>、<li> 等标准的HTML标签进行排版。**
 
 请严格按照以下JSON Schema返回结果：
 {
@@ -664,7 +886,7 @@ ${content}
 
                 // Define the payload for the Gemini API request
                 const chatHistory = [];
-                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                chatHistory.push({ role: "user", parts: [{ text: promptInstructions }] }); // Use the constructed prompt
                 const payload = {
                     contents: chatHistory,
                     generationConfig: {
@@ -729,9 +951,8 @@ ${content}
                         scoreNarrativeElem.textContent = parsedData.aspectScores.narrativeFlowCohesion !== undefined ? parsedData.aspectScores.narrativeFlowCohesion.toFixed(0) : '--';
                         scoreOriginalityElem.textContent = parsedData.aspectScores.originalityImpact !== undefined ? parsedData.aspectScores.originalityImpact.toFixed(0) : '--';
                         scoreAIRateElem.textContent = parsedData.aspectScores.aiRate !== undefined ? `${parsedData.aspectScores.aiRate.toFixed(0)}%` : '--';
-                        
+
                         // Set progress bar widths to trigger animation
-                        // Using a setTimeout with a small delay ensures the transition is visible
                         setTimeout(() => {
                             progressImageryElem.style.width = `${parsedData.aspectScores.imagerySensoryDetail || 0}%`;
                             progressEmotionalElem.style.width = `${parsedData.aspectScores.emotionalDepthAtmosphere || 0}%`;
@@ -739,9 +960,9 @@ ${content}
                             progressNarrativeElem.style.width = `${parsedData.aspectScores.narrativeFlowCohesion || 0}%`;
                             progressOriginalityElem.style.width = `${parsedData.aspectScores.originalityImpact || 0}%`;
                             progressAIRateElem.style.width = `${parsedData.aspectScores.aiRate || 0}%`;
-                        }, 100); // Small delay to allow initial render before transition
+                        }, 100);
                     }
-                    // Directly set innerHTML for rich text display
+                    // Directly set innerHTML for rich text display (no Markdown parsing)
                     analysisContentElem.innerHTML = parsedData.analysis || '未能生成评析内容。';
                     resultsSection.classList.remove('hidden');
 
@@ -762,6 +983,20 @@ ${content}
         // Event Listeners
         submitBtn.addEventListener('click', rateText);
         darkModeToggle.addEventListener('click', toggleDarkMode);
+
+        // Color swatch click listeners
+        colorSwatches.forEach(swatch => {
+            swatch.addEventListener('click', () => {
+                currentBaseTheme = swatch.dataset.theme;
+                localStorage.setItem('selectedTheme', currentBaseTheme);
+                applyTheme(document.body.classList.contains('dark-mode')); // Re-apply theme with new base color
+            });
+        });
+
+        // Strict mode toggle listener
+        strictModeToggle.addEventListener('change', () => {
+            localStorage.setItem('strictMode', strictModeToggle.checked);
+        });
 
         // Initialize theme and dark mode on page load
         document.addEventListener('DOMContentLoaded', initializeThemeAndDarkMode);
