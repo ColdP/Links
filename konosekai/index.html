@@ -3,20 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>この世界に二人だけ / ano</title>
+    <title>Material 3 Expressive 音乐播放器</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Inter font for a modern look */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        /* FIXED: Base HTML and Body styles for full-screen layout */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow: hidden; /* Prevent scrollbars on the body */
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #e0e0e0; /* Light gray background */
+            background-color: #e0e0e0; /* Default desktop background */
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            padding: 20px;
             box-sizing: border-box;
             transition: background-color 0.3s ease;
         }
@@ -33,7 +41,7 @@
         /* Custom styles for the phone frame */
         .phone-frame {
             position: relative;
-            width: 375px; /* Typical mobile width (approx. 9:19.5 aspect ratio with 812px height) */
+            width: 375px; /* Typical mobile width */
             height: 812px; /* Typical mobile height */
             background-color: #000; /* Black frame */
             border-radius: 40px;
@@ -62,50 +70,18 @@
         /* Notch/Punch-hole styles */
         .notch-area {
             position: absolute;
-            top: 0px; /* Aligns to the top of the screen */
+            top: 0px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: #000; /* Notch/punch-hole color */
-            z-index: 10; /* Ensure it's above content */
+            background-color: #000;
+            z-index: 10;
         }
 
-        .notch-hidden {
-            display: none;
-        }
-
-        .punch-hole {
-            width: 24px; /* Shrink punch-hole */
-            height: 24px;
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-            border-radius: 9999px; /* Full circle */
-            top: 8px; /* Offset from top */
-        }
-
-        .iphone-14-pro {
-            width: 100px; /* Shrink iPhone 14 Pro width */
-            height: 24px;
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-            border-radius: 9999px; /* Full capsule */
-            top: 8px; /* Offset from top */
-        }
-
-        .large-notch {
-            width: 180px;
-            height: 36px;
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
-            top: 0px; /* Aligns to top edge */
-        }
-
-        .small-notch {
-            width: 100px;
-            height: 24px;
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-            top: 0px; /* Aligns to top edge */
-        }
+        .notch-hidden { display: none; }
+        .punch-hole { width: 24px; height: 24px; border-radius: 9999px; top: 8px; }
+        .iphone-14-pro { width: 100px; height: 24px; border-radius: 9999px; top: 8px; }
+        .large-notch { width: 180px; height: 36px; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; top: 0px; }
+        .small-notch { width: 100px; height: 24px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; top: 0px; }
 
         /* Main content view (for music player) */
         .main-content-view {
@@ -114,7 +90,7 @@
             align-items: center;
             width: 100%;
             height: 100%;
-            padding-top: 50px; /* Space for status bar */
+            padding-top: 50px;
             box-sizing: border-box;
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
@@ -123,31 +99,31 @@
         .hidden-view {
             opacity: 0;
             transform: translateY(20px);
-            pointer-events: none; /* Disable interactions when hidden */
-            position: absolute; /* Take out of flow when hidden */
+            pointer-events: none;
+            position: absolute;
             width: 100%;
             height: 100%;
-            display: flex; /* To maintain flex properties for content */
+            display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center; /* Center content horizontally */
+            justify-content: center;
         }
 
         /* Lyrics View specific styles */
         .lyrics-view {
-            background-color: #fff; /* White background for lyrics */
+            background-color: #fff;
             width: 100%;
             height: 100%;
             padding: 20px;
             box-sizing: border-box;
-            border-radius: 30px; /* Match phone-screen border-radius */
+            border-radius: 30px;
             display: flex;
             flex-direction: column;
-            position: absolute; /* Position absolutely to layer */
+            position: absolute;
             top: 0;
             left: 0;
             transition: opacity 0.3s ease;
-            z-index: 5; /* Below status bar and notch */
+            z-index: 5;
         }
 
         /* Status Bar */
@@ -156,86 +132,69 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 50px; /* Height for the status bar */
+            height: 50px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 0 20px;
             box-sizing: border-box;
-            background-color: transparent; /* Immersive: no background */
-            border-top-left-radius: 30px; /* Match phone screen border radius */
-            border-top-right-radius: 30px; /* Match phone screen border radius */
-            z-index: 11; /* Ensure it's above notch and content */
-            color: #1a202c; /* Default dark color for status bar */
-            text-shadow: none; /* No shadow for status bar */
-            transition: color 0.3s ease; /* Smooth transition for color */
+            z-index: 11;
+            color: #1a202c;
+            transition: color 0.3s ease;
         }
-        .status-bar.light-text {
-            color: white;
-        }
-        .status-bar .material-symbols-outlined {
-            font-size: 18px; /* Smaller icons for status bar */
-        }
+        .status-bar .material-symbols-outlined { font-size: 18px; }
 
-        /* Material 3 Expressive elements */
+        /* Media Display Area */
         .media-display-area {
-            position: relative; /* For dynamic content swapping */
+            position: relative;
             width: 280px;
             height: 280px;
-            margin-top: 50px; /* Space for notch/status bar */
+            margin-top: 50px;
             transition: width 0.3s ease, height 0.3s ease, margin-top 0.3s ease;
         }
 
         .album-cover {
             width: 100%;
             height: 100%;
-            border-radius: 24px; /* Slightly more rounded */
+            border-radius: 24px;
             object-fit: cover;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease, opacity 0.3s ease;
-        }
-
-        .album-cover:hover {
-            transform: scale(1.02);
+            transition: transform 0.3s ease, opacity 0.4s ease-in-out;
         }
 
         .dynamic-media-player {
             width: 100%;
             height: 100%;
             border-radius: 24px;
-            object-fit: cover; /* Use cover for video to match image fill */
+            object-fit: cover;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-            display: block; /* Ensure video takes up space */
+            display: block;
             opacity: 0;
             transition: opacity 0.5s ease-in-out;
         }
-        .dynamic-media-player.visible {
-            opacity: 1;
-        }
+        .dynamic-media-player.visible { opacity: 1; }
 
         .song-title {
-            font-size: 1.5rem; /* Adjusted smaller */
-            font-weight: 700; /* font-bold */
-            color: #1a202c; /* neutral-900 */
+            font-size: 1.5rem;
+            font-weight: 700;
             margin-top: 32px;
             text-align: center;
-            line-height: 1.2;
-            transition: color 0.3s ease, font-size 0.3s ease, margin-top 0.3s ease;
+            transition: font-size 0.3s ease, margin-top 0.3s ease;
         }
 
         .artist-name {
-            font-size: 1.25rem; /* text-xl */
-            font-weight: 500; /* font-medium */
-            color: #4a5568; /* neutral-700 */
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: #4a5568;
             margin-top: 8px;
             text-align: center;
-            transition: color 0.3s ease, font-size 0.3s ease, margin-top 0.3s ease;
+            transition: font-size 0.3s ease, margin-top 0.3s ease;
         }
 
         .seek-bar-container {
             width: 100%;
             height: 8px;
-            background-color: #cbd5e0; /* gray-300 */
+            background-color: #cbd5e0;
             border-radius: 4px;
             margin-top: 40px;
             cursor: pointer;
@@ -245,8 +204,8 @@
 
         .seek-bar-progress {
             height: 100%;
-            width: 0%; /* Initial width */
-            background-color: #6366f1; /* indigo-500 */
+            width: 0%;
+            background-color: #6366f1;
             border-radius: 4px;
             position: absolute;
             top: 0;
@@ -257,25 +216,20 @@
         .seek-bar-thumb {
             width: 16px;
             height: 16px;
-            background-color: #6366f1; /* indigo-500 */
+            background-color: #6366f1;
             border-radius: 50%;
             position: absolute;
             top: 50%;
             transform: translate(-50%, -50%);
             cursor: grab;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            transition: background-color 0.3s ease;
-        }
-        .seek-bar-thumb:active {
-            cursor: grabbing;
         }
 
         .time-display {
             width: 100%;
             display: flex;
             justify-content: space-between;
-            font-size: 0.875rem; /* text-sm */
-            color: #718096; /* gray-600 */
+            font-size: 0.875rem;
+            color: #718096;
             margin-top: 8px;
         }
 
@@ -289,16 +243,15 @@
         }
 
         .control-button {
-            background-color: #e2e8f0; /* blue-gray-100 */
-            border-radius: 9999px; /* Full circle */
+            background-color: #e2e8f0;
+            border-radius: 9999px;
             width: 64px;
             height: 64px;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+            transition: background-color 0.2s ease, transform 0.2s ease, color 0.2s ease;
         }
         
         .control-button.active {
@@ -307,41 +260,13 @@
         }
 
         .control-button.play-pause {
-            background-color: #6366f1; /* indigo-500 */
+            background-color: #6366f1;
             color: white;
             width: 80px;
             height: 80px;
-            box-shadow: 0 6px 15px rgba(99, 102, 241, 0.3);
         }
-
-        .control-button:hover {
-            background-color: #d1d8e0;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .control-button.play-pause:hover {
-            background-color: #4f46e5;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 18px rgba(99, 102, 241, 0.4);
-        }
-
-        .control-button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .control-button.play-pause:active {
-            transform: translateY(0);
-            box-shadow: 0 3px 8px rgba(99, 102, 241, 0.2);
-        }
-
-        .control-button .material-symbols-outlined {
-            font-size: 32px;
-        }
-        .control-button.play-pause .material-symbols-outlined {
-            font-size: 48px;
-        }
+        .control-button .material-symbols-outlined { font-size: 32px; }
+        .control-button.play-pause .material-symbols-outlined { font-size: 48px; }
 
         .additional-controls {
             display: flex;
@@ -361,21 +286,7 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
         }
-
-        .additional-control-button:hover {
-            background-color: #d1d8e0;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-        }
-
-        .additional-control-button:active {
-            transform: translateY(0);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
         .additional-control-button .material-symbols-outlined {
             font-size: 24px;
             color: #4a5568;
@@ -386,165 +297,64 @@
             overflow-y: auto;
             line-height: 1.6;
             text-align: center;
-            padding-bottom: 20px;
+            padding-top: 50px;
             -ms-overflow-style: none;
             scrollbar-width: none;
-            padding-top: 50px;
         }
-        .lyrics-content-wrapper::-webkit-scrollbar {
-            display: none;
-        }
+        .lyrics-content-wrapper::-webkit-scrollbar { display: none; }
 
-        .lyrics-pair {
-            margin-bottom: 1rem;
-            padding: 0 10px;
-            text-align: left;
-        }
-        .original-lyric {
-            font-weight: 500;
-            transition: color 0.3s ease, font-weight 0.3s ease, transform 0.3s ease;
-        }
-        .translated-lyric {
-            font-size: 0.9em;
-            color: #6b7280; /* text-gray-500 */
-            margin-top: 4px;
-        }
-        .lyrics-pair.active .original-lyric {
-            color: #6366f1;
-            font-weight: 700;
-            transform: scale(1.05);
-            transform-origin: left center;
-        }
+        .lyrics-pair { margin-bottom: 1rem; padding: 0 10px; text-align: left; }
+        .original-lyric { font-weight: 500; transition: all 0.3s ease; }
+        .translated-lyric { font-size: 0.9em; color: #6b7280; margin-top: 4px; }
+        .lyrics-pair.active .original-lyric { color: #6366f1; font-weight: 700; transform: scale(1.05); transform-origin: left center; }
 
-        .fab-container {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            z-index: 10;
-        }
-
+        .fab-container { position: absolute; bottom: 20px; left: 20px; z-index: 10; }
         .fab-button {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background-color: #6366f1;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-            position: relative;
+            width: 56px; height: 56px; border-radius: 50%; background-color: #6366f1;
+            color: white; display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); cursor: pointer; position: relative;
         }
-        .fab-button:hover {
-            background-color: #4f46e5;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-        }
-
         .fab-options {
-            position: absolute;
-            bottom: 66px;
-            left: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            background-color: white;
-            padding: 10px;
-            border-radius: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            opacity: 0;
-            transform: translateY(20px);
-            pointer-events: none;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            transform-origin: bottom left;
+            position: absolute; bottom: 66px; left: 0; display: flex;
+            flex-direction: column; gap: 10px; background-color: white; padding: 10px;
+            border-radius: 20px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            opacity: 0; transform: translateY(20px); pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease; transform-origin: bottom left;
         }
-        .fab-options.visible {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
-        }
+        .fab-options.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
 
         .fab-option-button {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            border-radius: 12px;
-            background-color: #e2e8f0;
-            color: #4a5568;
-            font-size: 0.8rem;
-            font-weight: 500;
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.2s ease, transform 0.2s ease;
+            display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+            border-radius: 12px; background-color: #e2e8f0; color: #4a5568;
+            font-size: 0.8rem; font-weight: 500; cursor: pointer; border: none;
         }
-        .fab-option-button:hover {
-            background-color: #d1d8e0;
-        }
-        .fab-option-button.selected {
-            background-color: #6366f1;
-            color: white;
-        }
-        .fab-option-button .material-symbols-outlined {
-           display: none;
-        }
+        .fab-option-button.selected { background-color: #6366f1; color: white; }
+        .fab-option-button .material-symbols-outlined { display: none; }
 
         @media (max-height: 750px) and (max-width: 420px) {
-            .media-display-area {
-                width: 200px;
-                height: 200px;
-                margin-top: 20px;
-            }
-            .song-title {
-                font-size: 1.2rem;
-                margin-top: 20px;
-            }
-            .artist-name {
-                font-size: 0.9rem;
-                margin-top: 4px;
-            }
-            .seek-bar-container {
-                margin-top: 20px;
-            }
-            .controls {
-                margin-top: 20px;
-            }
-            .additional-controls {
-                margin-top: 15px;
-            }
+            .media-display-area { width: 200px; height: 200px; margin-top: 20px; }
+            .song-title { font-size: 1.2rem; margin-top: 20px; }
+            .artist-name { font-size: 0.9rem; margin-top: 4px; }
+            .seek-bar-container, .controls { margin-top: 20px; }
+            .additional-controls { margin-top: 15px; }
         }
         
         @media (max-width: 768px) {
-            body { padding: 0; }
+            body { padding: 0; background-color: #f0f0f0; }
             #notch-selection-ui { display: none; }
-            .phone-frame {
-                width: 100vw;
-                height: 100vh;
-                border-radius: 0;
-                background: transparent;
-                box-shadow: none;
-            }
-            .phone-screen, .lyrics-view {
-                width: 100%;
-                height: 100%;
-                border-radius: 0;
-            }
+            .phone-frame { width: 100%; height: 100%; border-radius: 0; background: transparent; box-shadow: none; }
+            .phone-screen, .lyrics-view { width: 100%; height: 100%; border-radius: 0; padding: 0 20px; }
             .notch-area { display: none !important; }
             .main-content-view, .lyrics-view {
-                padding-top: env(safe-area-inset-top, 50px);
+                padding-top: env(safe-area-inset-top, 20px);
                 padding-bottom: env(safe-area-inset-bottom, 20px);
             }
-             .fab-container {
-                bottom: env(safe-area-inset-bottom, 20px);
-             }
+             .fab-container { bottom: env(safe-area-inset-bottom, 20px); }
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
 </head>
-<body class="bg-gradient-to-br from-indigo-100 to-purple-100">
+<body>
 
     <div id="notch-selection-ui" class="absolute top-4 right-4 p-4 bg-white rounded-xl shadow-lg flex flex-col gap-3 z-20">
         <label for="notch-select" class="font-semibold text-gray-800">选择刘海/挖孔风格:</label>
@@ -571,7 +381,7 @@
 
             <div id="main-content-view" class="main-content-view">
                 <div id="media-display-area" class="media-display-area">
-                    <img id="album-cover" class="album-cover" src="./cover.jpg" alt="歌曲封面">
+                    <img id="album-cover" class="album-cover" src="https://imgs.ototoy.jp/imgs/jacket/2549/00000003.1738291718.6273orig.jpg" alt="歌曲封面">
                 </div>
                 <h1 id="song-title" class="song-title">この世界に二人だけ</h1>
                 <p id="artist-name" class="artist-name">ano</p>
@@ -645,12 +455,13 @@
     </div>
 
     <script>
+        // Element and state variables
         let audioPlayer, playPauseButton, playPauseIcon, prevButton, loopButton, seekBarContainer, 
             seekBarProgress, seekBarThumb, currentTimeSpan, totalTimeSpan, notchSelect, notchArea, 
             statusBarTime, phoneScreen, statusBarDiv, mainContentView, lyricsView, playMvButton, 
             viewLyricsButton, changeCoverButton, albumCoverElement, mvPlayerElement, mediaDisplayArea, 
             lyricsContentWrapper, fabContainer, fabMenuButton, fabOptions, 
-            fabBackButton, fabLangToggleButtons;
+            fabBackButton, fabLangToggleButtons, songTitle, artistName;
 
         let isDraggingSeekBar = false, isMvPlaying = false, isLyricsVisible = false, fabTimeout, isLooping = false;
         let isMobile = false;
@@ -673,6 +484,7 @@
             'https://links.0m-p.space/ano/9.jpg', 'https://links.0m-p.space/ano/10.jpg'
         ];
 
+        // --- Utility Functions ---
         function formatTime(seconds) {
             const minutes = Math.floor(seconds / 60);
             const secs = Math.floor(seconds % 60);
@@ -695,7 +507,6 @@
             lyricsView.style.transform = 'translateY(20px)';
             mainContentView.style.pointerEvents = 'none';
             lyricsView.style.pointerEvents = 'none';
-
             viewToShow.style.display = 'flex';
             viewToShow.style.pointerEvents = 'auto';
 
@@ -707,70 +518,70 @@
             if (phoneScreen) {
                 const newBgColor = viewToShow === lyricsView ? '#fff' : '#f0f0f0';
                 phoneScreen.style.backgroundColor = newBgColor;
-                if (isMobile) {
-                    document.body.style.backgroundColor = newBgColor;
-                }
+                if (isMobile) document.body.style.backgroundColor = newBgColor;
                 if (viewToShow === lyricsView) resetFabTimeout();
             }
         }
         
-        // FIXED: Media Session API integration
+        // --- Media Session API ---
         function updateMediaSessionMetadata() {
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.metadata = new MediaMetadata({
                     title: songTitle.textContent,
                     artist: artistName.textContent,
-                    album: 'この世界に二人だけ', // Example album
+                    album: 'この世界に二人だけ',
                     artwork: [ { src: albumCoverElement.src, type: 'image/jpeg' } ]
                 });
             }
         }
 
         function updateMediaSessionPosition() {
-             if ('mediaSession' in navigator) {
+             if ('mediaSession' in navigator && audioPlayer.duration) {
                 navigator.mediaSession.setPositionState({
-                    duration: audioPlayer.duration || 0,
+                    duration: audioPlayer.duration,
                     playbackRate: audioPlayer.playbackRate,
-                    position: audioPlayer.currentTime || 0,
+                    position: audioPlayer.currentTime,
                 });
             }
         }
+        
+        async function playAudio() {
+            try {
+                await audioPlayer.play();
+                playPauseIcon.textContent = 'pause';
+                if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "playing";
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    console.error("Play error:", error);
+                }
+                playPauseIcon.textContent = 'play_arrow';
+            }
+        }
+
+        function pauseAudio() {
+            audioPlayer.pause();
+            playPauseIcon.textContent = 'play_arrow';
+            if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
+        }
+
 
         function setupMediaSession() {
             if ('mediaSession' in navigator) {
-                navigator.mediaSession.setActionHandler('play', () => playPauseButton.click());
-                navigator.mediaSession.setActionHandler('pause', () => playPauseButton.click());
+                navigator.mediaSession.setActionHandler('play', playAudio);
+                navigator.mediaSession.setActionHandler('pause', pauseAudio);
                 navigator.mediaSession.setActionHandler('previoustrack', () => prevButton.click());
-                navigator.mediaSession.setActionHandler('nexttrack', () => loopButton.click()); // Or handle playlist
-                 navigator.mediaSession.setActionHandler('seekbackward', (details) => {
-                    audioPlayer.currentTime = Math.max(audioPlayer.currentTime - (details.seekOffset || 10), 0);
-                });
-                navigator.mediaSession.setActionHandler('seekforward', (details) => {
-                    audioPlayer.currentTime = Math.min(audioPlayer.currentTime + (details.seekOffset || 10), audioPlayer.duration);
-                });
-                 navigator.mediaSession.setActionHandler('seekto', (details) => {
-                    if (details.fastSeek && 'fastSeek' in audioPlayer) {
-                      audioPlayer.fastSeek(details.seekTime);
-                      return;
-                    }
-                    audioPlayer.currentTime = details.seekTime;
-                });
+                navigator.mediaSession.setActionHandler('nexttrack', () => loopButton.click()); 
+                navigator.mediaSession.setActionHandler('seekbackward', (d) => { audioPlayer.currentTime = Math.max(audioPlayer.currentTime - (d.seekOffset || 10), 0); });
+                navigator.mediaSession.setActionHandler('seekforward', (d) => { audioPlayer.currentTime = Math.min(audioPlayer.currentTime + (d.seekOffset || 10), audioPlayer.duration); });
+                navigator.mediaSession.setActionHandler('seekto', (d) => { audioPlayer.currentTime = d.seekTime; });
             }
         }
 
-
+        // --- Event Listener Initializers ---
         function initAudioListeners() {
             playPauseButton.addEventListener('click', () => {
-                if (audioPlayer.paused) {
-                    audioPlayer.play().then(() => {
-                        playPauseIcon.textContent = 'pause';
-                        if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "playing";
-                    });
-                } else {
-                    audioPlayer.pause();
-                    playPauseIcon.textContent = 'play_arrow';
-                    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
-                }
+                if (audioPlayer.paused) playAudio();
+                else pauseAudio();
             });
 
             audioPlayer.addEventListener('timeupdate', () => {
@@ -786,16 +597,16 @@
 
             audioPlayer.addEventListener('loadedmetadata', () => {
                 totalTimeSpan.textContent = formatTime(audioPlayer.duration);
+                updateMediaSessionMetadata();
                 updateMediaSessionPosition();
             });
             
             audioPlayer.addEventListener('ended', () => {
                 if (isLooping) {
                     audioPlayer.currentTime = 0;
-                    audioPlayer.play();
+                    playAudio();
                 } else {
-                    playPauseIcon.textContent = 'play_arrow';
-                    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
+                    pauseAudio();
                 }
             });
         }
@@ -818,56 +629,6 @@
             document.addEventListener('touchmove', (e) => { if (isDraggingSeekBar) handleDrag(e.touches[0].clientX); });
             document.addEventListener('touchend', () => { isDraggingSeekBar = false; });
             seekBarContainer.addEventListener('click', (e) => handleDrag(e.clientX));
-        }
-
-        function initMvControls() {
-            playMvButton.addEventListener('click', async () => {
-                if (isMvPlaying) {
-                    if (mvPlayerElement && mvPlayerElement.parentNode && !mvPlayerElement.paused) {
-                        mvPlayerElement.pause();
-                    }
-                    mvPlayerElement.classList.remove('visible');
-                    setTimeout(() => {
-                        if (mediaDisplayArea.contains(mvPlayerElement)) {
-                            mediaDisplayArea.replaceChild(albumCoverElement, mvPlayerElement);
-                        }
-                        albumCoverElement.style.opacity = 1;
-                    }, 500);
-                    isMvPlaying = false;
-                    playMvButton.querySelector('.material-symbols-outlined').textContent = 'play_circle';
-                } else {
-                    if (isLyricsVisible) viewLyricsButton.click();
-                    if (!mvPlayerElement) {
-                        mvPlayerElement = document.createElement('video');
-                        mvPlayerElement.id = 'mv-player-dynamic';
-                        mvPlayerElement.controls = true;
-                        mvPlayerElement.src = 'https://links.0m-p.space/konosekai.mp4';
-                        mvPlayerElement.classList.add('dynamic-media-player');
-                    }
-                    albumCoverElement.style.opacity = 0;
-                    setTimeout(async () => {
-                        try {
-                            if (!mediaDisplayArea.contains(mvPlayerElement)) {
-                                 mediaDisplayArea.replaceChild(mvPlayerElement, albumCoverElement);
-                            }
-                            await mvPlayerElement.play();
-                            isMvPlaying = true;
-                            playMvButton.querySelector('.material-symbols-outlined').textContent = 'stop';
-                            setTimeout(() => mvPlayerElement.classList.add('visible'), 10);
-                        } catch (error) {
-                            if (error.name !== 'AbortError') {
-                                console.error('Error playing MV:', error);
-                            }
-                            isMvPlaying = false;
-                            playMvButton.querySelector('.material-symbols-outlined').textContent = 'play_circle';
-                            if (mediaDisplayArea.contains(mvPlayerElement)) {
-                                mediaDisplayArea.replaceChild(albumCoverElement, mvPlayerElement);
-                            }
-                            albumCoverElement.style.opacity = 1;
-                        }
-                    }, 300);
-                }
-            });
         }
 
         function parseLRC(lrcContent) {
@@ -916,9 +677,7 @@
             if (selectedLang !== 'jp' && lyricsData[selectedLang]) {
                 lyricsData[selectedLang].forEach(line => {
                     const timeKey = line.time.toFixed(2);
-                    if (!translationMap.has(timeKey)) {
-                        translationMap.set(timeKey, line.text);
-                    }
+                    if (!translationMap.has(timeKey)) translationMap.set(timeKey, line.text);
                 });
             }
         
@@ -948,7 +707,6 @@
         function updateLyricsDisplay(currentTime) {
             let activePair = null;
             const pairs = lyricsContentWrapper.querySelectorAll('.lyrics-pair');
-            
             for (let i = 0; i < pairs.length; i++) {
                 const pair = pairs[i];
                 const nextPair = pairs[i + 1];
@@ -980,7 +738,6 @@
                     isLyricsVisible = false;
                     showView(mainContentView);
                 } else {
-                    if (isMvPlaying) playMvButton.click();
                     isLyricsVisible = true;
                     lyricsContentWrapper.innerHTML = '<p class="text-gray-500 mt-10">正在加载歌词...</p>';
                     showView(lyricsView);
@@ -1024,29 +781,18 @@
         }
 
         function initCoverChangeControls() {
-            let originalCoverSrc;
+            let originalCoverSrc = albumCoverElement.src;
             let isShowingOriginalCover = true;
-            
-            if (albumCoverElement) {
-                originalCoverSrc = albumCoverElement.src;
-            }
-
             changeCoverButton.addEventListener('click', () => {
                 albumCoverElement.style.opacity = 0;
                 setTimeout(() => {
-                    if (isShowingOriginalCover) {
-                        const randomIndex = Math.floor(Math.random() * anoPhotos.length);
-                        albumCoverElement.src = anoPhotos[randomIndex];
-                    } else {
-                        albumCoverElement.src = originalCoverSrc;
-                    }
+                    albumCoverElement.src = isShowingOriginalCover ? anoPhotos[Math.floor(Math.random() * anoPhotos.length)] : originalCoverSrc;
                     isShowingOriginalCover = !isShowingOriginalCover;
                     albumCoverElement.style.opacity = 1;
                     updateMediaSessionMetadata();
                 }, 300);
             });
         }
-
 
         document.addEventListener('DOMContentLoaded', () => {
             audioPlayer = document.getElementById('audio-player');
@@ -1077,11 +823,9 @@
             statusBarTime = document.getElementById('current-time-status');
             songTitle = document.getElementById('song-title');
             artistName = document.getElementById('artist-name');
+            phoneScreen = document.getElementById('phone-screen');
 
-
-            if (playPauseButton) {
-                 playPauseIcon = playPauseButton.querySelector('.material-symbols-outlined');
-            }
+            if (playPauseButton) playPauseIcon = playPauseButton.querySelector('.material-symbols-outlined');
 
             if (notchSelect) {
                 notchSelect.value = 'punch-hole';
@@ -1095,7 +839,7 @@
             isMobile = /Android|iPhone/i.test(navigator.userAgent);
             if(isMobile) {
                 if(statusBarDiv) statusBarDiv.style.display = 'none';
-                document.body.style.backgroundColor = '#f0f0f0';
+                document.body.style.padding = '0';
             }
 
             updateStatusBarTime();
@@ -1106,7 +850,7 @@
 
             initAudioListeners();
             initSeekBarListeners();
-            initMvControls();
+            // initMvControls(); // MV controls disabled
             initLyricsControls();
             initCoverChangeControls();
             setupMediaSession();
