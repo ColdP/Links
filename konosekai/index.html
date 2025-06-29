@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Material 3 Expressive 音乐播放器</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Inter font for a modern look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e0e0e0; /* Light gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Material Symbols Icons */
+        .material-symbols-outlined {
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 48;
+        }
+
+        /* Custom styles for the phone frame */
+        .phone-frame {
+            position: relative;
+            width: 375px; /* Typical mobile width (approx. 9:19.5 aspect ratio with 812px height) */
+            height: 812px; /* Typical mobile height */
+            background-color: #000; /* Black frame */
+            border-radius: 40px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; /* Keep content within frame */
+        }
+
+        .phone-screen {
+            width: calc(100% - 16px); /* Inner screen width */
+            height: calc(100% - 16px); /* Inner screen height */
+            background-color: #f0f0f0; /* Default screen background */
+            border-radius: 30px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: hidden; /* For content overflow, like seek bar */
+        }
+
+        /* Notch/Punch-hole styles */
+        .notch-area {
+            position: absolute;
+            top: 0px; /* Aligns to the top of the screen */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #000; /* Notch/punch-hole color */
+            z-index: 10; /* Ensure it's above content */
+        }
+
+        .notch-hidden {
+            display: none;
+        }
+
+        .punch-hole {
+            width: 24px; /* Shrink punch-hole */
+            height: 24px;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            border-radius: 9999px; /* Full circle */
+            top: 8px; /* Offset from top */
+        }
+
+        .iphone-14-pro {
+            width: 100px; /* Shrink iPhone 14 Pro width */
+            height: 24px;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            border-radius: 9999px; /* Full capsule */
+            top: 8px; /* Offset from top */
+        }
+
+        .large-notch {
+            width: 180px;
+            height: 36px;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            top: 0px; /* Aligns to top edge */
+        }
+
+        .small-notch {
+            width: 100px;
+            height: 24px;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            top: 0px; /* Aligns to top edge */
+        }
+
+        /* Main content view (for music player) */
+        .main-content-view {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            padding-top: 50px; /* Space for status bar */
+            box-sizing: border-box;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        /* Hidden view transition */
+        .hidden-view {
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none; /* Disable interactions when hidden */
+            position: absolute; /* Take out of flow when hidden */
+            width: 100%;
+            height: 100%;
+            display: flex; /* To maintain flex properties for content */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* Center content horizontally */
+        }
+
+        /* Lyrics View specific styles */
+        .lyrics-view {
+            background-color: #fff; /* White background for lyrics */
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 30px; /* Match phone-screen border-radius */
+            display: flex;
+            flex-direction: column;
+            position: absolute; /* Position absolutely to layer */
+            top: 0;
+            left: 0;
+            transition: opacity 0.3s ease;
+            z-index: 5; /* Below status bar and notch */
+        }
+
+        /* Status Bar */
+        .status-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px; /* Height for the status bar */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            box-sizing: border-box;
+            background-color: transparent; /* Immersive: no background */
+            border-top-left-radius: 30px; /* Match phone screen border radius */
+            border-top-right-radius: 30px; /* Match phone screen border radius */
+            z-index: 11; /* Ensure it's above notch and content */
+            color: #1a202c; /* Default dark color for status bar */
+            text-shadow: none; /* No shadow for status bar */
+            transition: color 0.3s ease; /* Smooth transition for color */
+        }
+        .status-bar.light-text {
+            color: white;
+        }
+        .status-bar .material-symbols-outlined {
+            font-size: 18px; /* Smaller icons for status bar */
+        }
+
+        /* Material 3 Expressive elements */
+        .media-display-area {
+            position: relative; /* For dynamic content swapping */
+            width: 280px;
+            height: 280px;
+            margin-top: 50px; /* Space for notch/status bar */
+            transition: width 0.3s ease, height 0.3s ease, margin-top 0.3s ease;
+        }
+
+        .album-cover {
+            width: 100%;
+            height: 100%;
+            border-radius: 24px; /* Slightly more rounded */
+            object-fit: cover;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .album-cover:hover {
+            transform: scale(1.02);
+        }
+
+        .dynamic-media-player {
+            width: 100%;
+            height: 100%;
+            border-radius: 24px;
+            object-fit: cover; /* Use cover for video to match image fill */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            display: block; /* Ensure video takes up space */
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .dynamic-media-player.visible {
+            opacity: 1;
+        }
+
+        .song-title {
+            font-size: 1.5rem; /* Adjusted smaller */
+            font-weight: 700; /* font-bold */
+            color: #1a202c; /* neutral-900 */
+            margin-top: 32px;
+            text-align: center;
+            line-height: 1.2;
+            transition: color 0.3s ease, font-size 0.3s ease, margin-top 0.3s ease;
+        }
+
+        .artist-name {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 500; /* font-medium */
+            color: #4a5568; /* neutral-700 */
+            margin-top: 8px;
+            text-align: center;
+            transition: color 0.3s ease, font-size 0.3s ease, margin-top 0.3s ease;
+        }
+
+        .seek-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: #cbd5e0; /* gray-300 */
+            border-radius: 4px;
+            margin-top: 40px;
+            cursor: pointer;
+            position: relative;
+            transition: margin-top 0.3s ease;
+        }
+
+        .seek-bar-progress {
+            height: 100%;
+            width: 0%; /* Initial width */
+            background-color: #6366f1; /* indigo-500 */
+            border-radius: 4px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: width 0.1s linear;
+        }
+
+        .seek-bar-thumb {
+            width: 16px;
+            height: 16px;
+            background-color: #6366f1; /* indigo-500 */
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            cursor: grab;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+        }
+        .seek-bar-thumb:active {
+            cursor: grabbing;
+        }
+
+        .time-display {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem; /* text-sm */
+            color: #718096; /* gray-600 */
+            margin-top: 8px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+            margin-top: 40px;
+            transition: margin-top 0.3s ease;
+        }
+
+        .control-button {
+            background-color: #e2e8f0; /* blue-gray-100 */
+            border-radius: 9999px; /* Full circle */
+            width: 64px;
+            height: 64px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+        }
+        
+        .control-button.active {
+             background-color: #6366f1;
+             color: white;
+        }
+
+        .control-button.play-pause {
+            background-color: #6366f1; /* indigo-500 */
+            color: white;
+            width: 80px;
+            height: 80px;
+            box-shadow: 0 6px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .control-button:hover {
+            background-color: #d1d8e0;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .control-button.play-pause:hover {
+            background-color: #4f46e5;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(99, 102, 241, 0.4);
+        }
+
+        .control-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-button.play-pause:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 8px rgba(99, 102, 241, 0.2);
+        }
+
+        .control-button .material-symbols-outlined {
+            font-size: 32px;
+        }
+        .control-button.play-pause .material-symbols-outlined {
+            font-size: 48px;
+        }
+
+        .additional-controls {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+            margin-top: 20px;
+            transition: margin-top 0.3s ease;
+        }
+
+        .additional-control-button {
+            background-color: #e2e8f0;
+            border-radius: 9999px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .additional-control-button:hover {
+            background-color: #d1d8e0;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .additional-control-button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .additional-control-button .material-symbols-outlined {
+            font-size: 24px;
+            color: #4a5568;
+        }
+
+        .lyrics-content-wrapper {
+            flex-grow: 1;
+            overflow-y: auto;
+            line-height: 1.6;
+            text-align: center;
+            padding-bottom: 20px;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .lyrics-content-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+        .lyrics-pair {
+            margin-bottom: 1rem;
+            padding: 0 10px;
+            text-align: left;
+        }
+        .original-lyric {
+            font-weight: 500;
+            transition: color 0.3s ease, font-weight 0.3s ease, transform 0.3s ease;
+        }
+        .translated-lyric {
+            font-size: 0.9em;
+            color: #6b7280; /* text-gray-500 */
+            margin-top: 4px;
+        }
+        .lyrics-pair.active .original-lyric {
+            color: #6366f1;
+            font-weight: 700;
+            transform: scale(1.05);
+            transform-origin: left center;
+        }
+
+        .fab-container {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 10;
+        }
+
+        .fab-button {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: #6366f1;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+        }
+        .fab-button:hover {
+            background-color: #4f46e5;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .fab-options {
+            position: absolute;
+            bottom: 66px;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-color: white;
+            padding: 10px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform-origin: bottom left;
+        }
+        .fab-options.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .fab-option-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 12px;
+            background-color: #e2e8f0;
+            color: #4a5568;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+        .fab-option-button:hover {
+            background-color: #d1d8e0;
+        }
+        .fab-option-button.selected {
+            background-color: #6366f1;
+            color: white;
+        }
+        .fab-option-button .material-symbols-outlined {
+           display: none;
+        }
+
+        @media (max-height: 750px) and (max-width: 420px) {
+            .media-display-area {
+                width: 200px;
+                height: 200px;
+                margin-top: 20px;
+            }
+            .song-title {
+                font-size: 1.2rem;
+                margin-top: 20px;
+            }
+            .artist-name {
+                font-size: 0.9rem;
+                margin-top: 4px;
+            }
+            .seek-bar-container {
+                margin-top: 20px;
+            }
+            .controls {
+                margin-top: 20px;
+            }
+            .additional-controls {
+                margin-top: 15px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body { padding: 0; }
+            #notch-selection-ui { display: none; }
+            .phone-frame {
+                width: 100vw;
+                height: 100vh;
+                border-radius: 0;
+                background: transparent;
+                box-shadow: none;
+            }
+            .phone-screen, .lyrics-view {
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+            }
+            .notch-area { display: none !important; }
+            .main-content-view, .lyrics-view {
+                padding-top: env(safe-area-inset-top, 50px);
+                padding-bottom: env(safe-area-inset-bottom, 20px);
+            }
+             .lyrics-view .modal-close-button {
+                top: env(safe-area-inset-top, 20px);
+             }
+             .fab-container {
+                bottom: env(safe-area-inset-bottom, 20px);
+             }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+</head>
+<body class="bg-gradient-to-br from-indigo-100 to-purple-100">
+
+    <div id="notch-selection-ui" class="absolute top-4 right-4 p-4 bg-white rounded-xl shadow-lg flex flex-col gap-3 z-20">
+        <label for="notch-select" class="font-semibold text-gray-800">选择刘海/挖孔风格:</label>
+        <select id="notch-select" class="p-2 border border-gray-300 rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+            <option value="hidden">隐藏</option>
+            <option value="punch-hole" selected>中置挖孔</option>
+            <option value="iphone-14-pro">iPhone 14 Pro 挖孔</option>
+            <option value="small-notch">小刘海</option>
+            <option value="large-notch">大刘海</option>
+        </select>
+    </div>
+
+    <div class="phone-frame">
+        <div class="phone-screen">
+            <div id="notch-area" class="notch-area punch-hole"></div>
+            <div id="status-bar" class="status-bar">
+                <span id="current-time-status" class="text-sm font-medium"></span>
+                <div class="flex items-center gap-1">
+                    <span class="material-symbols-outlined">signal_cellular_alt</span>
+                    <span class="material-symbols-outlined">wifi</span>
+                    <span class="material-symbols-outlined">battery_full</span>
+                </div>
+            </div>
+
+            <div id="main-content-view" class="main-content-view">
+                <div id="media-display-area" class="media-display-area">
+                    <img id="album-cover" class="album-cover" src="https://imgs.ototoy.jp/imgs/jacket/2549/00000003.1738291718.6273orig.jpg" alt="歌曲封面">
+                </div>
+                <h1 id="song-title" class="song-title">この世界に二人だけ</h1>
+                <p id="artist-name" class="artist-name">ano</p>
+                <audio id="audio-player" src="https://links.0m-p.space/konosekai.mp3"></audio>
+
+                <div class="seek-bar-container" id="seek-bar-container">
+                    <div class="seek-bar-progress" id="seek-bar-progress"></div>
+                    <div class="seek-bar-thumb" id="seek-bar-thumb"></div>
+                </div>
+                <div class="time-display">
+                    <span id="current-time">0:00</span>
+                    <span id="total-time">0:00</span>
+                </div>
+
+                <div class="controls">
+                    <div class="control-button" id="prev-button">
+                        <span class="material-symbols-outlined">skip_previous</span>
+                    </div>
+                    <div class="control-button play-pause" id="play-pause-button">
+                        <span class="material-symbols-outlined">play_arrow</span>
+                    </div>
+                    <div class="control-button" id="loop-button">
+                        <span class="material-symbols-outlined">repeat</span>
+                    </div>
+                </div>
+
+                <div class="additional-controls">
+                    <div class="additional-control-button" id="play-mv-button">
+                        <span class="material-symbols-outlined">play_circle</span>
+                    </div>
+                    <div class="additional-control-button" id="view-lyrics-button">
+                        <span class="material-symbols-outlined">lyrics</span>
+                    </div>
+                    <!-- FIXED: Replaced comment button with change cover button -->
+                    <div class="additional-control-button" id="change-cover-button">
+                        <span class="material-symbols-outlined">shuffle</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="lyrics-view" class="lyrics-view hidden-view">
+                <div class="lyrics-header">
+                    <button class="modal-close-button" id="close-lyrics-view">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="lyrics-content-wrapper">
+                </div>
+
+                <div id="fab-container" class="fab-container">
+                    <button id="fab-menu-button" class="fab-button">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
+                    <div id="fab-options" class="fab-options">
+                        <button class="fab-option-button" id="fab-back-button">
+                            <span>返回</span>
+                        </button>
+                        <button class="fab-option-button selected" data-lang-toggle="jp">
+                            <span>原歌词 (日文)</span>
+                        </button>
+                        <button class="fab-option-button" data-lang-toggle="zh">
+                            <span>中文翻译</span>
+                        </button>
+                        <button class="fab-option-button" data-lang-toggle="en">
+                             <span>英文翻译</span>
+                        </button>
+                        <button class="fab-option-button" data-lang-toggle="kana">
+                            <span>假名</span>
+                        </button>
+                        <button class="fab-option-button" data-lang-toggle="romaji">
+                            <span>罗马音</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let audioPlayer, playPauseButton, playPauseIcon, prevButton, loopButton, seekBarContainer, 
+            seekBarProgress, seekBarThumb, currentTimeSpan, totalTimeSpan, notchSelect, notchArea, 
+            statusBarTime, phoneScreen, statusBarDiv, mainContentView, lyricsView, playMvButton, 
+            viewLyricsButton, changeCoverButton, albumCoverElement, mvPlayerElement, mediaDisplayArea, 
+            closeLyricsView, lyricsContentWrapper, fabContainer, fabMenuButton, fabOptions, 
+            fabBackButton, fabLangToggleButtons;
+
+        let isDraggingSeekBar = false, isMvPlaying = false, isLyricsVisible = false, fabTimeout, isLooping = false;
+
+        let lyricsPromise;
+        const lyricsData = {};
+        const lyricsUrls = {
+            jp: 'https://links.0m-p.space/konosekai_jp.lrc',
+            zh: 'https://links.0m-p.space/konosekai_zh.lrc',
+            en: 'https://links.0m-p.space/konosekai_en.lrc',
+            kana: 'https://links.0m-p.space/konosekai_kana.lrc',
+            romaji: 'https://links.0m-p.space/konosekai_romaji.lrc'
+        };
+
+        const anoPhotos = [
+            'https://links.0m-p.space/ano/1.jpg', 'https://links.0m-p.space/ano/2.jpg',
+            'https://links.0m-p.space/ano/3.jpg', 'https://links.0m-p.space/ano/4.jpg',
+            'https://links.0m-p.space/ano/5.jpg', 'https://links.0m-p.space/ano/6.jpg',
+            'https://links.0m-p.space/ano/7.jpg', 'https://links.0m-p.space/ano/8.jpg',
+            'https://links.0m-p.space/ano/9.jpg', 'https://links.0m-p.space/ano/10.jpg'
+        ];
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+        
+        function updateStatusBarTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            if (statusBarTime) statusBarTime.textContent = `${hours}:${minutes}`;
+        }
+
+        function showView(viewToShow) {
+            mainContentView.style.display = 'none';
+            lyricsView.style.display = 'none';
+            mainContentView.style.opacity = 0;
+            lyricsView.style.opacity = 0;
+            mainContentView.style.transform = 'translateY(20px)';
+            lyricsView.style.transform = 'translateY(20px)';
+            mainContentView.style.pointerEvents = 'none';
+            lyricsView.style.pointerEvents = 'none';
+
+            viewToShow.style.display = 'flex';
+            viewToShow.style.pointerEvents = 'auto';
+
+            setTimeout(() => {
+                viewToShow.style.opacity = 1;
+                viewToShow.style.transform = 'translateY(0)';
+            }, 10);
+
+            if (phoneScreen) {
+                phoneScreen.style.backgroundColor = viewToShow === lyricsView ? '#fff' : '#f0f0f0';
+                if (viewToShow === lyricsView) resetFabTimeout();
+            }
+        }
+
+        function initAudioListeners() {
+            playPauseButton.addEventListener('click', () => {
+                if (audioPlayer.paused) {
+                    audioPlayer.play();
+                    playPauseIcon.textContent = 'pause';
+                } else {
+                    audioPlayer.pause();
+                    playPauseIcon.textContent = 'play_arrow';
+                }
+            });
+
+            audioPlayer.addEventListener('timeupdate', () => {
+                if (!isDraggingSeekBar) {
+                    const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+                    seekBarProgress.style.width = `${progress}%`;
+                    seekBarThumb.style.left = `${progress}%`;
+                }
+                currentTimeSpan.textContent = formatTime(audioPlayer.currentTime);
+                if (isLyricsVisible) updateLyricsDisplay(audioPlayer.currentTime);
+            });
+
+            audioPlayer.addEventListener('loadedmetadata', () => {
+                totalTimeSpan.textContent = formatTime(audioPlayer.duration);
+            });
+            
+            audioPlayer.addEventListener('ended', () => {
+                if (isLooping) {
+                    audioPlayer.currentTime = 0;
+                    audioPlayer.play();
+                } else {
+                    playPauseIcon.textContent = 'play_arrow';
+                }
+            });
+        }
+
+        function initSeekBarListeners() {
+            const handleDrag = (clientX) => {
+                const rect = seekBarContainer.getBoundingClientRect();
+                let newProgress = (clientX - rect.left) / rect.width;
+                newProgress = Math.max(0, Math.min(1, newProgress));
+                audioPlayer.currentTime = newProgress * audioPlayer.duration;
+                seekBarProgress.style.width = `${newProgress * 100}%`;
+                seekBarThumb.style.left = `${newProgress * 100}%`;
+            };
+
+            seekBarThumb.addEventListener('mousedown', (e) => { isDraggingSeekBar = true; e.preventDefault(); });
+            document.addEventListener('mousemove', (e) => { if (isDraggingSeekBar) handleDrag(e.clientX); });
+            document.addEventListener('mouseup', () => { isDraggingSeekBar = false; });
+            seekBarThumb.addEventListener('touchstart', (e) => { isDraggingSeekBar = true; e.preventDefault(); });
+            document.addEventListener('touchmove', (e) => { if (isDraggingSeekBar) handleDrag(e.touches[0].clientX); });
+            document.addEventListener('touchend', () => { isDraggingSeekBar = false; });
+            seekBarContainer.addEventListener('click', (e) => handleDrag(e.clientX));
+        }
+
+        function initMvControls() {
+            playMvButton.addEventListener('click', async () => {
+                if (isMvPlaying) {
+                    if (mvPlayerElement && mvPlayerElement.parentNode && !mvPlayerElement.paused) {
+                        mvPlayerElement.pause();
+                    }
+                    mvPlayerElement.classList.remove('visible');
+                    setTimeout(() => {
+                        if (mediaDisplayArea.contains(mvPlayerElement)) {
+                            mediaDisplayArea.replaceChild(albumCoverElement, mvPlayerElement);
+                        }
+                        albumCoverElement.style.opacity = 1;
+                    }, 500);
+                    isMvPlaying = false;
+                    playMvButton.querySelector('.material-symbols-outlined').textContent = 'play_circle';
+                } else {
+                    if (isLyricsVisible) viewLyricsButton.click();
+                    if (!mvPlayerElement) {
+                        mvPlayerElement = document.createElement('video');
+                        mvPlayerElement.id = 'mv-player-dynamic';
+                        mvPlayerElement.controls = true;
+                        mvPlayerElement.src = 'https://links.0m-p.space/konosekai.mp4';
+                        mvPlayerElement.classList.add('dynamic-media-player');
+                    }
+                    albumCoverElement.style.opacity = 0;
+                    setTimeout(async () => {
+                        try {
+                            if (!mediaDisplayArea.contains(mvPlayerElement)) {
+                                 mediaDisplayArea.replaceChild(mvPlayerElement, albumCoverElement);
+                            }
+                            await mvPlayerElement.play();
+                            isMvPlaying = true;
+                            playMvButton.querySelector('.material-symbols-outlined').textContent = 'stop';
+                            setTimeout(() => mvPlayerElement.classList.add('visible'), 10);
+                        } catch (error) {
+                            if (error.name !== 'AbortError') {
+                                console.error('Error playing MV:', error);
+                            }
+                            isMvPlaying = false;
+                            playMvButton.querySelector('.material-symbols-outlined').textContent = 'play_circle';
+                            if (mediaDisplayArea.contains(mvPlayerElement)) {
+                                mediaDisplayArea.replaceChild(albumCoverElement, mvPlayerElement);
+                            }
+                            albumCoverElement.style.opacity = 1;
+                        }
+                    }, 300);
+                }
+            });
+        }
+
+        function parseLRC(lrcContent) {
+            const lines = lrcContent.split('\n');
+            const parsed = [];
+            const timeRegex = /\[(\d{2}):(\d{2})\.(\d{2,3})\](.*)/;
+            lines.forEach(line => {
+                const match = line.match(timeRegex);
+                if (match) {
+                    const time = parseInt(match[1], 10) * 60 + parseInt(match[2], 10) + parseInt(match[3], 10) / (match[3].length === 3 ? 1000 : 100);
+                    const text = match[4].trim();
+                    if (text) parsed.push({ time, text });
+                }
+            });
+            return parsed.sort((a, b) => a.time - b.time);
+        }
+
+        function loadAllLyrics() {
+            const promises = Object.keys(lyricsUrls).map(async (lang) => {
+                try {
+                    const response = await fetch(lyricsUrls[lang]);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    lyricsData[lang] = parseLRC(await response.text());
+                } catch (error) {
+                    console.error(`Error loading lyrics for ${lang}:`, error);
+                    lyricsData[lang] = [];
+                }
+            });
+            return Promise.all(promises);
+        }
+        
+        function displaySelectedLyrics() {
+            if (!lyricsContentWrapper) return;
+            lyricsContentWrapper.innerHTML = '';
+        
+            const selectedButton = Array.from(fabLangToggleButtons).find(b => b.classList.contains('selected'));
+            const selectedLang = selectedButton ? selectedButton.dataset.langToggle : 'jp'; 
+        
+            const primaryLyrics = lyricsData.jp || [];
+            if (primaryLyrics.length === 0) {
+                lyricsContentWrapper.innerHTML = '<p class="text-gray-500 mt-10">歌词加载中...</p>';
+                return;
+            }
+        
+            let translationMap = new Map();
+            if (selectedLang !== 'jp' && lyricsData[selectedLang]) {
+                lyricsData[selectedLang].forEach(line => {
+                    const timeKey = line.time.toFixed(2);
+                    if (!translationMap.has(timeKey)) {
+                        translationMap.set(timeKey, line.text);
+                    }
+                });
+            }
+        
+            primaryLyrics.forEach(line => {
+                const pairContainer = document.createElement('div');
+                pairContainer.className = 'lyrics-pair';
+                pairContainer.dataset.time = line.time;
+        
+                const originalLine = document.createElement('p');
+                originalLine.className = 'original-lyric';
+                originalLine.textContent = line.text;
+                pairContainer.appendChild(originalLine);
+        
+                const timeKey = line.time.toFixed(2);
+                if (selectedLang !== 'jp' && translationMap.has(timeKey)) {
+                    const translatedLine = document.createElement('p');
+                    translatedLine.className = 'translated-lyric';
+                    translatedLine.textContent = translationMap.get(timeKey);
+                    pairContainer.appendChild(translatedLine);
+                }
+                lyricsContentWrapper.appendChild(pairContainer);
+            });
+        
+            updateLyricsDisplay(audioPlayer.currentTime);
+        }
+
+        function updateLyricsDisplay(currentTime) {
+            let activePair = null;
+            const pairs = lyricsContentWrapper.querySelectorAll('.lyrics-pair');
+            
+            for (let i = 0; i < pairs.length; i++) {
+                const pair = pairs[i];
+                const nextPair = pairs[i + 1];
+                const pairTime = parseFloat(pair.dataset.time);
+                const nextPairTime = nextPair ? parseFloat(nextPair.dataset.time) : (audioPlayer.duration || Infinity);
+                
+                if (currentTime >= pairTime && currentTime < nextPairTime) {
+                    pair.classList.add('active');
+                    activePair = pair;
+                } else {
+                    pair.classList.remove('active');
+                }
+            }
+    
+            if (activePair) {
+                const scrollTarget = activePair.offsetTop - lyricsContentWrapper.clientHeight / 3;
+                lyricsContentWrapper.scrollTo({ top: scrollTarget, behavior: 'smooth' });
+            }
+        }
+        
+        function resetFabTimeout() {
+            clearTimeout(fabTimeout);
+            fabTimeout = setTimeout(() => { if(fabOptions) fabOptions.classList.remove('visible') }, 5000);
+        }
+
+        function initLyricsControls() {
+            viewLyricsButton.addEventListener('click', async () => {
+                if (isLyricsVisible) {
+                    isLyricsVisible = false;
+                    showView(mainContentView);
+                } else {
+                    if (isMvPlaying) playMvButton.click();
+                    isLyricsVisible = true;
+                    lyricsContentWrapper.innerHTML = '<p class="text-gray-500 mt-10">正在加载歌词...</p>';
+                    showView(lyricsView);
+                    try {
+                        await lyricsPromise;
+                        displaySelectedLyrics();
+                    } catch (error) {
+                        lyricsContentWrapper.innerHTML = '<p class="text-red-500 mt-10">歌词加载失败。</p>';
+                    }
+                }
+            });
+
+            closeLyricsView.addEventListener('click', () => {
+                isLyricsVisible = false;
+                if (fabOptions) fabOptions.classList.remove('visible');
+                clearTimeout(fabTimeout);
+                showView(mainContentView);
+            });
+
+            fabMenuButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                fabOptions.classList.toggle('visible');
+                resetFabTimeout();
+            });
+
+            fabOptions.addEventListener('click', (e) => {
+                resetFabTimeout();
+                const button = e.target.closest('.fab-option-button');
+                if (!button) return;
+
+                if (button.id === 'fab-back-button') {
+                    closeLyricsView.click();
+                } else if (button.dataset.langToggle) {
+                    fabLangToggleButtons.forEach(btn => btn.classList.remove('selected'));
+                    button.classList.add('selected');
+                    displaySelectedLyrics();
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (fabContainer && !fabContainer.contains(e.target) && fabOptions.classList.contains('visible')) {
+                    fabOptions.classList.remove('visible');
+                }
+            });
+        }
+
+        function initCoverChangeControls() {
+            let originalCoverSrc;
+            let isShowingOriginalCover = true;
+            
+            if (albumCoverElement) {
+                originalCoverSrc = albumCoverElement.src;
+            }
+
+            changeCoverButton.addEventListener('click', () => {
+                if (isShowingOriginalCover) {
+                    const randomIndex = Math.floor(Math.random() * anoPhotos.length);
+                    albumCoverElement.src = anoPhotos[randomIndex];
+                    isShowingOriginalCover = false;
+                } else {
+                    albumCoverElement.src = originalCoverSrc;
+                    isShowingOriginalCover = true;
+                }
+            });
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            audioPlayer = document.getElementById('audio-player');
+            playPauseButton = document.getElementById('play-pause-button');
+            prevButton = document.getElementById('prev-button');
+            loopButton = document.getElementById('loop-button');
+            seekBarContainer = document.getElementById('seek-bar-container');
+            seekBarProgress = document.getElementById('seek-bar-progress');
+            seekBarThumb = document.getElementById('seek-bar-thumb');
+            currentTimeSpan = document.getElementById('current-time');
+            totalTimeSpan = document.getElementById('total-time');
+            notchSelect = document.getElementById('notch-select');
+            notchArea = document.getElementById('notch-area');
+            statusBarTime = document.getElementById('current-time-status');
+            phoneScreen = document.getElementById('phone-screen');
+            statusBarDiv = document.getElementById('status-bar');
+            mainContentView = document.getElementById('main-content-view');
+            lyricsView = document.getElementById('lyrics-view');
+            playMvButton = document.getElementById('play-mv-button');
+            viewLyricsButton = document.getElementById('view-lyrics-button');
+            changeCoverButton = document.getElementById('change-cover-button');
+            mediaDisplayArea = document.getElementById('media-display-area');
+            albumCoverElement = document.getElementById('album-cover');
+            closeLyricsView = document.getElementById('close-lyrics-view');
+            lyricsContentWrapper = document.querySelector('.lyrics-content-wrapper');
+            fabContainer = document.getElementById('fab-container');
+            fabMenuButton = document.getElementById('fab-menu-button');
+            fabOptions = document.getElementById('fab-options');
+            fabBackButton = document.getElementById('fab-back-button');
+            fabLangToggleButtons = document.querySelectorAll('.fab-option-button[data-lang-toggle]');
+
+            if (playPauseButton) {
+                 playPauseIcon = playPauseButton.querySelector('.material-symbols-outlined');
+            }
+
+            if (notchSelect) {
+                notchSelect.value = 'punch-hole';
+                notchArea.classList.add('punch-hole');
+                notchSelect.addEventListener('change', (e) => {
+                    notchArea.className = 'notch-area';
+                    notchArea.classList.add(e.target.value === 'hidden' ? 'notch-hidden' : e.target.value);
+                });
+            }
+
+            updateStatusBarTime();
+            setInterval(updateStatusBarTime, 60000);
+
+            lyricsPromise = loadAllLyrics();
+            showView(mainContentView);
+
+            initAudioListeners();
+            initSeekBarListeners();
+            initMvControls();
+            initLyricsControls();
+            initCoverChangeControls();
+            
+            if(prevButton) prevButton.addEventListener('click', () => console.log('Previous song'));
+            if(loopButton) loopButton.addEventListener('click', () => {
+                isLooping = !isLooping;
+                loopButton.classList.toggle('active', isLooping);
+            });
+        });
+    </script>
+</body>
+</html>
