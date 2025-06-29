@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Material 3 Expressive 音乐播放器</title>
+    <title>この世界に二人だけ / ano</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -387,6 +387,7 @@
             padding-bottom: 20px;
             -ms-overflow-style: none;
             scrollbar-width: none;
+            padding-top: 50px;
         }
         .lyrics-content-wrapper::-webkit-scrollbar {
             display: none;
@@ -534,9 +535,6 @@
                 padding-top: env(safe-area-inset-top, 50px);
                 padding-bottom: env(safe-area-inset-bottom, 20px);
             }
-             .lyrics-view .modal-close-button {
-                top: env(safe-area-inset-top, 20px);
-             }
              .fab-container {
                 bottom: env(safe-area-inset-bottom, 20px);
              }
@@ -571,7 +569,7 @@
 
             <div id="main-content-view" class="main-content-view">
                 <div id="media-display-area" class="media-display-area">
-                    <img id="album-cover" class="album-cover" src="https://imgs.ototoy.jp/imgs/jacket/2549/00000003.1738291718.6273orig.jpg" alt="歌曲封面">
+                    <img id="album-cover" class="album-cover" src="./cover.jpg" alt="歌曲封面">
                 </div>
                 <h1 id="song-title" class="song-title">この世界に二人だけ</h1>
                 <p id="artist-name" class="artist-name">ano</p>
@@ -605,19 +603,13 @@
                     <div class="additional-control-button" id="view-lyrics-button">
                         <span class="material-symbols-outlined">lyrics</span>
                     </div>
-                    <!-- FIXED: Replaced comment button with change cover button -->
                     <div class="additional-control-button" id="change-cover-button">
-                        <span class="material-symbols-outlined">shuffle</span>
+                        <span class="material-symbols-outlined">art_track</span>
                     </div>
                 </div>
             </div>
 
             <div id="lyrics-view" class="lyrics-view hidden-view">
-                <div class="lyrics-header">
-                    <button class="modal-close-button" id="close-lyrics-view">
-                        <span class="material-symbols-outlined">close</span>
-                    </button>
-                </div>
                 <div class="lyrics-content-wrapper">
                 </div>
 
@@ -655,7 +647,7 @@
             seekBarProgress, seekBarThumb, currentTimeSpan, totalTimeSpan, notchSelect, notchArea, 
             statusBarTime, phoneScreen, statusBarDiv, mainContentView, lyricsView, playMvButton, 
             viewLyricsButton, changeCoverButton, albumCoverElement, mvPlayerElement, mediaDisplayArea, 
-            closeLyricsView, lyricsContentWrapper, fabContainer, fabMenuButton, fabOptions, 
+            lyricsContentWrapper, fabContainer, fabMenuButton, fabOptions, 
             fabBackButton, fabLangToggleButtons;
 
         let isDraggingSeekBar = false, isMvPlaying = false, isLyricsVisible = false, fabTimeout, isLooping = false;
@@ -942,13 +934,6 @@
                 }
             });
 
-            closeLyricsView.addEventListener('click', () => {
-                isLyricsVisible = false;
-                if (fabOptions) fabOptions.classList.remove('visible');
-                clearTimeout(fabTimeout);
-                showView(mainContentView);
-            });
-
             fabMenuButton.addEventListener('click', (e) => {
                 e.stopPropagation();
                 fabOptions.classList.toggle('visible');
@@ -961,7 +946,10 @@
                 if (!button) return;
 
                 if (button.id === 'fab-back-button') {
-                    closeLyricsView.click();
+                    isLyricsVisible = false;
+                    if (fabOptions) fabOptions.classList.remove('visible');
+                    clearTimeout(fabTimeout);
+                    showView(mainContentView);
                 } else if (button.dataset.langToggle) {
                     fabLangToggleButtons.forEach(btn => btn.classList.remove('selected'));
                     button.classList.add('selected');
@@ -985,14 +973,17 @@
             }
 
             changeCoverButton.addEventListener('click', () => {
-                if (isShowingOriginalCover) {
-                    const randomIndex = Math.floor(Math.random() * anoPhotos.length);
-                    albumCoverElement.src = anoPhotos[randomIndex];
-                    isShowingOriginalCover = false;
-                } else {
-                    albumCoverElement.src = originalCoverSrc;
-                    isShowingOriginalCover = true;
-                }
+                albumCoverElement.style.opacity = 0;
+                setTimeout(() => {
+                    if (isShowingOriginalCover) {
+                        const randomIndex = Math.floor(Math.random() * anoPhotos.length);
+                        albumCoverElement.src = anoPhotos[randomIndex];
+                    } else {
+                        albumCoverElement.src = originalCoverSrc;
+                    }
+                    isShowingOriginalCover = !isShowingOriginalCover;
+                    albumCoverElement.style.opacity = 1;
+                }, 300);
             });
         }
 
@@ -1009,8 +1000,6 @@
             totalTimeSpan = document.getElementById('total-time');
             notchSelect = document.getElementById('notch-select');
             notchArea = document.getElementById('notch-area');
-            statusBarTime = document.getElementById('current-time-status');
-            phoneScreen = document.getElementById('phone-screen');
             statusBarDiv = document.getElementById('status-bar');
             mainContentView = document.getElementById('main-content-view');
             lyricsView = document.getElementById('lyrics-view');
@@ -1019,13 +1008,13 @@
             changeCoverButton = document.getElementById('change-cover-button');
             mediaDisplayArea = document.getElementById('media-display-area');
             albumCoverElement = document.getElementById('album-cover');
-            closeLyricsView = document.getElementById('close-lyrics-view');
             lyricsContentWrapper = document.querySelector('.lyrics-content-wrapper');
             fabContainer = document.getElementById('fab-container');
             fabMenuButton = document.getElementById('fab-menu-button');
             fabOptions = document.getElementById('fab-options');
             fabBackButton = document.getElementById('fab-back-button');
             fabLangToggleButtons = document.querySelectorAll('.fab-option-button[data-lang-toggle]');
+            statusBarTime = document.getElementById('current-time-status');
 
             if (playPauseButton) {
                  playPauseIcon = playPauseButton.querySelector('.material-symbols-outlined');
@@ -1038,6 +1027,11 @@
                     notchArea.className = 'notch-area';
                     notchArea.classList.add(e.target.value === 'hidden' ? 'notch-hidden' : e.target.value);
                 });
+            }
+            
+            const isMobile = /Android|iPhone/i.test(navigator.userAgent);
+            if(isMobile && statusBarDiv) {
+                statusBarDiv.style.display = 'none';
             }
 
             updateStatusBarTime();
