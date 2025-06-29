@@ -18,6 +18,7 @@
             min-height: 100vh;
             padding: 20px;
             box-sizing: border-box;
+            transition: background-color 0.3s ease;
         }
 
         /* Material Symbols Icons */
@@ -55,6 +56,7 @@
             padding: 20px;
             box-sizing: border-box;
             overflow: hidden; /* For content overflow, like seek bar */
+            transition: background-color 0.3s ease;
         }
 
         /* Notch/Punch-hole styles */
@@ -651,6 +653,7 @@
             fabBackButton, fabLangToggleButtons;
 
         let isDraggingSeekBar = false, isMvPlaying = false, isLyricsVisible = false, fabTimeout, isLooping = false;
+        let isMobile = false;
 
         let lyricsPromise;
         const lyricsData = {};
@@ -702,19 +705,71 @@
             }, 10);
 
             if (phoneScreen) {
-                phoneScreen.style.backgroundColor = viewToShow === lyricsView ? '#fff' : '#f0f0f0';
+                const newBgColor = viewToShow === lyricsView ? '#fff' : '#f0f0f0';
+                phoneScreen.style.backgroundColor = newBgColor;
+                if (isMobile) {
+                    document.body.style.backgroundColor = newBgColor;
+                }
                 if (viewToShow === lyricsView) resetFabTimeout();
             }
         }
+        
+        // FIXED: Media Session API integration
+        function updateMediaSessionMetadata() {
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: songTitle.textContent,
+                    artist: artistName.textContent,
+                    album: 'この世界に二人だけ', // Example album
+                    artwork: [ { src: albumCoverElement.src, type: 'image/jpeg' } ]
+                });
+            }
+        }
+
+        function updateMediaSessionPosition() {
+             if ('mediaSession' in navigator) {
+                navigator.mediaSession.setPositionState({
+                    duration: audioPlayer.duration || 0,
+                    playbackRate: audioPlayer.playbackRate,
+                    position: audioPlayer.currentTime || 0,
+                });
+            }
+        }
+
+        function setupMediaSession() {
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.setActionHandler('play', () => playPauseButton.click());
+                navigator.mediaSession.setActionHandler('pause', () => playPauseButton.click());
+                navigator.mediaSession.setActionHandler('previoustrack', () => prevButton.click());
+                navigator.mediaSession.setActionHandler('nexttrack', () => loopButton.click()); // Or handle playlist
+                 navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+                    audioPlayer.currentTime = Math.max(audioPlayer.currentTime - (details.seekOffset || 10), 0);
+                });
+                navigator.mediaSession.setActionHandler('seekforward', (details) => {
+                    audioPlayer.currentTime = Math.min(audioPlayer.currentTime + (details.seekOffset || 10), audioPlayer.duration);
+                });
+                 navigator.mediaSession.setActionHandler('seekto', (details) => {
+                    if (details.fastSeek && 'fastSeek' in audioPlayer) {
+                      audioPlayer.fastSeek(details.seekTime);
+                      return;
+                    }
+                    audioPlayer.currentTime = details.seekTime;
+                });
+            }
+        }
+
 
         function initAudioListeners() {
             playPauseButton.addEventListener('click', () => {
                 if (audioPlayer.paused) {
-                    audioPlayer.play();
-                    playPauseIcon.textContent = 'pause';
+                    audioPlayer.play().then(() => {
+                        playPauseIcon.textContent = 'pause';
+                        if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "playing";
+                    });
                 } else {
                     audioPlayer.pause();
                     playPauseIcon.textContent = 'play_arrow';
+                    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
                 }
             });
 
@@ -726,10 +781,12 @@
                 }
                 currentTimeSpan.textContent = formatTime(audioPlayer.currentTime);
                 if (isLyricsVisible) updateLyricsDisplay(audioPlayer.currentTime);
+                updateMediaSessionPosition();
             });
 
             audioPlayer.addEventListener('loadedmetadata', () => {
                 totalTimeSpan.textContent = formatTime(audioPlayer.duration);
+                updateMediaSessionPosition();
             });
             
             audioPlayer.addEventListener('ended', () => {
@@ -738,6 +795,7 @@
                     audioPlayer.play();
                 } else {
                     playPauseIcon.textContent = 'play_arrow';
+                    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
                 }
             });
         }
@@ -750,6 +808,7 @@
                 audioPlayer.currentTime = newProgress * audioPlayer.duration;
                 seekBarProgress.style.width = `${newProgress * 100}%`;
                 seekBarThumb.style.left = `${newProgress * 100}%`;
+                updateMediaSessionPosition();
             };
 
             seekBarThumb.addEventListener('mousedown', (e) => { isDraggingSeekBar = true; e.preventDefault(); });
@@ -983,6 +1042,7 @@
                     }
                     isShowingOriginalCover = !isShowingOriginalCover;
                     albumCoverElement.style.opacity = 1;
+                    updateMediaSessionMetadata();
                 }, 300);
             });
         }
@@ -1015,6 +1075,9 @@
             fabBackButton = document.getElementById('fab-back-button');
             fabLangToggleButtons = document.querySelectorAll('.fab-option-button[data-lang-toggle]');
             statusBarTime = document.getElementById('current-time-status');
+            songTitle = document.getElementById('song-title');
+            artistName = document.getElementById('artist-name');
+
 
             if (playPauseButton) {
                  playPauseIcon = playPauseButton.querySelector('.material-symbols-outlined');
@@ -1029,9 +1092,10 @@
                 });
             }
             
-            const isMobile = /Android|iPhone/i.test(navigator.userAgent);
-            if(isMobile && statusBarDiv) {
-                statusBarDiv.style.display = 'none';
+            isMobile = /Android|iPhone/i.test(navigator.userAgent);
+            if(isMobile) {
+                if(statusBarDiv) statusBarDiv.style.display = 'none';
+                document.body.style.backgroundColor = '#f0f0f0';
             }
 
             updateStatusBarTime();
@@ -1045,6 +1109,7 @@
             initMvControls();
             initLyricsControls();
             initCoverChangeControls();
+            setupMediaSession();
             
             if(prevButton) prevButton.addEventListener('click', () => console.log('Previous song'));
             if(loopButton) loopButton.addEventListener('click', () => {
