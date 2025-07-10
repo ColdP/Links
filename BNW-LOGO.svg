@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_图层_1" data-name="图层 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3840 2160">
+  <defs>
+    <style>
+      .cls-1 {
+        letter-spacing: -.06em;
+      }
+
+      .cls-2 {
+        font-size: 451.07px;
+        opacity: .84;
+      }
+
+      .cls-2, .cls-3, .cls-4, .cls-5 {
+        fill: #d9f1ff;
+        font-family: Inter28pt-Black, 'Inter 28pt';
+        font-weight: 800;
+      }
+
+      .cls-6 {
+        letter-spacing: 0em;
+      }
+
+      .cls-7 {
+        letter-spacing: 0em;
+      }
+
+      .cls-3 {
+        letter-spacing: .11em;
+      }
+
+      .cls-3, .cls-4, .cls-5 {
+        font-size: 177px;
+        opacity: .61;
+      }
+
+      .cls-8 {
+        letter-spacing: 0em;
+      }
+
+      .cls-4 {
+        letter-spacing: .1em;
+      }
+
+      .cls-9 {
+        letter-spacing: 0em;
+      }
+
+      .cls-5 {
+        letter-spacing: .1em;
+      }
+
+      .cls-10 {
+        letter-spacing: .1em;
+      }
+
+      .cls-10, .cls-11, .cls-12, .cls-13 {
+        fill: none;
+        stroke: #fff;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-10, .cls-11, .cls-13 {
+        font-family: GillSansMT-Bold, 'Gill Sans MT';
+        font-size: 177.71px;
+        font-weight: 700;
+      }
+
+      .cls-10, .cls-12, .cls-13 {
+        stroke-width: 4px;
+      }
+
+      .cls-10, .cls-13 {
+        opacity: .48;
+      }
+
+      .cls-11 {
+        opacity: .54;
+        stroke-width: 6px;
+      }
+
+      .cls-11, .cls-13 {
+        letter-spacing: .2em;
+      }
+
+      .cls-14 {
+        letter-spacing: .01em;
+      }
+
+      .cls-12 {
+        opacity: .28;
+      }
+    </style>
+  </defs>
+  <text class="cls-2" transform="translate(20.22 1348.01)"><tspan x="0" y="0">B</tspan><tspan class="cls-6" x="294.92" y="0">r</tspan><tspan x="481.69" y="0">and N</tspan><tspan class="cls-7" x="1732.27" y="0">e</tspan><tspan x="1993.27" y="0">w </tspan><tspan class="cls-1" x="2472.54" y="0">W</tspan><tspan class="cls-8" x="2917.67" y="0">o</tspan><tspan class="cls-14" x="3193.42" y="0">r</tspan><tspan class="cls-9" x="3387.9" y="0">ld</tspan></text>
+  <text transform="translate(1019.34 810.48)"><tspan><tspan class="cls-4" x="0" y="0">0</tspan><tspan class="cls-3" x="139.47" y="0">M_</tspan><tspan class="cls-5" x="429.66" y="0">P</tspan><tspan class="cls-13" x="562.39" y="0"> </tspan><tspan class="cls-11" x="647.3" y="0">5</tspan><tspan class="cls-13" x="780.89" y="0">th</tspan><tspan class="cls-10" x="1027.69" y="0"> </tspan><tspan class="cls-13" x="1094.81" y="0">Album</tspan></tspan></text>
+  <line class="cls-12" x1="1533" y1="916.74" x2="2307" y2="916.74"/>
+</svg>
