@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>湖南农业大学计费处</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Google Fonts Material Symbols -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <style>
+        /* 自定义样式以确保图标正确显示 */
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 1,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 48
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+
+    <div class="container mx-auto max-w-md min-h-screen bg-white shadow-md">
+        <!-- 顶部导航栏 -->
+        <header class="relative flex items-center justify-center p-4 border-b">
+            <a href="#" class="absolute left-4 text-gray-600">
+                <span class="material-symbols-outlined">
+                    arrow_back_ios
+                </span>
+            </a>
+            <h1 class="text-lg font-semibold text-gray-800">支付成功</h1>
+        </header>
+
+        <!-- 主要内容区域 -->
+        <main class="p-8 flex flex-col items-center text-center">
+            
+            <!-- 成功图标 -->
+            <div class="my-8">
+                <span class="material-symbols-outlined text-green-500" style="font-size: 80px;">
+                    check_circle
+                </span>
+            </div>
+
+            <!-- 成功信息 -->
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">支付成功</h2>
+            
+            <!-- 支付金额 -->
+            <p class="text-4xl font-bold text-gray-900 mb-12">
+                258.60 <span class="text-xl font-normal">元</span>
+            </p>
+
+            <!-- 支付详情 -->
+            <div class="w-full bg-gray-50 rounded-lg p-5 text-left">
+                <ul class="space-y-4 text-gray-700">
+                    <li class="flex justify-between items-center">
+                        <span class="text-gray-500">缴费项目</span>
+                        <span class="font-medium text-gray-900">2024学年学分学费补交</span>
+                    </li>
+                    <li class="flex justify-between items-center">
+                        <span class="text-gray-500">姓名</span>
+                        <span class="font-medium text-gray-900">谭文旭</span>
+                    </li>
+                    <li class="flex justify-between items-center">
+                        <span class="text-gray-500">学号</span>
+                        <span class="font-medium text-gray-900">202440181007</span>
+                    </li>
+                    <li class="flex justify-between items-center">
+                        <span class="text-gray-500">支付单号</span>
+                        <span class="font-medium text-gray-900">HUQ20250716134536.....</span>
+                    </li>
+                </ul>
+            </div>
+
+        </main>
+    </div>
+
+</body>
+</html>
