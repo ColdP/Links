@@ -1,269 +1,230 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>0M_P feat. 初音ミク - 夏末回音 Echoes of Late Summer</title>
+    <title>0M_P's Links</title>
     
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts: Inter and Noto Sans SC -->
+    <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
     
+    <!-- Material Symbols for icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
     <style>
-        /* 基本样式和字体设置 */
+        /* Custom styles for the page */
+        :root {
+            --theme-blue: #3b82f6; /* A nice, not-too-saturated blue */
+        }
+        
+        /* Define fonts and base styles */
         body {
-            font-family: 'Inter', 'Noto Sans SC', sans-serif;
-            background-color: #f8f9fa; /* 浅色背景 */
-            color: #1a202c; /* 深色文字 */
-        }
-
-        /* 强制使用无圆角设计 */
-        * {
-            border-radius: 0 !important;
-        }
-
-        /* 标题字体 */
-        .section-title {
             font-family: 'Inter', 'Google Sans', sans-serif;
-            font-weight: 900;
-            letter-spacing: 0.05em;
-        }
-        
-        /* 漫画风格边框 */
-        .comic-border {
-            border: 2px solid #1a202c;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* 动画效果：元素默认状态 */
-        .scroll-animate {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        /* Custom box-shadow for the "manga panel" effect */
+        .manga-shadow {
+            box-shadow: 5px 5px 0px 0px rgba(0,0,0,1);
+        }
+        .dark .manga-shadow {
+            box-shadow: 5px 5px 0px 0px var(--theme-blue);
         }
 
-        /* 动画效果：元素进入视窗后的状态 */
-        .scroll-animate.is-visible {
-            opacity: 1;
-            transform: translateY(0);
+        /* Animation for cards appearing on load */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0; /* Start hidden */
         }
 
-        /* 按钮样式 */
-        .theme-button {
-            background-color: #3b82f6; /* 主题蓝色 */
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            border: 2px solid #1a202c;
-            font-weight: bold;
-            box-shadow: 4px 4px 0px #1a202c; /* 漫画风格阴影 */
-        }
-
-        .theme-button:hover {
-            background-color: #2563eb; /* 悬停时颜色加深 */
-            transform: translate(2px, 2px);
-            box-shadow: 2px 2px 0px #1a202c;
-        }
-        
-        .theme-button.disabled {
-            background-color: #9ca3af;
-            cursor: not-allowed;
-            box-shadow: 4px 4px 0px #6b7280;
-        }
-        .theme-button.disabled:hover {
-            background-color: #9ca3af;
-            transform: none;
-            box-shadow: 4px 4px 0px #6b7280;
-        }
-
-        /* 卡片悬停效果 */
-        .card-hover {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        /* Style for the Material Symbols icon */
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24
         }
     </style>
 </head>
-<body class="bg-slate-100">
+<body class="bg-slate-100 dark:bg-black text-slate-900 dark:text-slate-100 transition-colors duration-500">
 
-    <!-- 1. 封面 + 大标题 -->
-    <header class="bg-white w-full min-h-screen flex flex-col items-center justify-center p-8 scroll-animate">
-        <div class="text-center">
-            <img src="EoLS_Cover.png" alt="夏末回音 EP 封面" class="w-full max-w-sm md:max-w-md mx-auto comic-border shadow-xl">
-            <img src="EoLS_Logo.png" alt="夏末回音 Logo" class="w-full max-w-md md:max-w-lg mx-auto mt-8">
+    <!-- Theme switcher button -->
+    <div class="fixed top-4 right-4 z-50">
+        <button id="theme-toggle" class="w-12 h-12 flex items-center justify-center bg-slate-200 dark:bg-slate-800 border border-slate-900 dark:border-slate-500 transition-all duration-300 hover:bg-slate-300 dark:hover:bg-slate-700 hover:scale-110">
+            <span class="material-symbols-outlined" id="theme-icon">light_mode</span>
+        </button>
+    </div>
+
+    <!-- Main container for all content -->
+    <main class="container mx-auto max-w-2xl p-4 sm:p-6 md:p-8">
+        <div class="space-y-8">
+            
+            <!-- Card 1: Profile -->
+            <section class="card-animate bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-200 manga-shadow transition-all duration-500">
+                <div class="flex flex-col items-center text-center p-8">
+                    <img src="avatar.png" alt="0M_P Avatar" class="w-28 h-28 object-cover border-2 border-slate-900 dark:border-slate-200" onerror="this.onerror=null;this.src='https://placehold.co/112x112/000000/FFFFFF?text=0M_P';">
+                    <h1 class="text-4xl font-black mt-4">0M_P</h1>
+                    <p class="mt-1 text-slate-600 dark:text-slate-400">VOCALOID Producer since 2017</p>
+                </div>
+            </section>
+
+            <!-- Card 2: New Release -->
+            <section class="card-animate bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-200 manga-shadow transition-all duration-500">
+                <div class="p-6">
+                    <h2 class="text-xl font-bold text-center mb-4 border-b-2 border-slate-900 dark:border-slate-200 pb-2">NEW RELEASE</h2>
+                    <div class="space-y-6">
+                        <!-- Release Item 1 -->
+                        <a href="https://ep.0m-p.space/1st" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-4 group transition-transform duration-300 hover:scale-[1.02]">
+                            <img src="EoLS_Cover.png" alt="EP 'Echoes of Late Summer' Cover" class="w-24 h-24 object-cover border-2 border-slate-900 dark:border-slate-400 group-hover:border-[var(--theme-blue)] transition-colors duration-300" onerror="this.onerror=null;this.src='https://placehold.co/96x96/1e293b/FFFFFF?text=EoLS';">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-lg group-hover:text-[var(--theme-blue)] transition-colors duration-300">EP "夏末回音 Echoes of Late Summer"</h3>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Release Date : 2025-08-31</p>
+                            </div>
+                        </a>
+                        <!-- Release Item 2 -->
+                        <a href="AfterDream/" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-4 group transition-transform duration-300 hover:scale-[1.02]">
+                            <img src="AD.png" alt="After Dream Cover" class="w-24 h-24 object-cover border-2 border-slate-900 dark:border-slate-400 group-hover:border-[var(--theme-blue)] transition-colors duration-300" onerror="this.onerror=null;this.src='https://placehold.co/96x96/1e293b/FFFFFF?text=AD';">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-lg group-hover:text-[var(--theme-blue)] transition-colors duration-300">After Dream</h3>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Release Date : 2025-03-09</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Card 3: Links -->
+            <section class="card-animate bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-200 manga-shadow transition-all duration-500">
+                <div class="p-6">
+                    <h2 class="text-xl font-bold text-center mb-4 border-b-2 border-slate-900 dark:border-slate-200 pb-2">LINKS</h2>
+                    <div class="grid grid-cols-1 gap-3">
+                        <a href="https://www.0m-p.space/" target="_blank" rel="noopener noreferrer" class="link-button">Official Site</a>
+                        <a href="https://space.bilibili.com/168264291" target="_blank" rel="noopener noreferrer" class="link-button">bilibili</a>
+                        <a href="https://www.tunecore.co.jp/artists/0M_P" target="_blank" rel="noopener noreferrer" class="link-button">TuneCore Japan</a>
+                        <a href="https://youtube.com/@0M_P" target="_blank" rel="noopener noreferrer" class="link-button">YouTube Channel</a>
+                        <a href="https://music.apple.com/jp/artist/1699342983" target="_blank" rel="noopener noreferrer" class="link-button">Apple Music</a>
+                        <a href="https://open.spotify.com/artist/2xPheCv27oLtbyjb7TsXd0" target="_blank" rel="noopener noreferrer" class="link-button">Spotify</a>
+                        <a href="http://music.163.com/artist?id=36284273" target="_blank" rel="noopener noreferrer" class="link-button">网易云音乐</a>
+                        <a href="https://twitter.com/0M_P_39" target="_blank" rel="noopener noreferrer" class="link-button">X (Twitter)</a>
+                        <a href="mailto:coiko39@gmail.com" class="link-button">E-mail</a>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Card 4: Works -->
+            <section class="card-animate bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-200 manga-shadow transition-all duration-500">
+                <div class="p-6">
+                    <h2 class="text-xl font-bold text-center mb-4 border-b-2 border-slate-900 dark:border-slate-200 pb-2">WORKS</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                         <!-- Work Item 1 -->
+                        <a href="https://linkco.re/XThrYXSs" target="_blank" rel="noopener noreferrer" class="group transition-transform duration-300 hover:scale-105">
+                            <img src="inner_Cover.png" alt="inner Cover" class="w-full h-auto object-cover border-2 border-slate-900 dark:border-slate-400 group-hover:border-[var(--theme-blue)] transition-colors duration-300" onerror="this.onerror=null;this.src='https://placehold.co/300x300/1e293b/FFFFFF?text=inner';">
+                            <h3 class="font-bold mt-2 text-center group-hover:text-[var(--theme-blue)] transition-colors duration-300">inner</h3>
+                        </a>
+                         <!-- Work Item 2 -->
+                        <a href="https://linkco.re/gHE8PnXa" target="_blank" rel="noopener noreferrer" class="group transition-transform duration-300 hover:scale-105">
+                            <img src="https://ep.0m-p.space/1st/YNR.jpg" alt="You Need - Reloaded Cover" class="w-full h-auto object-cover border-2 border-slate-900 dark:border-slate-400 group-hover:border-[var(--theme-blue)] transition-colors duration-300" onerror="this.onerror=null;this.src='https://placehold.co/300x300/1e293b/FFFFFF?text=YNR';">
+                            <h3 class="font-bold mt-2 text-center group-hover:text-[var(--theme-blue)] transition-colors duration-300">You Need - Reloaded</h3>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
         </div>
-    </header>
 
-    <main class="container mx-auto px-4 md:px-8 py-16 space-y-24">
-
-        <!-- 2. EDITIONS -->
-        <section class="scroll-animate">
-            <h2 class="section-title text-4xl md:text-5xl text-center mb-12">EDITIONS</h2>
-            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                <!-- 数字版 -->
-                <div class="bg-white p-8 comic-border flex flex-col">
-                    <h3 class="text-2xl font-bold mb-4">数字版</h3>
-                    <p class="text-slate-600 mb-2">Hi-Res Audio</p>
-                    <p class="text-slate-600 mb-6 font-bold">免费公开</p>
-                    <div class="mt-auto">
-                        <a href="http://links.0m-p.space/ReWind" target="_blank" class="theme-button block">获取</a>
-                    </div>
-                </div>
-                <!-- 实体版 -->
-                <div class="bg-white p-8 comic-border flex flex-col">
-                    <h3 class="text-2xl font-bold mb-4">实体版</h3>
-                    <p class="text-slate-600 mb-2">1 CD</p>
-                    <p class="text-slate-600 mb-6 font-bold">39 RMB <span class="text-sm">(不包含邮费)</span></p>
-                    <div class="mt-auto">
-                        <a href="http://links.0m-p.space/ReWind_CD" target="_blank" class="theme-button block">购买</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 3. TRACK LIST -->
-        <section class="scroll-animate">
-            <h2 class="section-title text-4xl md:text-5xl text-center mb-12">TRACK LIST</h2>
-            <div class="max-w-4xl mx-auto bg-white p-8 md:p-12 comic-border">
-                <ol class="space-y-6">
-                    <li class="border-b-2 border-dashed border-slate-300 pb-4">
-                        <p class="font-bold text-lg">01. Memories Here</p>
-                        <p class="text-sm text-slate-500">Music & Arrangement : 0M_P</p>
-                    </li>
-                    <li class="border-b-2 border-dashed border-slate-300 pb-4">
-                        <p class="font-bold text-lg">02. Summer is Coming</p>
-                        <p class="text-sm text-slate-500">Lyrics, Music & Arrangement : 0M_P, Vocal : 初音ミク</p>
-                    </li>
-                    <li class="border-b-2 border-dashed border-slate-300 pb-4">
-                        <p class="font-bold text-lg">03. After Dream</p>
-                        <p class="text-sm text-slate-500">Lyrics, Music & Arrangement : 0M_P, Vocal : 初音ミク</p>
-                    </li>
-                    <li class="border-b-2 border-dashed border-slate-300 pb-4">
-                        <p class="font-bold text-lg">04. inner</p>
-                        <p class="text-sm text-slate-500">Lyrics, Music & Arrangement : 0M_P, Synthesizer Arrangement : HoT, Vocal : 初音ミク</p>
-                    </li>
-                    <li class="border-b-2 border-dashed border-slate-300 pb-4">
-                        <p class="font-bold text-lg">05. Back to Summer</p>
-                        <p class="text-sm text-slate-500">Lyrics, Music & Arrangement : 0M_P, Vocal : 初音ミク</p>
-                    </li>
-                    <li class="border-b-2 border-dashed border-slate-300 pb-4">
-                        <p class="font-bold text-lg">06. After Dream - Life Remix</p>
-                        <p class="text-sm text-slate-500">Lyrics, Music & Remix : 0M_P, Vocal : 初音ミク</p>
-                    </li>
-                    <li class="border-b-2 border-dashed border-slate-300 pb-4">
-                        <p class="font-bold text-lg">07. You Need - Reloaded</p>
-                        <p class="text-sm text-slate-500">Lyrics, Music & Arrangement : 0M_P, Vocal : 初音ミク</p>
-                    </li>
-                    <li>
-                        <p class="font-bold text-lg">08. Always Your Birthday</p>
-                        <p class="text-sm text-slate-500">Lyrics, Music & Arrangement : 0M_P, Synthesizer Arrangement : HoT, Vocal : 初音ミク</p>
-                    </li>
-                </ol>
-            </div>
-        </section>
-
-        <!-- 4. MOVIES -->
-        <section class="scroll-animate">
-            <h2 class="section-title text-4xl md:text-5xl text-center mb-12">MOVIES</h2>
-            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                <a href="https://www.bilibili.com/video/BV1u1fvYKETw/" target="_blank" class="block bg-white comic-border card-hover">
-                    <img src="AfterDream_MVCover.jpg" alt="After Dream MV 封面" class="w-full h-auto comic-border border-b-2">
-                    <p class="font-bold text-center p-4">After Dream</p>
-                </a>
-                <div class="bg-white comic-border">
-                    <img src="EoLS_XFD.png" alt="CrossFade Video 封面" class="w-full h-auto comic-border border-b-2 opacity-60">
-                    <p class="font-bold text-center p-4 text-slate-500">CrossFade Video (Coming Soon)</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- 5. STREAMING -->
-        <section class="scroll-animate">
-            <h2 class="section-title text-4xl md:text-5xl text-center mb-12">STREAMING</h2>
-            <div class="max-w-5xl mx-auto">
-                <h3 class="text-2xl font-bold mb-6 text-center">Singles</h3>
-                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-                    <a href="https://links.0m-p.space/AfterDream/" target="_blank" class="block bg-white comic-border card-hover">
-                        <img src="AD.png" alt="After Dream 单曲封面" class="w-full h-auto aspect-square object-cover comic-border border-b-2">
-                        <p class="font-bold text-center p-4">After Dream</p>
-                    </a>
-                    <a href="https://linkco.re/XThrYXSs" target="_blank" class="block bg-white comic-border card-hover">
-                        <img src="inner_Cover.png" alt="inner 单曲封面" class="w-full h-auto aspect-square object-cover comic-border border-b-2">
-                        <p class="font-bold text-center p-4">inner</p>
-                    </a>
-                    <a href="https://linkco.re/gHE8PnXa" target="_blank" class="block bg-white comic-border card-hover">
-                        <img src="YNR.jpg" alt="You Need - Reloaded 单曲封面" class="w-full h-auto aspect-square object-cover comic-border border-b-2">
-                        <p class="font-bold text-center p-4">You Need - Reloaded</p>
-                    </a>
-                </div>
-                <h3 class="text-2xl font-bold mb-6 text-center">EP</h3>
-                <div class="max-w-sm mx-auto bg-white comic-border">
-                     <img src="EoLS_Cover.png" alt="EP 封面" class="w-full h-auto aspect-square object-cover comic-border border-b-2 opacity-60">
-                     <p class="font-bold text-center p-4 text-slate-500">Coming Soon</p>
-                </div>
-            </div>
-        </section>
-        
-        <!-- 6. ABOUT -->
-        <section class="scroll-animate">
-            <h2 class="section-title text-4xl md:text-5xl text-center mb-12">ABOUT</h2>
-            <div class="max-w-4xl mx-auto bg-white p-8 comic-border flex flex-col md:flex-row items-center gap-8">
-                <img src="avatar.png" alt="0M_P 头像" class="w-32 h-32 comic-border flex-shrink-0">
-                <div class="w-full">
-                    <h3 class="text-2xl font-bold">0M_P</h3>
-                    <p class="text-slate-600 mb-4">VOCALOID Producer since 2017</p>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-blue-600 font-bold">
-                        <a href="https://links.0m-p.space/" target="_blank" class="hover:underline">Links</a>
-                        <a href="https://space.bilibili.com/168264291" target="_blank" class="hover:underline">bilibili</a>
-                        <a href="https://www.tunecore.co.jp/artists/0M_P" target="_blank" class="hover:underline">TuneCore Japan</a>
-                        <a href="https://music.apple.com/jp/artist/1699342983" target="_blank" class="hover:underline">Apple Music</a>
-                        <a href="https://open.spotify.com/artist/2xPheCv27oLtbyjb7TsXd0" target="_blank" class="hover:underline">Spotify</a>
-                        <a href="http://music.163.com/artist?id=36284273" target="_blank" class="hover:underline">网易云音乐</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
+        <!-- Footer -->
+        <footer class="text-center text-sm text-slate-500 dark:text-slate-400 py-8">
+            <p>© 2025 0M_P. All rights reserved.</p>
+        </footer>
     </main>
 
-    <!-- 7. Footer -->
-    <footer class="text-center py-8 text-slate-500 text-sm">
-        <p>© 2025 0M_P ALL RIGHTS RESERVED.</p>
-    </footer>
-
     <script>
-        // JavaScript for scroll animations
-        document.addEventListener('DOMContentLoaded', () => {
-            const animatedElements = document.querySelectorAll('.scroll-animate');
+        // --- Theme Toggling Logic ---
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const htmlEl = document.documentElement;
 
-            if ('IntersectionObserver' in window) {
-                const observer = new IntersectionObserver((entries, observer) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('is-visible');
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                }, {
-                    threshold: 0.1 // Trigger when 10% of the element is visible
-                });
-
-                animatedElements.forEach(el => {
-                    observer.observe(el);
-                });
+        // Function to set theme
+        const setTheme = (theme) => {
+            if (theme === 'dark') {
+                htmlEl.classList.add('dark');
+                themeIcon.textContent = 'dark_mode';
+                localStorage.setItem('theme', 'dark');
             } else {
-                // Fallback for older browsers
-                animatedElements.forEach(el => {
-                    el.classList.add('is-visible');
-                });
+                htmlEl.classList.remove('dark');
+                themeIcon.textContent = 'light_mode';
+                localStorage.setItem('theme', 'light');
+            }
+        };
+
+        // Event listener for the toggle button
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = htmlEl.classList.contains('dark') ? 'dark' : 'light';
+            setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        });
+
+        // Initialize theme on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme) {
+                setTheme(savedTheme);
+            } else {
+                // If no theme is saved, use the system preference. Default is light.
+                setTheme(prefersDark ? 'dark' : 'light');
             }
         });
+
+        // --- Staggered Animation Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.card-animate');
+            cards.forEach((card, index) => {
+                // Apply a delay to each card to create a staggered effect
+                card.style.animationDelay = `${index * 100}ms`;
+                card.classList.add('fade-in-up');
+            });
+        });
+        
+        // --- Tailwind CSS Configuration ---
+        tailwind.config = {
+            darkMode: 'class', // Enable class-based dark mode
+            theme: {
+                extend: {
+                    // You can extend the theme here if needed
+                }
+            },
+            plugins: [
+                function({ addComponents }) {
+                    addComponents({
+                        '.link-button': {
+                            '@apply w-full p-4 bg-slate-100 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-500 text-center font-bold transition-all duration-300': {},
+                            '&:hover': {
+                                '@apply bg-[var(--theme-blue)] text-white border-[var(--theme-blue)] dark:border-[var(--theme-blue)] -translate-y-1': {},
+                                'box-shadow': '0 5px 0 0 rgba(0,0,0,0.2)',
+                            },
+                        }
+                    })
+                }
+            ]
+        }
     </script>
 
 </body>
