@@ -1,148 +1,181 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>After Dream | 0M_P</title>
-    <link href="https://fonts.googleapis.com/css2?family=SF+Pro:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Material Symbols for icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
     <style>
+        /* Custom styles for the page */
+        :root {
+            --theme-blue: #3b82f6; /* A nice, not-too-saturated blue */
+        }
+        
+        /* Define fonts and base styles */
         body {
-            font-family: 'SF Pro', sans-serif;
-            background: url('AD.png') center/cover no-repeat;
-            backdrop-filter: blur(10px);
-            margin: 0;
-            padding: 20px 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            color: #333;
+            font-family: 'Inter', 'Google Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
-        .container {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 18px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            max-width: 350px; /* Slightly wider than button width */
-            width: 90%;
-            padding: 20px;
-            text-align: center;
-            backdrop-filter: blur(10px);
+
+        /* Custom box-shadow for the "manga panel" effect */
+        .manga-shadow {
+            box-shadow: 5px 5px 0px 0px rgba(0,0,0,1);
         }
-        .dark-mode .container {
-            background: rgba(20, 20, 20, 0.9);
-            color: #fff;
+        .dark .manga-shadow {
+            box-shadow: 5px 5px 0px 0px var(--theme-blue);
         }
-        .cover img {
-            width: 300px;
-            height: auto;
-            border-radius: 18px;
-            margin: 30px 0 20px; /* Move cover down */
-            draggable: false; /* Disable image dragging */
-        }
-        h1 {
-            font-size: 24px;
-            font-weight: 600;
-            margin: 10px 0;
-        }
-        h2 {
-            font-size: 18px;
-            font-weight: 400;
-            margin-bottom: 20px;
-        }
-        .divider {
-            border-top: 1px solid #ccc;
-            margin: 20px 0;
-        }
-        .platform-buttons ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .platform-buttons li {
-            margin: 10px 0;
-        }
-        .platform-buttons a {
-            display: block;
-            padding: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            color: #000;
-            background-color: #f7f7f7;
-            border-radius: 18px;
-            text-decoration: none;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            text-align: left;
-            width: 300px; /* Match cover width */
-            margin: 0 auto;
-        }
-        .dark-mode .platform-buttons a {
-            background-color: #444;
-            color: #fff;
-        }
-        .platform-buttons a:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
-        }
-        .dark-mode .platform-buttons a:hover {
-            box-shadow: 0 4px 12px rgba(30, 144, 255, 0.7);
-        }
-        .footer {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #999;
-            line-height: 1.5; /* Space out lines */
-        }
-        @media (prefers-color-scheme: dark) {
-            body {
-                color: #fff;
+
+        /* Animation for cards appearing on load */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
             }
-            .container {
-                background: rgba(20, 20, 20, 0.9);
-                color: #fff;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
-            .platform-buttons a {
-                background-color: #444;
-                color: #fff;
-            }
+        }
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0; /* Start hidden */
+        }
+
+        /* Style for the Material Symbols icon */
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24
         }
     </style>
+</head>
+<body class="bg-slate-100 dark:bg-black text-slate-900 dark:text-slate-100 transition-colors duration-500">
+
+    <!-- Theme switcher button -->
+    <div class="fixed top-4 right-4 z-50">
+        <button id="theme-toggle" class="w-12 h-12 flex items-center justify-center bg-slate-200 dark:bg-slate-800 border border-slate-900 dark:border-slate-500 transition-all duration-300 hover:bg-slate-300 dark:hover:bg-slate-700 hover:scale-110">
+            <span class="material-symbols-outlined" id="theme-icon">light_mode</span>
+        </button>
+    </div>
+
+    <!-- Main container for all content -->
+    <main class="container mx-auto max-w-2xl p-4 sm:p-6 md:p-8">
+        <div class="space-y-8">
+            
+            <!-- Main Content Card -->
+            <section class="card-animate bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-200 manga-shadow transition-all duration-500">
+                <div class="flex flex-col items-center text-center p-8">
+                    <img src="AD.png" alt="After Dream Cover" class="w-48 h-48 sm:w-64 sm:h-64 object-cover border-2 border-slate-900 dark:border-slate-200" onerror="this.onerror=null;this.src='https://placehold.co/256x256/000000/FFFFFF?text=AD';">
+                    <h1 class="text-4xl font-black mt-6">After Dream</h1>
+                    <p class="mt-2 text-lg text-slate-600 dark:text-slate-400">0M_P feat. Hatsune Miku</p>
+                </div>
+
+                <div class="p-6 pt-0">
+                    <h2 class="text-xl font-bold text-center mb-4 border-b-2 border-slate-900 dark:border-slate-200 pb-2">LISTEN ON</h2>
+                    <div class="grid grid-cols-1 gap-3">
+                        <a href="https://music.apple.com" target="_blank" rel="noopener noreferrer" class="link-button">Apple Music</a>
+                        <a href="https://open.spotify.com/album/0vfGCotykDAJJE7qOF1fz5?go=1" target="_blank" rel="noopener noreferrer" class="link-button">Spotify</a>
+                        <a href="https://music.youtube.com/playlist?list=OLAK5uy_ntdCHMdwUAoo_Pz9vCcsaW-5GpFXbCixI&src=Linkfire&lId=84f40bf1-e372-4aa4-a6e3-ad7d4011a42d&cId=d3d58fd7-4c47-11e6-9fd0-066c3e7a8751" target="_blank" rel="noopener noreferrer" class="link-button">YouTube Music</a>
+                        <a href="https://music.apple.com" target="_blank" rel="noopener noreferrer" class="link-button">iTunes</a>
+                        <a href="https://www.boomplaymusic.com/share/album/107011123?srModel=Linkfire&srList=d6b538b66e17b1f455cef5b5d99d7a8e" target="_blank" rel="noopener noreferrer" class="link-button">Boomplay</a>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center text-sm text-slate-500 dark:text-slate-400 py-8 px-4">
+            <p>© 2025 0M_P All rights reserved.</p>
+            <p>℗ 2025 0M Production/0M_P, distributed by 秀動發行 ShowStart Release</p>
+        </footer>
+    </main>
+
     <script>
-        // Disable right-click
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
+        // --- Theme Toggling Logic ---
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const htmlEl = document.documentElement;
+
+        // Function to set theme
+        const setTheme = (theme) => {
+            if (theme === 'dark') {
+                htmlEl.classList.add('dark');
+                themeIcon.textContent = 'dark_mode';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                htmlEl.classList.remove('dark');
+                themeIcon.textContent = 'light_mode';
+                localStorage.setItem('theme', 'light');
+            }
+        };
+
+        // Event listener for the toggle button
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = htmlEl.classList.contains('dark') ? 'dark' : 'light';
+            setTheme(currentTheme === 'dark' ? 'light' : 'dark');
         });
 
-        // Disable F12 and developer tools
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J'))) {
-                e.preventDefault();
+        // Initialize theme on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme) {
+                setTheme(savedTheme);
+            } else {
+                // If no theme is saved, use the system preference. Default is light.
+                setTheme(prefersDark ? 'dark' : 'light');
             }
         });
-    </script>
-</head>
-<body>
-    <div class="container">
-        <div class="cover">
-            <img src="AD.png" alt="After Dream Cover">
-        </div>
-        <h1>After Dream</h1>
-        <h2>0M_P feat. Hatsune Miku</h2>
-        <div class="divider"></div>
-        <div class="platform-buttons">
-            <ul>
-                <li><a href="https://music.apple.com" target="_blank">Apple Music</a></li>
-                <li><a href="https://open.spotify.com/album/0vfGCotykDAJJE7qOF1fz5?go=1" target="_blank">Spotify</a></li>
-                <li><a href="https://music.youtube.com/playlist?list=OLAK5uy_ntdCHMdwUAoo_Pz9vCcsaW-5GpFXbCixI&src=Linkfire&lId=84f40bf1-e372-4aa4-a6e3-ad7d4011a42d&cId=d3d58fd7-4c47-11e6-9fd0-066c3e7a8751" target="_blank">YouTube Music</a></li>
-                <li><a href="https://music.apple.com" target="_blank">iTunes</a></li>
-                <li><a href="https://www.boomplaymusic.com/share/album/107011123?srModel=Linkfire&srList=d6b538b66e17b1f455cef5b5d99d7a8e" target="_blank">Boomplay</a></li>
 
-            </ul>
-        </div>
-        <div class="footer">
-            © 2025 0M_P All rights reserved.<br>
-            ℗ 2025 0M Production/0M_P, distributed by 秀動發行 ShowStart Release
-        </div>
-    </div>
+        // --- Staggered Animation Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.card-animate');
+            cards.forEach((card, index) => {
+                // Apply a delay to each card to create a staggered effect
+                card.style.animationDelay = `${index * 100}ms`;
+                card.classList.add('fade-in-up');
+            });
+        });
+        
+        // --- Tailwind CSS Configuration ---
+        tailwind.config = {
+            darkMode: 'class', // Enable class-based dark mode
+            theme: {
+                extend: {
+                    // You can extend the theme here if needed
+                }
+            },
+            plugins: [
+                function({ addComponents }) {
+                    addComponents({
+                        '.link-button': {
+                            '@apply w-full p-4 bg-slate-100 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-500 text-center font-bold transition-all duration-300': {},
+                            '&:hover': {
+                                '@apply bg-[var(--theme-blue)] text-white border-[var(--theme-blue)] dark:border-[var(--theme-blue)] -translate-y-1': {},
+                                'box-shadow': '0 5px 0 0 rgba(0,0,0,0.2)',
+                            },
+                        }
+                    })
+                }
+            ]
+        }
+    </script>
+
 </body>
 </html>
