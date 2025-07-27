@@ -1,328 +1,270 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>0M_P Link Aggregation</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/microsoft-fluentui/9.0.0/fluentui.min.css">
+    <title>0M_P feat. 初音ミク - 夏末回音 Echoes of Late Summer</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter and Noto Sans SC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
+    
     <style>
-        :root {
-            --bg-color: #f9f9f9;
-            --text-color: #000000;
-            --text-color-light: #555555;
-            --card-bg: #ffffff;
-            --button-bg: #3b82f6;
-            --button-hover-bg: #2563eb;
-            --button-active-bg: #93c5fd;
-        }
-
-        :root[data-theme="dark"] {
-            --bg-color: #121212;
-            --text-color: #ffffff;
-            --text-color-light: #bbbbbb;
-            --card-bg: #1e1e1e;
-            --button-bg: #1e3a8a;
-            --button-hover-bg: #1e40af;
-            --button-active-bg: #374151;
-        }
-
+        /* 基本样式和字体设置 */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: var(--bg-color);
-            color: var(--text-color);
-            transition: background 0.3s ease, color 0.3s ease;
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            background-color: #f8f9fa; /* 浅色背景 */
+            color: #1a202c; /* 深色文字 */
         }
 
-        .container {
-            max-width: 400px;
-            width: 100%;
-            padding: 20px;
-            display: grid;
-            gap: 20px;
-            margin-top: 39px;
-            margin-bottom: 40px;
+        /* 强制使用无圆角设计 */
+        * {
+            border-radius: 0 !important;
         }
 
-        .card {
-            background: var(--card-bg);
-            border-radius: 30px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            text-align: center;
+        /* 标题字体 */
+        .section-title {
+            font-family: 'Inter', 'Google Sans', sans-serif;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+        }
+        
+        /* 漫画风格边框 */
+        .comic-border {
+            border: 2px solid #1a202c;
         }
 
-        .avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            margin: 0 auto 10px auto;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        /* 动画效果：元素默认状态 */
+        .scroll-animate {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
-        .button {
-            display: inline-block;
-            width: 80%;
-            margin: 10px auto;
-            padding: 10px;
-            border: none;
-            border-radius: 15px;
-            background: var(--button-bg);
+        /* 动画效果：元素进入视窗后的状态 */
+        .scroll-animate.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 按钮样式 */
+        .theme-button {
+            background-color: #3b82f6; /* 主题蓝色 */
             color: white;
-            font-size: 16px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background 0.3s ease, transform 0.2s ease;
-        }
-
-        .button:hover {
-            background: var(--button-hover-bg);
-            transform: scale(1.05);
-        }
-
-        .copyright {
-            font-size: 12px;
-            color: var(--text-color-light);
-        }
-
-        .menu {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 10px 20px;
             text-align: center;
-        }
-
-        .menu button {
-            display: block;
-            margin: 5px 0;
-            padding: 10px;
-            width: 100%;
-            border: none;
-            border-radius: 10px;
-            background: var(--button-bg);
-            color: white;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s ease, transform 0.2s ease;
-        }
-
-        .menu button:hover {
-            background: var(--button-hover-bg);
-            transform: scale(1.05);
-        }
-
-        .menu button.active {
-            background: var(--button-active-bg);
-        }
-
-        .work-card {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .work-cover {
-            width: 100px;
-            height: 100px;
-            border-radius: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s ease;
-        }
-
-        .work-cover:hover {
-            transform: scale(1.05);
-        }
-
-        .work-info {
-            text-align: left;
-        }
-
-        .work-title {
-            font-size: 18px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: 2px solid #1a202c;
             font-weight: bold;
-            margin: 0;
-            color: var(--text-color);
-            text-decoration: none;
+            box-shadow: 4px 4px 0px #1a202c; /* 漫画风格阴影 */
         }
 
-        .work-title:hover {
-            text-decoration: underline;
+        .theme-button:hover {
+            background-color: #2563eb; /* 悬停时颜色加深 */
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #1a202c;
+        }
+        
+        .theme-button.disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+            box-shadow: 4px 4px 0px #6b7280;
+        }
+        .theme-button.disabled:hover {
+            background-color: #9ca3af;
+            transform: none;
+            box-shadow: 4px 4px 0px #6b7280;
         }
 
-        .work-date {
-            font-size: 14px;
-            color: var(--text-color-light);
+        /* 卡片悬停效果 */
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-
-        .floating-menu {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .floating-menu a {
-            display: block;
-            margin: 5px 0;
-            padding: 10px;
-            border: none;
-            border-radius: 10px;
-            background: var(--button-bg);
-            color: white;
-            text-align: center;
-            text-decoration: none;
-            font-size: 14px;
-            transition: background 0.3s ease, transform 0.2s ease;
-        }
-
-        .floating-menu a:hover {
-            background: var(--button-hover-bg);
-            transform: scale(1.05);
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
     </style>
 </head>
-<body>
-    <div class="menu">
-        <button id="darkModeBtn" onclick="setDarkMode()">深色模式</button>
-        <button id="lightModeBtn" onclick="setLightMode()">浅色模式</button>
-        <button id="autoModeBtn" onclick="setAutoMode()">自动模式</button>
-    </div>
+<body class="bg-slate-100">
 
-    <div class="container">
-        <div class="card">
-            <img src="Avatar.png" alt="0M_P Avatar" class="avatar">
-            <h2>0M_P</h2>
+    <!-- 1. 封面 + 大标题 -->
+    <header class="bg-white w-full min-h-screen flex flex-col items-center justify-center p-8 scroll-animate">
+        <div class="text-center">
+            <img src="EoLS_Cover.png" alt="夏末回音 EP 封面" class="w-full max-w-sm md:max-w-md mx-auto comic-border shadow-xl">
+            <img src="EoLS_Logo.png" alt="夏末回音 Logo" class="w-full max-w-md md:max-w-lg mx-auto mt-8">
         </div>
+    </header>
 
-        <div class="card">
-            <h2>New Release</h2>
-            <div class="work-card">
-                <a href="https://links.0m-p.space/AfterDream/" target="_blank">
-                    <img src="AD.png" alt="After Dream" class="work-cover">
-                </a>
-                <div class="work-info">
-                    <a href="https://links.0m-p.space/AfterDream/" target="_blank" class="work-title">After Dream</a>
-                    <p class="work-date">Release Date: 2025-03-09</p>
+    <main class="container mx-auto px-4 md:px-8 py-16 space-y-24">
+
+        <!-- 2. EDITIONS -->
+        <section class="scroll-animate">
+            <h2 class="section-title text-4xl md:text-5xl text-center mb-12">EDITIONS</h2>
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <!-- 数字版 -->
+                <div class="bg-white p-8 comic-border flex flex-col">
+                    <h3 class="text-2xl font-bold mb-4">数字版</h3>
+                    <p class="text-slate-600 mb-2">Hi-Res Audio</p>
+                    <p class="text-slate-600 mb-6 font-bold">免费公开</p>
+                    <div class="mt-auto">
+                        <a href="http://links.0m-p.space/ReWind" target="_blank" class="theme-button block">获取</a>
+                    </div>
+                </div>
+                <!-- 实体版 -->
+                <div class="bg-white p-8 comic-border flex flex-col">
+                    <h3 class="text-2xl font-bold mb-4">实体版</h3>
+                    <p class="text-slate-600 mb-2">1 CD</p>
+                    <p class="text-slate-600 mb-6 font-bold">39 RMB <span class="text-sm">(不包含邮费)</span></p>
+                    <div class="mt-auto">
+                        <a href="http://links.0m-p.space/ReWind_CD" target="_blank" class="theme-button block">购买</a>
+                    </div>
                 </div>
             </div>
-<div><br></div>
-            <div class="work-card">
-                <a href="https://linkco.re/XThrYXSs" target="_blank">
-                    <img src="inner_Cover.png" alt="inner" class="work-cover">
+        </section>
+
+        <!-- 3. TRACK LIST -->
+        <section class="scroll-animate">
+            <h2 class="section-title text-4xl md:text-5xl text-center mb-12">TRACK LIST</h2>
+            <div class="max-w-4xl mx-auto bg-white p-8 md:p-12 comic-border">
+                <ol class="space-y-6">
+                    <li class="border-b-2 border-dashed border-slate-300 pb-4">
+                        <p class="font-bold text-lg">01. Memories Here</p>
+                        <p class="text-sm text-slate-500">Music & Arrangement : 0M_P</p>
+                    </li>
+                    <li class="border-b-2 border-dashed border-slate-300 pb-4">
+                        <p class="font-bold text-lg">02. Summer is Coming</p>
+                        <p class="text-sm text-slate-500">Lyrics, Music & Arrangement : 0M_P, Vocal : 初音ミク</p>
+                    </li>
+                    <li class="border-b-2 border-dashed border-slate-300 pb-4">
+                        <p class="font-bold text-lg">03. After Dream</p>
+                        <p class="text-sm text-slate-500">Lyrics, Music & Arrangement : 0M_P, Vocal : 初音ミク</p>
+                    </li>
+                    <li class="border-b-2 border-dashed border-slate-300 pb-4">
+                        <p class="font-bold text-lg">04. inner</p>
+                        <p class="text-sm text-slate-500">Lyrics, Music & Arrangement : 0M_P, Synthesizer Arrangement : HoT, Vocal : 初音ミク</p>
+                    </li>
+                    <li class="border-b-2 border-dashed border-slate-300 pb-4">
+                        <p class="font-bold text-lg">05. Back to Summer</p>
+                        <p class="text-sm text-slate-500">Lyrics, Music & Arrangement : 0M_P, Vocal : 初音ミク</p>
+                    </li>
+                    <li class="border-b-2 border-dashed border-slate-300 pb-4">
+                        <p class="font-bold text-lg">06. After Dream - Life Remix</p>
+                        <p class="text-sm text-slate-500">Lyrics, Music & Remix : 0M_P, Vocal : 初音ミク</p>
+                    </li>
+                    <li class="border-b-2 border-dashed border-slate-300 pb-4">
+                        <p class="font-bold text-lg">07. You Need - Reloaded</p>
+                        <p class="text-sm text-slate-500">Lyrics, Music & Arrangement : 0M_P, Vocal : 初音ミク</p>
+                    </li>
+                    <li>
+                        <p class="font-bold text-lg">08. Always Your Birthday</p>
+                        <p class="text-sm text-slate-500">Lyrics, Music & Arrangement : 0M_P, Synthesizer Arrangement : HoT, Vocal : 初音ミク</p>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- 4. MOVIES -->
+        <section class="scroll-animate">
+            <h2 class="section-title text-4xl md:text-5xl text-center mb-12">MOVIES</h2>
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <a href="https://www.bilibili.com/video/BV1u1fvYKETw/" target="_blank" class="block bg-white comic-border card-hover">
+                    <img src="AfterDream_MVCover.jpg" alt="After Dream MV 封面" class="w-full h-auto comic-border border-b-2">
+                    <p class="font-bold text-center p-4">After Dream</p>
                 </a>
-                <div class="work-info">
-                    <a href="https://linkco.re/XThrYXSs" target="_blank" class="work-title">inner</a>
-                    <p class="work-date">Release Date: 2025-02-25</p>
+                <div class="bg-white comic-border">
+                    <img src="EoLS_XFD.png" alt="CrossFade Video 封面" class="w-full h-auto comic-border border-b-2 opacity-60">
+                    <p class="font-bold text-center p-4 text-slate-500">CrossFade Video (Coming Soon)</p>
                 </div>
             </div>
-         </div>
+        </section>
 
-        <div class="card">
-            <h2>Links</h2>
-            <a href="https://www.0m-p.space/" target="_blank" class="button">Official Site</a>
-            <a href="https://space.bilibili.com/168264291" target="_blank" class="button">Bilibili</a>
-            <a href="https://www.tunecore.co.jp/artists/0M_P" target="_blank" class="button">TuneCore Japan</a>
-            <a href="https://youtube.com/@0M_P" target="_blank" class="button">YouTube</a>
-            <a href="https://music.apple.com/jp/artist/1699342983" target="_blank" class="button">Apple Music</a>
-            <a href="https://open.spotify.com/artist/2xPheCv27oLtbyjb7TsXd0" target="_blank" class="button">Spotify</a>
-            <a href="http://music.163.com/artist?id=36284273" target="_blank" class="button">网易云音乐</a>
-            <a href="https://twitter.com/0M_P_39" target="_blank" class="button">X (Twitter)</a>
-            <a href="mailto:coiko39@gmail.com" class="button">E-mail</a>
-            <a href="tencent://Message/?uin=1164266078" class="button">QQ</a>
-            <a href="https://links.0m-p.space/MusicPlayer/" class="button">Apple Music Style Player</a>
-            <a href="https://links.0m-p.space/Timer/" class="button">College Entrance Exam Countdown</a>
-            <a href="https://links.0m-p.space/GPA/" class="button">GPA Calculator</a>
-        </div>
-
-        <div class="card">
-            <h2>Works</h2>
-            <div class="work-card">
-                <a href="https://links.0m-p.space/GoodNightRe/" target="_blank">
-                    <img src="GNR.jpg" alt="Good Night - Reloaded" class="work-cover">
-                </a>
-                <div class="work-info">
-                    <a href="https://links.0m-p.space/GoodNightRe/" target="_blank" class="work-title">Good Night - Reloaded</a>
-                    <p class="work-date">Release Date: 2024-05-01</p>
+        <!-- 5. STREAMING -->
+        <section class="scroll-animate">
+            <h2 class="section-title text-4xl md:text-5xl text-center mb-12">STREAMING</h2>
+            <div class="max-w-5xl mx-auto">
+                <h3 class="text-2xl font-bold mb-6 text-center">Singles</h3>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                    <a href="https://links.0m-p.space/AfterDream/" target="_blank" class="block bg-white comic-border card-hover">
+                        <img src="AD.png" alt="After Dream 单曲封面" class="w-full h-auto aspect-square object-cover comic-border border-b-2">
+                        <p class="font-bold text-center p-4">After Dream</p>
+                    </a>
+                    <a href="https://linkco.re/XThrYXSs" target="_blank" class="block bg-white comic-border card-hover">
+                        <img src="inner_Cover.png" alt="inner 单曲封面" class="w-full h-auto aspect-square object-cover comic-border border-b-2">
+                        <p class="font-bold text-center p-4">inner</p>
+                    </a>
+                    <a href="https://linkco.re/gHE8PnXa" target="_blank" class="block bg-white comic-border card-hover">
+                        <img src="YNR.jpg" alt="You Need - Reloaded 单曲封面" class="w-full h-auto aspect-square object-cover comic-border border-b-2">
+                        <p class="font-bold text-center p-4">You Need - Reloaded</p>
+                    </a>
+                </div>
+                <h3 class="text-2xl font-bold mb-6 text-center">EP</h3>
+                <div class="max-w-sm mx-auto bg-white comic-border">
+                     <img src="EoLS_Cover.png" alt="EP 封面" class="w-full h-auto aspect-square object-cover comic-border border-b-2 opacity-60">
+                     <p class="font-bold text-center p-4 text-slate-500">Coming Soon</p>
                 </div>
             </div>
-            <div class="work-card">
-                <a href="https://links.0m-p.space/YouNeedReloaded/" target="_blank">
-                    <img src="YNR.jpg" alt="You Need - Reloaded" class="work-cover">
-                </a>
-                <div class="work-info">
-                    <a href="https://links.0m-p.space/YouNeedReloaded/" target="_blank" class="work-title">You Need - Reloaded</a>
-                    <p class="work-date">Release Date: 2024-08-31</p>
+        </section>
+        
+        <!-- 6. ABOUT -->
+        <section class="scroll-animate">
+            <h2 class="section-title text-4xl md:text-5xl text-center mb-12">ABOUT</h2>
+            <div class="max-w-4xl mx-auto bg-white p-8 comic-border flex flex-col md:flex-row items-center gap-8">
+                <img src="avatar.png" alt="0M_P 头像" class="w-32 h-32 comic-border flex-shrink-0">
+                <div class="w-full">
+                    <h3 class="text-2xl font-bold">0M_P</h3>
+                    <p class="text-slate-600 mb-4">VOCALOID Producer since 2017</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-blue-600 font-bold">
+                        <a href="https://links.0m-p.space/" target="_blank" class="hover:underline">Links</a>
+                        <a href="https://space.bilibili.com/168264291" target="_blank" class="hover:underline">bilibili</a>
+                        <a href="https://www.tunecore.co.jp/artists/0M_P" target="_blank" class="hover:underline">TuneCore Japan</a>
+                        <a href="https://music.apple.com/jp/artist/1699342983" target="_blank" class="hover:underline">Apple Music</a>
+                        <a href="https://open.spotify.com/artist/2xPheCv27oLtbyjb7TsXd0" target="_blank" class="hover:underline">Spotify</a>
+                        <a href="http://music.163.com/artist?id=36284273" target="_blank" class="hover:underline">网易云音乐</a>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="card">
-            <div class="copyright">
-                Developed with ChatGPT<br>
-                &copy; 2025 0M_P. All rights reserved.
-            </div>
-        </div>
-    </div>
+        </section>
 
-    <div class="floating-menu">
-        <a href="#" onclick="scrollToTop()">Top</a>
-        <a href="#" onclick="scrollToSection('Links')">Links</a>
-        <a href="#" onclick="scrollToSection('Works')">Works</a>
-    </div>
+    </main>
+
+    <!-- 7. Footer -->
+    <footer class="text-center py-8 text-slate-500 text-sm">
+        <p>© 2025 0M_P ALL RIGHTS RESERVED.</p>
+    </footer>
 
     <script>
-        function setDarkMode() {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            updateActiveMode('darkModeBtn');
-        }
+        // JavaScript for scroll animations
+        document.addEventListener('DOMContentLoaded', () => {
+            const animatedElements = document.querySelectorAll('.scroll-animate');
 
-        function setLightMode() {
-            document.documentElement.setAttribute('data-theme', 'light');
-            updateActiveMode('lightModeBtn');
-        }
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    threshold: 0.1 // Trigger when 10% of the element is visible
+                });
 
-        function setAutoMode() {
-            document.documentElement.removeAttribute('data-theme');
-            updateActiveMode('autoModeBtn');
-        }
-
-        function updateActiveMode(activeButtonId) {
-            document.querySelectorAll('.menu button').forEach(button => {
-                button.classList.remove('active');
-            });
-            document.getElementById(activeButtonId).classList.add('active');
-        }
-
-        function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function scrollToSection(section) {
-            const target = Array.from(document.querySelectorAll('h2')).find(h => h.textContent === section);
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-
-        // Ensure correct theme on page load based on system preferences
-        window.addEventListener('DOMContentLoaded', () => {
-            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                setDarkMode();
+                animatedElements.forEach(el => {
+                    observer.observe(el);
+                });
             } else {
-                setLightMode();
+                // Fallback for older browsers
+                animatedElements.forEach(el => {
+                    el.classList.add('is-visible');
+                });
             }
         });
     </script>
+
 </body>
 </html>
